@@ -28,16 +28,16 @@ spec:
             from orquestra.qcbm.ansatz import generate_random_initial_params
             from orquestra.core.circuit import save_circuit_template_params
 
-            n_qubits = {{inputs.parameters.n-qubits}}
-            n_layers = {{inputs.parameters.n-layers}}
-            topology = {{inputs.parameters.topology}}
-            min_val = {{inputs.parameters.min-val}}
-            max_val = {{inputs.parameters.max-val}}
-            n_par = {{inputs.parameters.n-par}}
-            seed = {{inputs.parameters.seed}}
+            n_qubits = "{{inputs.parameters.n-qubits}}"
+            n_layers = "{{inputs.parameters.n-layers}}"
+            topology = "{{inputs.parameters.topology}}"
+            min_val = "{{inputs.parameters.min-val}}"
+            max_val = "{{inputs.parameters.max-val}}"
+            n_par = "{{inputs.parameters.n-par}}"
+            seed = "{{inputs.parameters.seed}}"
 
             parameters = generate_random_initial_params(n_qubits, n_layers=n_layers, 
-                  topology=toplogy, min_val=0., max_val=1., n_par=0, seed=None)
+                  topology=topology, min_val=min_val, max_val=max_val, n_par=n_par, seed=seed)
 
             save_circuit_template_params(parameters, "parameters.json")
     outputs:
@@ -85,17 +85,17 @@ spec:
             from orquestra.optimizers.utils import save_optimization_results
             from orquestra.core.bitstring_distribution import load_bitstring_distribution
 
-            n_qubits = {{inputs.parameters.n-qubits}}
-            single_qubit_gate = {{inputs.parameters.single-qubit-gate}}
-            static_entangler = {{inputs.parameters.static-entangler}}
-            topology = {{inputs.parameters.topology}}
-            epsilon = {{inputs.parameters.epsilon}}
-            distance_measure = {{inputs.parameters.distance-measure}}
+            n_qubits = "{{inputs.parameters.n-qubits}}"
+            single_qubit_gate = "{{inputs.parameters.single-qubit-gate}}"
+            static_entangler = "{{inputs.parameters.static-entangler}}"
+            topology = "{{inputs.parameters.topology}}"
+            epsilon = "{{inputs.parameters.epsilon}}"
+            distance_measure = "{{inputs.parameters.distance-measure}}"
 
-            backend_specs = {{inputs.parameters.backend-specs}}
+            backend_specs = "{{inputs.parameters.backend-specs}}"
             backend = create_object(backend_specs)
 
-            optimizer_specs = {{inputs.parameters.optimizer-specs}}
+            optimizer_specs = "{{inputs.parameters.optimizer-specs}}"
             optimizer = create_object(optimizer_specs)
 
             initial_params = load_circuit_template_params("initial-parameters.json")
