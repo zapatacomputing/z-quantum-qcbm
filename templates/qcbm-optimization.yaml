@@ -92,10 +92,10 @@ spec:
             epsilon = {{inputs.parameters.epsilon}}
             distance_measure = "{{inputs.parameters.distance-measure}}"
 
-            backend_specs = "{{inputs.parameters.backend-specs}}"
+            backend_specs = {{inputs.parameters.backend-specs}}
             backend = create_object(backend_specs)
 
-            optimizer_specs = "{{inputs.parameters.optimizer-specs}}"
+            optimizer_specs = {{inputs.parameters.optimizer-specs}}
             optimizer = create_object(optimizer_specs)
 
             initial_params = load_circuit_template_params("initial-parameters.json")
