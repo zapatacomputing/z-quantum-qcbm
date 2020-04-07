@@ -1,0 +1,100 @@
+ZapOSApiVersion: v1alpha1
+kind: Workflow
+
+resources:
+- name: open-pack-core
+  type: git
+  parameters:
+    url: "git@github.com:zapatacomputing/open-pack-core.git"
+    branch: "172181981-bitstring-distribution"
+- name: open-pack-qcbm
+  type: git
+  parameters:
+    url: "git@github.com:zapatacomputing/open-pack-qcbm.git"
+    branch: "master"
+- name: open-pack-optimizers
+  type: git
+  parameters:
+    url: "git@github.com:zapatacomputing/open-pack-optimizers.git"
+    branch: "master"
+- name: open-pack-forest
+  type: git
+  parameters:
+    url: "git@github.com:zapatacomputing/open-pack-forest.git"
+    branch: "172181981-bitstring-dist-test"
+- name: open-pack-qhipster
+  type: git
+  parameters:
+    url: "git@github.com:zapatacomputing/open-pack-qhipster.git"
+    branch: "master"
+- name: qe-openfermion
+  type: git
+  parameters:
+    url: "git@github.com:zapatacomputing/qe-openfermion.git"
+    branch: "master"
+
+# Specify the prefix to use when generating names of workflow executions.
+metadata:
+  generateName: qcbm-opt-
+
+# The actual workflow specification
+spec:
+
+  entrypoint: main
+  arguments:
+    parameters:
+    - s3-bucket: quantum-engine
+    - s3-key: projects/open-pack-qcbm/qcbm-opt
+    - docker-image: 'open_pack_default'
+
+  templates:
+
+  - name: main
+    steps:
+    - - name: get-initial-parameters
+        template: generate-random-qcbm-params
+        arguments:
+          parameters:
+          - n-qubits: "4"
+          - seed: "1234"
+          - n-layers: "3"
+          - min-val: "-1.57"
+          - max-val: "1.57"
+          - resources: [open-pack-core, open-pack-qcbm]
+          - docker-image: "{{workflow.parameters.docker-image}}"
+    - - name: optimize-circuit
+        template: optimize-variational-qcbm-circuit
+        arguments:
+          parameters:
+          - n-qubits: "4"
+          - single-qubit-gate: "Rx"
+          - static-entangler: "XX"
+          - epsilon: "0.000001"
+          - backend-specs: "{'module_name': 'orquestra.forest.simulator', 'function_name': 'ForestSimulator', 'device_name': 'wavefunction-simulator', 'n_samples': 1000}"
+          - optimizer-specs: "{'module_name': 'orquestra.optimizers.scipy_optimizer', 'function_name': 'ScipyOptimizer', 'method': 'L-BFGS-B'}"
+          - resources: [open-pack-core, qe-openfermion, open-pack-optimizers, open-pack-forest, open-pack-qcbm]
+          - docker-image: "{{workflow.parameters.docker-image}}"
+          - memory: 2048Mi
+          artifacts:
+          - initial-parameters:
+              from: "{{steps.get-initial-parameters.outputs.artifacts.parameters}}"
+          - target-distribution:
+              raw:
+                data: |
+                  {"bitstring_distribution": {"0000": 1.0,
+                                              "0001": 0.0,
+                                              "0010": 0.0,
+                                              "0011": 1.0,
+                                              "0100": 0.0,
+                                              "0101": 1.0,
+                                              "0110": 0.0,
+                                              "0111": 0.0,
+                                              "1000": 0.0,
+                                              "1001": 0.0,
+                                              "1010": 1.0,
+                                              "1011": 0.0,
+                                              "1100": 1.0,
+                                              "1101": 0.0,
+                                              "1110": 0.0,
+                                              "1111": 1.0},
+                    "schema": "io-ZapOS-v1alpha1-bitstring-distribution"}
