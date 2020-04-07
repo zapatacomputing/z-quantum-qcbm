@@ -1,0 +1,117 @@
+spec:
+  templates:
+
+  - name: generate-random-qcbm-params
+    parent: generic-task
+    inputs:
+      parameters:
+      - name: n-qubits
+      - name: n-layers
+        default: "1"
+      - name: topology
+        default: "all"
+      - name: min-val
+        default: "0."
+      - name: max-val
+        default: "1."
+      - name: n-par
+        default: "0"
+      - name: seed
+        default: "None"
+      - name: command
+        value: python3 main_script.py
+      artifacts:
+      - name: main-script
+        path: /app/main_script.py
+        raw:
+          data: |
+            from orquestra.qcbm.ansatz import generate_random_initial_params
+            from orquestra.core.circuit import save_circuit_template_params
+
+            n_qubits = {{inputs.parameters.n-qubits}}
+            n_layers = {{inputs.parameters.n-layers}}
+            topology = {{inputs.parameters.topology}}
+            min_val = {{inputs.parameters.min-val}}
+            max_val = {{inputs.parameters.max-val}}
+            n_par = {{inputs.parameters.n-par}}
+            seed = {{inputs.parameters.seed}}
+
+            parameters = generate_random_initial_params(n_qubits, n_layers=n_layers, 
+                  topology=toplogy, min_val=0., max_val=1., n_par=0, seed=None)
+
+            save_circuit_template_params(parameters, "parameters.json")
+    outputs:
+      artifacts:
+      - name: parameters
+        path: /app/parameters.json
+      
+
+  - name: optimize-variational-qcbm-circuit
+    parent: generic-task
+    inputs:
+      parameters:
+      - name: n-qubits
+      - name: single-qubit-gate
+      - name: static-entangler
+      - name: topology
+        default: "all"
+      - name: epsilon
+      - name: distance-measure
+        default: "clipped_log_likelihood"
+      - name: backend-specs
+      - name: optimizer-specs
+      - name: command
+        value: bash main_script.sh
+      artifacts:
+      - name: initial-parameters
+        path: /app/initial-parameters.json
+      - name: target-distribution
+        path: /app/target-distribution.json
+      - name: main-script
+        path: /app/main_script.sh
+        raw:
+          data: |
+            qvm -S &
+            quilc -S &
+            source /app/usr/local/bin/compilers_and_libraries.sh
+            python3 python_script.py
+      - name: python-script
+        path: /app/python_script.py
+        raw:
+          data: |
+            from orquestra.qcbm.optimization import optimize_variational_qcbm_circuit
+            from orquestra.core.circuit import load_circuit_template_params, save_circuit_template_params
+            from orquestra.core.utils import create_object
+            from orquestra.optimizers.utils import save_optimization_results
+            from orquestra.core.bitstring_distribution import load_bitstring_distribution
+
+            n_qubits = {{inputs.parameters.n-qubits}}
+            single_qubit_gate = {{inputs.parameters.single-qubit-gate}}
+            static_entangler = {{inputs.parameters.static-entangler}}
+            topology = {{inputs.parameters.topology}}
+            epsilon = {{inputs.parameters.epsilon}}
+            distance_measure = {{inputs.parameters.distance-measure}}
+
+            backend_specs = {{inputs.parameters.backend-specs}}
+            backend = create_object(backend_specs)
+
+            optimizer_specs = {{inputs.parameters.optimizer-specs}}
+            optimizer = create_object(optimizer_specs)
+
+            initial_params = load_circuit_template_params("initial-parameters.json")
+            target_distribution = load_bitstring_distribution("target-distribution.json")
+
+            opt_results = optimize_variational_qcbm_circuit(n_qubits,
+                single_qubit_gate, static_entangler, topology, epsilon, initial_params,
+                distance_measure, backend, optimizer,
+                target_distribution)
+
+            save_optimization_results(opt_results, "optimization-results.json")
+            save_circuit_template_params(opt_results.opt_params, "optimized-parameters.json")
+    outputs:
+      artifacts:
+      - name: optimization-results
+        path: /app/optimization-results.json
+      - name: optimized-parameters
+        path: /app/optimized-parameters.json
+      
