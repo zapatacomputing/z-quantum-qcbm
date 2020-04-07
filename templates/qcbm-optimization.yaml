@@ -85,11 +85,11 @@ spec:
             from orquestra.optimizers.utils import save_optimization_results
             from orquestra.core.bitstring_distribution import load_bitstring_distribution
 
-            n_qubits = "{{inputs.parameters.n-qubits}}"
+            n_qubits = {{inputs.parameters.n-qubits}}
             single_qubit_gate = "{{inputs.parameters.single-qubit-gate}}"
             static_entangler = "{{inputs.parameters.static-entangler}}"
             topology = "{{inputs.parameters.topology}}"
-            epsilon = "{{inputs.parameters.epsilon}}"
+            epsilon = {{inputs.parameters.epsilon}}
             distance_measure = "{{inputs.parameters.distance-measure}}"
 
             backend_specs = "{{inputs.parameters.backend-specs}}"
