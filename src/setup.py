@@ -22,6 +22,5 @@ setuptools.setup(
     ),
     install_requires=[
         'orquestra-core',
-        'orquestra-optimizers'
     ]
 )
