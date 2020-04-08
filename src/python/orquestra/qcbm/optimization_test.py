@@ -7,7 +7,7 @@ import subprocess
 from .ansatz import build_qcbm_circuit_ion_trap, generate_random_initial_params
 from .optimization import optimize_variational_qcbm_circuit
 
-from orquestra.core.bitstring_distribution import BitstringDistribution #, create_bitstring_distribution_from_measurements, evaluate_cost_function, create_bitstring_distribution_from_probability_distribution, load_bitstring_distribution
+from orquestra.core.bitstring_distribution import BitstringDistribution 
 from orquestra.core.utils import ValueEstimate, RNDSEED
 from orquestra.forest import ForestSimulator
 from orquestra.optimizers import ScipyOptimizer
@@ -23,6 +23,7 @@ class TestQCBM(unittest.TestCase):
              "1001": 0.0, "1010": 1.0, "1011": 0.0,
              "1100": 1.0, "1101": 0.0, "1110": 0.0,
              "1111": 1.0})
+
 
     def test_qcbm_set_initial_params_scipy_forest(self):
         num_qubits = 4
@@ -41,8 +42,6 @@ class TestQCBM(unittest.TestCase):
             distance_measure, simulator, optimizer,
             self.target_distribution)
 
-        # print("optimization value: {}".format(opt_result))
-
         expected_opt_result = {
             "fun": 1.7917594694188614,
             "nfev": 300,
@@ -57,6 +56,7 @@ class TestQCBM(unittest.TestCase):
         self.assertAlmostEqual(expected_opt_result["opt_value"], opt_result["opt_value"])
         self.assertAlmostEqual(expected_opt_result["status"], opt_result["status"])
         self.assertAlmostEqual(expected_opt_result["success"], opt_result["success"])
+
 
     def test_qcbm_set_initial_params_scipy_forest_sampling(self):
         num_qubits = 4
@@ -75,10 +75,10 @@ class TestQCBM(unittest.TestCase):
             distance_measure, simulator, optimizer,
             self.target_distribution)
 
-        expected_opt_result = {
-            "status": 0,
-            "success": True}
-
-        self.assertAlmostEqual(expected_opt_result["status"], opt_result["status"])
-        self.assertAlmostEqual(expected_opt_result["success"], opt_result["success"])
-
+        self.assertIn("fun", opt_result.keys())
+        self.assertIn("nfev", opt_result.keys())
+        self.assertIn("nit", opt_result.keys())
+        self.assertIn("opt_value", opt_result.keys())
+        self.assertIn("status", opt_result.keys())
+        self.assertIn("success", opt_result.keys())
+        self.assertIn("opt_params", opt_result.keys())
