@@ -27,7 +27,7 @@ def optimize_variational_qcbm_circuit(n_qubits, single_qubit_gate,
                     n_qubits, params, single_qubit_gate, static_entangler,
                     topology=topology)
 
-        measured_distr = backend.get_bitstring_distributrion(qcbm_circuit)
+        measured_distr = backend.get_bitstring_distribution(qcbm_circuit)
 
         value_estimate = ValueEstimate(evaluate_distribution_distance(
                                             target_bitstring_distribution,
