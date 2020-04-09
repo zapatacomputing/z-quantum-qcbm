@@ -71,6 +71,7 @@ spec:
           - static-entangler: "XX"
           - epsilon: "0.000001"
           - backend-specs: "{'module_name': 'orquestra.forest.simulator', 'function_name': 'ForestSimulator', 'device_name': 'wavefunction-simulator', 'n_samples': 1000}"
+          # - optimizer-specs: "{'module_name': 'orquestra.optimizers.cma_es_optimizer', 'function_name': 'CMAESOptimizer', 'options': {'popsize': 5, 'sigma_0': 0.1}}"
           - optimizer-specs: "{'module_name': 'orquestra.optimizers.scipy_optimizer', 'function_name': 'ScipyOptimizer', 'method': 'L-BFGS-B'}"
           - resources: [open-pack-core, qe-openfermion, open-pack-optimizers, open-pack-forest, open-pack-qcbm]
           - docker-image: "{{workflow.parameters.docker-image}}"
