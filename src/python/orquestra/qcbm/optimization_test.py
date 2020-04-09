@@ -35,7 +35,7 @@ class TestQCBM(unittest.TestCase):
         distance_measure = "clipped_log_likelihood"
 
         simulator = ForestSimulator("wavefunction-simulator")
-        optimizer = ScipyOptimizer(method="L-BFGS-B")
+        optimizer = ScipyOptimizer(method="L-BFGS-B", options={'keep_value_history': True})
 
         opt_result = optimize_variational_qcbm_circuit(num_qubits,
             single_qubit_gate, static_entangler, topology, epsilon, initial_params,
@@ -56,6 +56,12 @@ class TestQCBM(unittest.TestCase):
         self.assertAlmostEqual(expected_opt_result["opt_value"], opt_result["opt_value"])
         self.assertAlmostEqual(expected_opt_result["status"], opt_result["status"])
         self.assertAlmostEqual(expected_opt_result["success"], opt_result["success"])
+        self.assertIn("history", opt_result.keys())
+
+        for evaluation in opt_result['history']:
+            self.assertIn("bitstring_distribution", evaluation.keys())
+            self.assertIn("value", evaluation.keys())
+            self.assertIn("params", evaluation.keys())
 
 
     def test_qcbm_set_initial_params_scipy_forest_sampling(self):
@@ -82,3 +88,4 @@ class TestQCBM(unittest.TestCase):
         self.assertIn("status", opt_result.keys())
         self.assertIn("success", opt_result.keys())
         self.assertIn("opt_params", opt_result.keys())
+        self.assertIn("history", opt_result.keys())

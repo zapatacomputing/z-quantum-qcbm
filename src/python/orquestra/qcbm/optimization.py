@@ -21,6 +21,8 @@ def optimize_variational_qcbm_circuit(n_qubits, single_qubit_gate,
         target_bitstring_distribution : See evaluate_distribution_distance.
     Returns:
     """
+    distribution_history = []
+
     def cost_function(params):
         # Build the ansatz circuit
         qcbm_circuit = build_qcbm_circuit_ion_trap(
@@ -28,6 +30,8 @@ def optimize_variational_qcbm_circuit(n_qubits, single_qubit_gate,
                     topology=topology)
 
         measured_distr = backend.get_bitstring_distribution(qcbm_circuit)
+
+        distribution_history.append(measured_distr)
 
         value_estimate = ValueEstimate(evaluate_distribution_distance(
                                             target_bitstring_distribution,
@@ -38,5 +42,8 @@ def optimize_variational_qcbm_circuit(n_qubits, single_qubit_gate,
         return value_estimate.value
 
     optimization_results = optimizer.minimize(cost_function, initial_params)
-    return optimization_results
 
+    for i, evaluation in enumerate(optimization_results['history']):
+        evaluation['bitstring_distribution'] = distribution_history[i].distribution_dict
+
+    return optimization_results
