@@ -6,22 +6,22 @@ resources:
   type: git
   parameters:
     url: "git@github.com:zapatacomputing/open-pack-core.git"
-    branch: "172181981-bitstring-distribution"
+    branch: "master"
 - name: open-pack-qcbm
   type: git
   parameters:
     url: "git@github.com:zapatacomputing/open-pack-qcbm.git"
-    branch: "master"
+    branch: "172246562-bitstring-dist-history"
 - name: open-pack-optimizers
   type: git
   parameters:
     url: "git@github.com:zapatacomputing/open-pack-optimizers.git"
-    branch: "master"
+    branch: "172246562-bitstring-dist-history"
 - name: open-pack-forest
   type: git
   parameters:
     url: "git@github.com:zapatacomputing/open-pack-forest.git"
-    branch: "172181981-bitstring-dist-test"
+    branch: "master"
 - name: open-pack-qhipster
   type: git
   parameters:
@@ -70,9 +70,9 @@ spec:
           - single-qubit-gate: "Rx"
           - static-entangler: "XX"
           - epsilon: "0.000001"
-          - backend-specs: "{'module_name': 'orquestra.forest.simulator', 'function_name': 'ForestSimulator', 'device_name': 'wavefunction-simulator', 'n_samples': 1000}"
-          # - optimizer-specs: "{'module_name': 'orquestra.optimizers.cma_es_optimizer', 'function_name': 'CMAESOptimizer', 'options': {'popsize': 5, 'sigma_0': 0.1}}"
-          - optimizer-specs: "{'module_name': 'orquestra.optimizers.scipy_optimizer', 'function_name': 'ScipyOptimizer', 'method': 'L-BFGS-B'}"
+          - backend-specs: "{'module_name': 'orquestra.forest.simulator', 'function_name': 'ForestSimulator', 'device_name': 'wavefunction-simulator'}"
+          - optimizer-specs: "{'module_name': 'orquestra.optimizers.cma_es_optimizer', 'function_name': 'CMAESOptimizer', 'options': {'popsize': 5, 'sigma_0': 0.1, 'tolx': 1e-6}}"
+          # - optimizer-specs: "{'module_name': 'orquestra.optimizers.scipy_optimizer', 'function_name': 'ScipyOptimizer', 'method': 'L-BFGS-B'}"
           - resources: [open-pack-core, qe-openfermion, open-pack-optimizers, open-pack-forest, open-pack-qcbm]
           - docker-image: "{{workflow.parameters.docker-image}}"
           - memory: 2048Mi
