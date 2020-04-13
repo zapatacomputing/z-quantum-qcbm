@@ -16,7 +16,7 @@ resources:
   type: git
   parameters:
     url: "git@github.com:zapatacomputing/open-pack-optimizers.git"
-    branch: "172246562-bitstring-dist-history"
+    branch: "master"
 - name: open-pack-forest
   type: git
   parameters:
