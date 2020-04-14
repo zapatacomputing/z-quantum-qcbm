@@ -8,8 +8,7 @@ from .ansatz import build_qcbm_circuit_ion_trap, generate_random_initial_params
 from .optimization import optimize_variational_qcbm_circuit
 
 from orquestra.core.bitstring_distribution import BitstringDistribution 
-from orquestra.core.utils import ValueEstimate, RNDSEED
-from orquestra.forest import ForestSimulator
+from orquestra.core.utils import ValueEstimate, RNDSEED, create_object
 from orquestra.optimizers import ScipyOptimizer
 
 
@@ -34,28 +33,15 @@ class TestQCBM(unittest.TestCase):
         initial_params = generate_random_initial_params(num_qubits, seed=RNDSEED)
         distance_measure = "clipped_log_likelihood"
 
-        simulator = ForestSimulator("wavefunction-simulator")
-        optimizer = ScipyOptimizer(method="L-BFGS-B", options={'keep_value_history': True})
+        simulator = create_object({'module_name': 'orquestra.core.interfaces.mock_objects', 'function_name': 'MockQuantumSimulator', 'n_samples': 1})
+        optimizer = create_object({'module_name': 'orquestra.core.interfaces.mock_objects', 'function_name': 'MockOptimizer'})
 
         opt_result = optimize_variational_qcbm_circuit(num_qubits,
             single_qubit_gate, static_entangler, topology, epsilon, initial_params,
             distance_measure, simulator, optimizer,
             self.target_distribution)
 
-        expected_opt_result = {
-            "fun": 1.7917594694188614,
-            "nfev": 300,
-            "nit": 16,
-            "opt_value": 1.7917594694188614,
-            "status": 0,
-            "success": True}
-
-        self.assertAlmostEqual(expected_opt_result["fun"], opt_result["fun"])
-        self.assertAlmostEqual(expected_opt_result["nfev"], opt_result["nfev"])
-        self.assertAlmostEqual(expected_opt_result["nit"], opt_result["nit"])
-        self.assertAlmostEqual(expected_opt_result["opt_value"], opt_result["opt_value"])
-        self.assertAlmostEqual(expected_opt_result["status"], opt_result["status"])
-        self.assertAlmostEqual(expected_opt_result["success"], opt_result["success"])
+        self.assertIsInstance(opt_result["opt_value"], float)
         self.assertIn("history", opt_result.keys())
 
         for evaluation in opt_result['history']:
@@ -73,19 +59,14 @@ class TestQCBM(unittest.TestCase):
         initial_params = generate_random_initial_params(num_qubits, seed=RNDSEED)
         distance_measure = "clipped_log_likelihood"
 
-        simulator = ForestSimulator("wavefunction-simulator", n_samples=1000)
-        optimizer = ScipyOptimizer(method="L-BFGS-B")
+        simulator = create_object({'module_name': 'orquestra.core.interfaces.mock_objects', 'function_name': 'MockQuantumSimulator', 'n_samples': 1})
+        optimizer = create_object({'module_name': 'orquestra.core.interfaces.mock_objects', 'function_name': 'MockOptimizer'})
 
         opt_result = optimize_variational_qcbm_circuit(num_qubits,
             single_qubit_gate, static_entangler, topology, epsilon, initial_params,
             distance_measure, simulator, optimizer,
             self.target_distribution)
 
-        self.assertIn("fun", opt_result.keys())
-        self.assertIn("nfev", opt_result.keys())
-        self.assertIn("nit", opt_result.keys())
         self.assertIn("opt_value", opt_result.keys())
-        self.assertIn("status", opt_result.keys())
-        self.assertIn("success", opt_result.keys())
         self.assertIn("opt_params", opt_result.keys())
         self.assertIn("history", opt_result.keys())
