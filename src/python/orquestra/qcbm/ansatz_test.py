@@ -4,8 +4,8 @@ import cirq
 from pyquil import Program
 from pyquil.gates import CZ, RY
 
-from orquestra.core.circuit import Circuit, Qubit, Gate
-from orquestra.core.utils import compare_unitary
+from zquantum.core.circuit import Circuit, Qubit, Gate
+from zquantum.core.utils import compare_unitary
 
 from .ansatz import ( build_qcbm_circuit_ion_trap, get_single_qubit_layer,
     get_all_topology, get_entangling_layer, generate_random_initial_params )

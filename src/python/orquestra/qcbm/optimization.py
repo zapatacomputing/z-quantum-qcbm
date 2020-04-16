@@ -1,6 +1,6 @@
 import copy
-from orquestra.core.bitstring_distribution import evaluate_distribution_distance
-from orquestra.core.utils import ValueEstimate
+from zquantum.core.bitstring_distribution import evaluate_distribution_distance
+from zquantum.core.utils import ValueEstimate
 from .ansatz import build_qcbm_circuit_ion_trap
 
 def optimize_variational_qcbm_circuit(n_qubits, single_qubit_gate,
@@ -16,8 +16,8 @@ def optimize_variational_qcbm_circuit(n_qubits, single_qubit_gate,
         epsilon (float):  See evaluate_distribution_distance.
         initial_params: Initial parameters for the optimization
         distance_measure (str): See evaluate_distribution_distance.
-        backend (orquestra.core.interfaces.backend.QuantumSimulator): the backend to run the circuits on 
-        optimizer (orquestra.core.interfaces.optimizer.Optimizer): the optimizer used to manage the optimization process
+        backend (zquantum.core.interfaces.backend.QuantumSimulator): the backend to run the circuits on 
+        optimizer (zquantum.core.interfaces.optimizer.Optimizer): the optimizer used to manage the optimization process
         target_bitstring_distribution : See evaluate_distribution_distance.
     Returns:
     """

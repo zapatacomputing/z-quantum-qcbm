@@ -13,7 +13,7 @@ setuptools.setup(
     description="QCBM package for Orquestra.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/zapatacomputing/open-pack-qcbm ",
+    url="https://github.com/zapatacomputing/z-quantum-qcbm ",
     packages=setuptools.find_namespace_packages(include=['orquestra.*']),
     package_dir={'' : 'python'},
     classifiers=(
@@ -21,6 +21,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ),
     install_requires=[
-        'orquestra-core',
+        'z-quantum-core',
     ]
 )
