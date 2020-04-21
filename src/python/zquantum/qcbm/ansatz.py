@@ -10,7 +10,7 @@ def get_single_qubit_layer(n_qubits, params, single_qubit_gate):
         single_qubit_gate (str): the gate to be applied to each qubit.
 
     Returns:
-        Circuit: an Orquestra Circuit object
+        Circuit: a zquantum.core.circuit.Circuit object
     """
 
     output = Circuit()
@@ -31,7 +31,7 @@ def get_all_topology(n_qubits, params, static_entangler):
         static_entangler (str): gate specification for the entangling layer.
 
     Returns:
-        Circuit: an Orquestra Circuit object
+        Circuit: a zquantum.core.circuit.Circuit object
     """
 
     assert(params.shape[0] == int((n_qubits*(n_qubits-1))/2))
@@ -57,7 +57,7 @@ def get_entangling_layer(n_qubits, params, static_entangler, single_qubit_gate, 
         topology (str): topology (str): describes topology of qubits connectivity.
 
     Returns:
-        Circuit: an Orquestra Circuit object
+        Circuit: a zquantum.core.circuit.Circuit object
     """
     circuit = Circuit()
     if topology == 'all':

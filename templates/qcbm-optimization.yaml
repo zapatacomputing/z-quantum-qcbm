@@ -25,8 +25,8 @@ spec:
         path: /app/main_script.py
         raw:
           data: |
-            from orquestra.qcbm.ansatz import generate_random_initial_params
-            from orquestra.core.circuit import save_circuit_template_params
+            from zquantum.qcbm.ansatz import generate_random_initial_params
+            from zquantum.core.circuit import save_circuit_template_params
 
             n_qubits = {{inputs.parameters.n-qubits}}
             n_layers = {{inputs.parameters.n-layers}}
@@ -79,11 +79,11 @@ spec:
         path: /app/python_script.py
         raw:
           data: |
-            from orquestra.qcbm.optimization import optimize_variational_qcbm_circuit
-            from orquestra.core.circuit import load_circuit_template_params, save_circuit_template_params
-            from orquestra.core.utils import create_object
-            from orquestra.optimizers.utils import save_optimization_results
-            from orquestra.core.bitstring_distribution import load_bitstring_distribution
+            from zquantum.qcbm.optimization import optimize_variational_qcbm_circuit
+            from zquantum.core.circuit import load_circuit_template_params, save_circuit_template_params
+            from zquantum.core.utils import create_object
+            from zquantum.optimizers.utils import save_optimization_results
+            from zquantum.core.bitstring_distribution import load_bitstring_distribution
 
             n_qubits = {{inputs.parameters.n-qubits}}
             single_qubit_gate = "{{inputs.parameters.single-qubit-gate}}"

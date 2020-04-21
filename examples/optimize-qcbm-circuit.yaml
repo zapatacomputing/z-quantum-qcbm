@@ -2,30 +2,30 @@ ZapOSApiVersion: v1alpha1
 kind: Workflow
 
 resources:
-- name: open-pack-core
+- name: z-quantum-core
   type: git
   parameters:
-    url: "git@github.com:zapatacomputing/open-pack-core.git"
+    url: "git@github.com:zapatacomputing/z-quantum-core.git"
     branch: "master"
-- name: open-pack-qcbm
+- name: z-quantum-qcbm
   type: git
   parameters:
-    url: "git@github.com:zapatacomputing/open-pack-qcbm.git"
+    url: "git@github.com:zapatacomputing/z-quantum-qcbm.git"
     branch: "172246562-bitstring-dist-history"
-- name: open-pack-optimizers
+- name: z-quantum-optimizers
   type: git
   parameters:
-    url: "git@github.com:zapatacomputing/open-pack-optimizers.git"
+    url: "git@github.com:zapatacomputing/z-quantum-optimizers.git"
     branch: "master"
-- name: open-pack-forest
+- name: qe-forest
   type: git
   parameters:
-    url: "git@github.com:zapatacomputing/open-pack-forest.git"
+    url: "git@github.com:zapatacomputing/qe-forest.git"
     branch: "master"
-- name: open-pack-qhipster
+- name: qe-qhipster
   type: git
   parameters:
-    url: "git@github.com:zapatacomputing/open-pack-qhipster.git"
+    url: "git@github.com:zapatacomputing/qe-qhipster.git"
     branch: "master"
 - name: qe-openfermion
   type: git
@@ -44,7 +44,7 @@ spec:
   arguments:
     parameters:
     - s3-bucket: quantum-engine
-    - s3-key: projects/open-pack-qcbm/qcbm-opt
+    - s3-key: projects/z-quantum-qcbm/qcbm-opt
     - docker-image: 'open_pack_default'
 
   templates:
@@ -60,7 +60,7 @@ spec:
           - n-layers: "3"
           - min-val: "-1.57"
           - max-val: "1.57"
-          - resources: [open-pack-core, open-pack-qcbm]
+          - resources: [z-quantum-core, z-quantum-qcbm]
           - docker-image: "{{workflow.parameters.docker-image}}"
     - - name: optimize-circuit
         template: optimize-variational-qcbm-circuit
@@ -73,7 +73,7 @@ spec:
           - backend-specs: "{'module_name': 'orquestra.forest.simulator', 'function_name': 'ForestSimulator', 'device_name': 'wavefunction-simulator'}"
           - optimizer-specs: "{'module_name': 'orquestra.optimizers.cma_es_optimizer', 'function_name': 'CMAESOptimizer', 'options': {'popsize': 5, 'sigma_0': 0.1, 'tolx': 1e-6}}"
           # - optimizer-specs: "{'module_name': 'orquestra.optimizers.scipy_optimizer', 'function_name': 'ScipyOptimizer', 'method': 'L-BFGS-B'}"
-          - resources: [open-pack-core, qe-openfermion, open-pack-optimizers, open-pack-forest, open-pack-qcbm]
+          - resources: [z-quantum-core, qe-openfermion, z-quantum-optimizers, qe-forest, z-quantum-qcbm]
           - docker-image: "{{workflow.parameters.docker-image}}"
           - memory: 2048Mi
           artifacts:
