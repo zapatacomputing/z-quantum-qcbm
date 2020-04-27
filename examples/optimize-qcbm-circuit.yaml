@@ -68,8 +68,6 @@ spec:
         arguments:
           parameters:
           - n-qubits: "4"
-          - single-qubit-gate: "Rx"
-          - static-entangler: "XX"
           - epsilon: "0.000001"
           - backend-specs: "{'module_name': 'qeforest.simulator', 'function_name': 'ForestSimulator', 'device_name': 'wavefunction-simulator'}"
           - optimizer-specs: "{'module_name': 'zquantum.optimizers.cma_es_optimizer', 'function_name': 'CMAESOptimizer', 'options': {'popsize': 5, 'sigma_0': 0.1, 'tolx': 1e-6}}"
