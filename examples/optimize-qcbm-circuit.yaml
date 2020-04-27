@@ -57,7 +57,8 @@ spec:
           parameters:
           - n-qubits: "4"
           - seed: "1234"
-          - n-layers: "3"
+          - n-layers: "4"
+          - topology: "line"
           - min-val: "-1.57"
           - max-val: "1.57"
           - resources: [z-quantum-core, z-quantum-qcbm]

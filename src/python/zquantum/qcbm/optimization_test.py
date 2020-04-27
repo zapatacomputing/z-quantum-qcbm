@@ -26,8 +26,6 @@ class TestQCBM(unittest.TestCase):
 
     def test_qcbm_set_initial_params_scipy_forest(self):
         num_qubits = 4
-        single_qubit_gate = "Rx"
-        static_entangler = "XX"
         topology = "all"
         epsilon = 1e-6
         initial_params = generate_random_initial_params(num_qubits, seed=RNDSEED)
@@ -37,7 +35,7 @@ class TestQCBM(unittest.TestCase):
         optimizer = create_object({'module_name': 'zquantum.core.interfaces.mock_objects', 'function_name': 'MockOptimizer'})
 
         opt_result = optimize_variational_qcbm_circuit(num_qubits,
-            single_qubit_gate, static_entangler, topology, epsilon, initial_params,
+            topology, epsilon, initial_params,
             distance_measure, simulator, optimizer,
             self.target_distribution)
 
@@ -52,8 +50,6 @@ class TestQCBM(unittest.TestCase):
 
     def test_qcbm_set_initial_params_scipy_forest_sampling(self):
         num_qubits = 4
-        single_qubit_gate = "Rx"
-        static_entangler = "XX"
         topology = "all"
         epsilon = 1e-6
         initial_params = generate_random_initial_params(num_qubits, seed=RNDSEED)
@@ -63,7 +59,7 @@ class TestQCBM(unittest.TestCase):
         optimizer = create_object({'module_name': 'zquantum.core.interfaces.mock_objects', 'function_name': 'MockOptimizer'})
 
         opt_result = optimize_variational_qcbm_circuit(num_qubits,
-            single_qubit_gate, static_entangler, topology, epsilon, initial_params,
+            topology, epsilon, initial_params,
             distance_measure, simulator, optimizer,
             self.target_distribution)
 

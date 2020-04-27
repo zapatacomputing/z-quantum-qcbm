@@ -48,8 +48,6 @@ spec:
     inputs:
       parameters:
       - name: n-qubits
-      - name: single-qubit-gate
-      - name: static-entangler
       - name: topology
         default: "all"
       - name: epsilon
@@ -83,8 +81,6 @@ spec:
             from zquantum.core.bitstring_distribution import load_bitstring_distribution
 
             n_qubits = {{inputs.parameters.n-qubits}}
-            single_qubit_gate = "{{inputs.parameters.single-qubit-gate}}"
-            static_entangler = "{{inputs.parameters.static-entangler}}"
             topology = "{{inputs.parameters.topology}}"
             epsilon = {{inputs.parameters.epsilon}}
             distance_measure = "{{inputs.parameters.distance-measure}}"
@@ -98,10 +94,8 @@ spec:
             initial_params = load_circuit_template_params("initial-parameters.json")
             target_distribution = load_bitstring_distribution("target-distribution.json")
 
-            opt_results = optimize_variational_qcbm_circuit(n_qubits,
-                single_qubit_gate, static_entangler, topology, epsilon, initial_params,
-                distance_measure, backend, optimizer,
-                target_distribution)
+            opt_results = optimize_variational_qcbm_circuit(n_qubits, topology, epsilon,
+                initial_params, distance_measure, backend, optimizer, target_distribution)
 
             save_optimization_results(opt_results, "optimization-results.json")
             save_circuit_template_params(opt_results.opt_params, "optimized-parameters.json")

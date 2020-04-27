@@ -3,8 +3,7 @@ from zquantum.core.bitstring_distribution import evaluate_distribution_distance
 from zquantum.core.utils import ValueEstimate
 from .ansatz import build_qcbm_circuit_ion_trap
 
-def optimize_variational_qcbm_circuit(n_qubits, single_qubit_gate,
-    static_entangler, topology, epsilon, initial_params, distance_measure, 
+def optimize_variational_qcbm_circuit(n_qubits, topology, epsilon, initial_params, distance_measure, 
     backend, optimizer, target_bitstring_distribution,**kwargs):
     """Optimize a quantum circuit Born machine (QCBM).
 
