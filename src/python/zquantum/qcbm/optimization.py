@@ -25,9 +25,7 @@ def optimize_variational_qcbm_circuit(n_qubits, single_qubit_gate,
 
     def cost_function(params):
         # Build the ansatz circuit
-        qcbm_circuit = build_qcbm_circuit_ion_trap(
-                    n_qubits, params, single_qubit_gate, static_entangler,
-                    topology=topology)
+        qcbm_circuit = build_qcbm_circuit_ion_trap(n_qubits, params, topology=topology)
 
         measured_distr = backend.get_bitstring_distribution(qcbm_circuit)
 
