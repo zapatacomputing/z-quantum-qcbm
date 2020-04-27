@@ -195,4 +195,4 @@ def generate_random_initial_params(n_qubits, n_layers=2, topology='all', min_val
             # A normal single qubit rotation layer
             params.append(gen.uniform(min_val, max_val, n_qubits*2))
     
-    return params
+    return np.asarray(params)
