@@ -11,7 +11,7 @@ resources:
   type: git
   parameters:
     url: "git@github.com:zapatacomputing/z-quantum-qcbm.git"
-    branch: "172246562-bitstring-dist-history"
+    branch: "update-ansatz"
 - name: z-quantum-optimizers
   type: git
   parameters:

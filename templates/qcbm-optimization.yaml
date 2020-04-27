@@ -7,15 +7,13 @@ spec:
       parameters:
       - name: n-qubits
       - name: n-layers
-        default: "1"
+        default: "2"
       - name: topology
         default: "all"
       - name: min-val
         default: "0."
       - name: max-val
         default: "1."
-      - name: n-par
-        default: "0"
       - name: seed
         default: "None"
       - name: command
@@ -33,11 +31,10 @@ spec:
             topology = "{{inputs.parameters.topology}}"
             min_val = {{inputs.parameters.min-val}}
             max_val = {{inputs.parameters.max-val}}
-            n_par = {{inputs.parameters.n-par}}
             seed = {{inputs.parameters.seed}}
 
             parameters = generate_random_initial_params(n_qubits, n_layers=n_layers, 
-                  topology=topology, min_val=min_val, max_val=max_val, n_par=n_par, seed=seed)
+                  topology=topology, min_val=min_val, max_val=max_val, seed=seed)
 
             save_circuit_template_params(parameters, "parameters.json")
     outputs:
