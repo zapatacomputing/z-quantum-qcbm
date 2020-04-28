@@ -91,59 +91,58 @@ def get_entangling_layer(n_qubits, params, static_entangler, topology):
         raise RuntimeError("Topology: {} is not supported".format(topology))
 
 
-def build_qcbm_circuit_ion_trap(n_qubits, input_params, topology='all'):
+def build_qcbm_circuit_ion_trap(n_qubits, input_params, n_layers, topology='all'):
     """Builds a qcbm ansatz circuit, using the ansatz in https://advances.sciencemag.org/content/5/10/eaaw9918/tab-pdf (Fig.2 - top).
 
     Args:
         n_qubits (int): number of qubits initialized for circuit.
         input_params (numpy.array): input parameters of the circuit (1d array).
-        single_qubit_gate(str): Gate specification for the single-qubit layer (L0).
-        static_entangler(str): Gate specification for the entangling layers (L1, L2, ... , Ln).
         topology (str): describes topology of qubits connectivity.
 
     Returns:
         Circuit: the qcbm circuit
     """
-    if len(input_params) == 1:
+    if n_layers == 1:
         # Only one layer, should be a single layer of rotations with Rx
-        return get_single_qubit_layer(n_qubits, input_params[0], ["Rx"])
+        return get_single_qubit_layer(n_qubits, input_params, ["Rx"])
+
+    if topology == "all":
+        n_params_per_ent_layer = int((n_qubits*(n_qubits-1))/2)
+    elif topology == "line":
+        n_params_per_ent_layer = n_qubits-1
+    else:
+        raise RuntimeError("Topology: {} is not supported".format(topology))
 
     circuit = Circuit()
-    n_layers = len(input_params)
+    parameter_index = 0
     for layer_index in range(n_layers):
         if layer_index == 0:
             # First layer is always 2 single qubit rotations on Rx Rz
-            circuit += get_single_qubit_layer(n_qubits, input_params[layer_index], ["Rx", "Rz"])
+            circuit += get_single_qubit_layer(n_qubits, input_params[parameter_index:parameter_index+2*n_qubits], ["Rx", "Rz"])
+            parameter_index += 2*n_qubits
         elif n_layers%2 == 1 and layer_index == n_layers-1:
             # Last layer for odd number of layers is rotations on Rx Rz
-            circuit += get_single_qubit_layer(n_qubits, input_params[layer_index], ["Rz", "Rx"])
+            circuit += get_single_qubit_layer(n_qubits, input_params[parameter_index:parameter_index+2*n_qubits], ["Rz", "Rx"])
+            parameter_index += 2*n_qubits
         elif n_layers%2 == 0 and layer_index == n_layers-2:
             # Even number of layers, second to last layer is 3 rotation layer with Rx Rz Rx
-            circuit += get_single_qubit_layer(n_qubits, input_params[layer_index], ["Rx", "Rz", "Rx"])
+            circuit += get_single_qubit_layer(n_qubits, input_params[parameter_index:parameter_index+3*n_qubits], ["Rx", "Rz", "Rx"])
+            parameter_index += 3*n_qubits
         elif n_layers%2 == 1 and layer_index == n_layers-3:
             # Odd number of layers, third to last layer is 3 rotation layer with Rx Rz Rx
-            circuit += get_single_qubit_layer(n_qubits, input_params[layer_index], ["Rx", "Rz", "Rx"])
+            circuit += get_single_qubit_layer(n_qubits, input_params[parameter_index:parameter_index+3*n_qubits], ["Rx", "Rz", "Rx"])
+            parameter_index += 3*n_qubits
         elif layer_index%2 == 1:
             # Currently on an entangling layer
-            circuit += get_entangling_layer(n_qubits, input_params[layer_index], "XX", topology)
+            circuit += get_entangling_layer(n_qubits, input_params[parameter_index:parameter_index+n_params_per_ent_layer], "XX", topology)
+            parameter_index += n_params_per_ent_layer
         else:
             # A normal single qubit rotation layer of Rx Rz
-            circuit += get_single_qubit_layer(n_qubits, input_params[layer_index], ["Rx", "Rz"])
-    # # Add first layer of single-qubit gates consisting of single_qubit_gate on each qubit, followed by Rz on each qubit
-    # circuit += get_single_qubit_layer(n_qubits, input_params[0], ["Rx", "Rz"])
+            circuit += get_single_qubit_layer(n_qubits, input_params[parameter_index:parameter_index+2*n_qubits], ["Rx", "Rz"])
+            parameter_index += 2*n_qubits
 
-    # # Iterate through remaining input parameters, alternating between adding single qubit layers and entangling layers
-    # for layer_index, params in enumerate(input_params[1:-1]):
-    #     if layer_index%2 == 0:
-    #         circuit += get_entangling_layer(n_qubits, params, "XX", topology)
-    #     else:
-    #         circuit += get_single_qubit_layer(n_qubits, params, ["Rx", "Rz"])
-
-    # if len(input_params) > 1:
-    #     if len(input_params)%2 == 0:
-    #         circuit += get_entangling_layer(n_qubits, input_params[-1], "XX", topology)
-    #     else:
-    #         circuit += get_single_qubit_layer(n_qubits, input_params[-1], ["Rx", "Rz", "Rx"])
+    if parameter_index != len(input_params):
+        raise RuntimeError("Incorrect number of parameters provided. {} parameters provided for {} layers".format(len(input_params), n_layers))
 
     return circuit
 
@@ -165,8 +164,30 @@ def generate_random_initial_params(n_qubits, n_layers=2, topology='all', min_val
     gen = np.random.RandomState(seed)
     if n_layers == 1:
         # If only one layer, then only need parameters for a single layer of Rx gates
-        return [gen.uniform(min_val, max_val, n_qubits)]
-    
+        return gen.uniform(min_val, max_val, n_qubits)
+
+    num_parameters_by_layer = get_number_of_parameters_by_layer(n_qubits, n_layers, topology)
+
+    params = []
+    for num_parameters in num_parameters_by_layer:
+        params = np.concatenate([params, gen.uniform(min_val, max_val, num_parameters)])
+    return params
+
+def get_number_of_parameters_by_layer(n_qubits, n_layers, topology):
+    """Determine the number of parameters each layer in the ansatz needs.
+
+    Args:
+        n_qubits (int): number of qubits in the circuit.
+        n_layers (int): number of entangling layers in the circuit. If n_layers=-1, you can specify a custom number of parameters (see below).
+        topology (str): describes topology of qubits connectivity.
+
+    Returns:
+        A 1D array of integers 
+    """
+    if n_layers == 1:
+        # If only one layer, then only need parameters for a single layer of Rx gates
+        return [n_qubits]
+
     if topology == "all":
         n_params_per_ent_layer = int((n_qubits*(n_qubits-1))/2)
     elif topology == "line":
@@ -174,25 +195,25 @@ def generate_random_initial_params(n_qubits, n_layers=2, topology='all', min_val
     else:
         raise RuntimeError("Topology: {} is not supported".format(topology))
 
-    params = []
+    num_params_by_layer = []
     for layer_index in range(n_layers):
         if layer_index == 0:
             # First layer is always 2 parameters per qubit for 2 single qubit rotations
-            params.append(gen.uniform(min_val, max_val, n_qubits*2))
+            num_params_by_layer.append(n_qubits*2)
         elif n_layers%2 == 1 and layer_index == n_layers-1:
             # Last layer for odd number of layers is 2 layer rotations
-            params.append(gen.uniform(min_val, max_val, n_qubits*2))
+            num_params_by_layer.append(n_qubits*2)
         elif n_layers%2 == 0 and layer_index == n_layers-2:
             # Even number of layers, second to last layer is 3 rotation layer
-            params.append(gen.uniform(min_val, max_val, n_qubits*3))
+            num_params_by_layer.append(n_qubits*3)
         elif n_layers%2 == 1 and layer_index == n_layers-3:
             # Odd number of layers, third to last layer is 3 rotation layer
-            params.append(gen.uniform(min_val, max_val, n_qubits*3))
+            num_params_by_layer.append(n_qubits*3)
         elif layer_index%2 == 1:
             # Currently on an entangling layer
-            params.append(gen.uniform(min_val, max_val, n_params_per_ent_layer))
+            num_params_by_layer.append(n_params_per_ent_layer)
         else:
             # A normal single qubit rotation layer
-            params.append(gen.uniform(min_val, max_val, n_qubits*2))
+            num_params_by_layer.append(n_qubits*2)
     
-    return np.asarray(params)
+    return num_params_by_layer

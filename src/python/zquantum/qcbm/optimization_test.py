@@ -34,7 +34,7 @@ class TestQCBM(unittest.TestCase):
         simulator = create_object({'module_name': 'zquantum.core.interfaces.mock_objects', 'function_name': 'MockQuantumSimulator', 'n_samples': 1})
         optimizer = create_object({'module_name': 'zquantum.core.interfaces.mock_objects', 'function_name': 'MockOptimizer'})
 
-        opt_result = optimize_variational_qcbm_circuit(num_qubits,
+        opt_result = optimize_variational_qcbm_circuit(num_qubits, 2,
             topology, epsilon, initial_params,
             distance_measure, simulator, optimizer,
             self.target_distribution)
@@ -58,7 +58,7 @@ class TestQCBM(unittest.TestCase):
         simulator = create_object({'module_name': 'zquantum.core.interfaces.mock_objects', 'function_name': 'MockQuantumSimulator', 'n_samples': 1})
         optimizer = create_object({'module_name': 'zquantum.core.interfaces.mock_objects', 'function_name': 'MockOptimizer'})
 
-        opt_result = optimize_variational_qcbm_circuit(num_qubits,
+        opt_result = optimize_variational_qcbm_circuit(num_qubits, 2,
             topology, epsilon, initial_params,
             distance_measure, simulator, optimizer,
             self.target_distribution)

@@ -48,6 +48,7 @@ spec:
     inputs:
       parameters:
       - name: n-qubits
+      - name: n-layers
       - name: topology
         default: "all"
       - name: epsilon
@@ -81,6 +82,7 @@ spec:
             from zquantum.core.bitstring_distribution import load_bitstring_distribution
 
             n_qubits = {{inputs.parameters.n-qubits}}
+            n_layers = {{inputs.parameters.n-layers}}
             topology = "{{inputs.parameters.topology}}"
             epsilon = {{inputs.parameters.epsilon}}
             distance_measure = "{{inputs.parameters.distance-measure}}"
@@ -94,7 +96,7 @@ spec:
             initial_params = load_circuit_template_params("initial-parameters.json")
             target_distribution = load_bitstring_distribution("target-distribution.json")
 
-            opt_results = optimize_variational_qcbm_circuit(n_qubits, topology, epsilon,
+            opt_results = optimize_variational_qcbm_circuit(n_qubits, n_layers, topology, epsilon,
                 initial_params, distance_measure, backend, optimizer, target_distribution)
 
             save_optimization_results(opt_results, "optimization-results.json")

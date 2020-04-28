@@ -167,6 +167,18 @@ class TestQCBMAnsatz(unittest.TestCase):
         # When
         self.assertRaises(RuntimeError, lambda: get_entangling_layer(n_qubits, params, static_entangler, topology))
 
+    def test_build_qcbm_circuit_iontrap_too_many_parameters(self):
+        # Given
+        n_qubits = 4
+        params = [np.ones(2*n_qubits), np.ones(int((n_qubits*(n_qubits-1))/2)), np.ones(2*n_qubits)]
+        params = np.concatenate(params)
+        topology = "all"
+        n_layers = 2
+
+        # When/Then
+        self.assertRaises(RuntimeError, lambda: build_qcbm_circuit_ion_trap(n_qubits, params, n_layers, topology))
+
+
     def test_build_qcbm_circuit_iontrap_one_layer(self):
         # Given
         n_qubits = 4
@@ -177,9 +189,12 @@ class TestQCBMAnsatz(unittest.TestCase):
         for i in range(n_qubits):
             expected_pycircuit += Program(pyquil.gates.RX(params[0][i], i))
         expected_circuit = Circuit(expected_pycircuit)
-        
+
+        params = np.concatenate(params)
+        n_layers = 1
+
         # When
-        circuit = build_qcbm_circuit_ion_trap(n_qubits, params, topology)
+        circuit = build_qcbm_circuit_ion_trap(n_qubits, params, n_layers, topology)
 
         # Then
         self.assertEqual(circuit, expected_circuit)
@@ -199,8 +214,12 @@ class TestQCBMAnsatz(unittest.TestCase):
         expected_circuit = Circuit(expected_pycircuit)
         expected_circuit += get_entangling_layer(n_qubits, params[1], "XX", topology)
         
+
+        params = np.concatenate(params)
+        n_layers = 2
+
         # When
-        circuit = build_qcbm_circuit_ion_trap(n_qubits, params, topology)
+        circuit = build_qcbm_circuit_ion_trap(n_qubits, params, n_layers, topology)
 
         # Then
         self.assertEqual(circuit, expected_circuit)
@@ -227,8 +246,12 @@ class TestQCBMAnsatz(unittest.TestCase):
         expected_third_layer = Circuit(expected_pycircuit)
         expected_circuit = expected_first_layer + expected_second_layer + expected_third_layer
         
+
+        params = np.concatenate(params)
+        n_layers = 3
+
         # When
-        circuit = build_qcbm_circuit_ion_trap(n_qubits, params, topology)
+        circuit = build_qcbm_circuit_ion_trap(n_qubits, params, n_layers, topology)
 
         # Then
         self.assertEqual(circuit, expected_circuit)
@@ -258,8 +281,12 @@ class TestQCBMAnsatz(unittest.TestCase):
         expected_fourth_layer = get_entangling_layer(n_qubits, params[3], "XX", topology)
         expected_circuit = expected_first_layer + expected_second_layer + expected_third_layer + expected_fourth_layer
         
+
+        params = np.concatenate(params)
+        n_layers = 4
+
         # When
-        circuit = build_qcbm_circuit_ion_trap(n_qubits, params, topology)
+        circuit = build_qcbm_circuit_ion_trap(n_qubits, params, n_layers, topology)
 
         # Then
         self.assertEqual(circuit, expected_circuit)
@@ -295,8 +322,12 @@ class TestQCBMAnsatz(unittest.TestCase):
         expected_fifth_layer = Circuit(expected_pycircuit)
         expected_circuit = expected_first_layer + expected_second_layer + expected_third_layer + expected_fourth_layer + expected_fifth_layer
         
+
+        params = np.concatenate(params)
+        n_layers = 5
+
         # When
-        circuit = build_qcbm_circuit_ion_trap(n_qubits, params, topology)
+        circuit = build_qcbm_circuit_ion_trap(n_qubits, params, n_layers, topology)
 
         # Then
         self.assertEqual(circuit, expected_circuit)
@@ -333,8 +364,12 @@ class TestQCBMAnsatz(unittest.TestCase):
         expected_sixth_layer = get_entangling_layer(n_qubits, params[5], "XX", topology)
         expected_circuit = expected_first_layer + expected_second_layer + expected_third_layer + expected_fourth_layer + expected_fifth_layer + expected_sixth_layer
         
+
+        params = np.concatenate(params)
+        n_layers = 6
+
         # When
-        circuit = build_qcbm_circuit_ion_trap(n_qubits, params, topology)
+        circuit = build_qcbm_circuit_ion_trap(n_qubits, params, n_layers, topology)
 
         # Then
         self.assertEqual(circuit, expected_circuit)
@@ -377,8 +412,12 @@ class TestQCBMAnsatz(unittest.TestCase):
         expected_seventh_layer = Circuit(expected_pycircuit)
         expected_circuit = expected_first_layer + expected_second_layer + expected_third_layer + expected_fourth_layer + expected_fifth_layer + expected_sixth_layer + expected_seventh_layer
         
+
+        params = np.concatenate(params)
+        n_layers = 7
+
         # When
-        circuit = build_qcbm_circuit_ion_trap(n_qubits, params, topology)
+        circuit = build_qcbm_circuit_ion_trap(n_qubits, params, n_layers, topology)
 
         # Then
         self.assertEqual(circuit, expected_circuit)
@@ -422,8 +461,12 @@ class TestQCBMAnsatz(unittest.TestCase):
         expected_eigth_layer = get_entangling_layer(n_qubits, params[7], "XX", topology)
         expected_circuit = expected_first_layer + expected_second_layer + expected_third_layer + expected_fourth_layer + expected_fifth_layer + expected_sixth_layer + expected_seventh_layer + expected_eigth_layer
         
+
+        params = np.concatenate(params)
+        n_layers = 8
+
         # When
-        circuit = build_qcbm_circuit_ion_trap(n_qubits, params, topology)
+        circuit = build_qcbm_circuit_ion_trap(n_qubits, params, n_layers, topology)
 
         # Then
         self.assertEqual(circuit, expected_circuit)
@@ -472,8 +515,12 @@ class TestQCBMAnsatz(unittest.TestCase):
         expected_ninth_layer = Circuit(expected_pycircuit)
         expected_circuit = expected_first_layer + expected_second_layer + expected_third_layer + expected_fourth_layer + expected_fifth_layer + expected_sixth_layer + expected_seventh_layer + expected_eigth_layer + expected_ninth_layer
         
+
+        params = np.concatenate(params)
+        n_layers = 9
+
         # When
-        circuit = build_qcbm_circuit_ion_trap(n_qubits, params, topology)
+        circuit = build_qcbm_circuit_ion_trap(n_qubits, params, n_layers, topology)
 
         # Then
         self.assertEqual(circuit, expected_circuit)
@@ -488,9 +535,7 @@ class TestQCBMAnsatz(unittest.TestCase):
         params = generate_random_initial_params(n_qubits, n_layers, topology, seed=RNDSEED)
 
         # Then
-        self.assertEqual(len(params), 2)
-        self.assertEqual(len(params[0]), 2*n_qubits)
-        self.assertEqual(len(params[1]), int((n_qubits*(n_qubits-1))/2))
+        self.assertEqual(len(params), 2*n_qubits+int((n_qubits*(n_qubits-1))/2))
         
 
     def test_generate_random_params_line_toplogy(self):
@@ -503,9 +548,7 @@ class TestQCBMAnsatz(unittest.TestCase):
         params = generate_random_initial_params(n_qubits, n_layers, topology, seed=RNDSEED)
 
         # Then
-        self.assertEqual(len(params), 2)
-        self.assertEqual(len(params[0]), 2*n_qubits)
-        self.assertEqual(len(params[1]), n_qubits-1)
+        self.assertEqual(len(params), 2*n_qubits+n_qubits-1)
         
 
     def test_generate_random_params_toplogy_not_supported(self):
@@ -528,58 +571,58 @@ class TestQCBMAnsatz(unittest.TestCase):
         params = generate_random_initial_params(n_qubits, n_layers, topology, seed=RNDSEED)
 
         # Then
-        self.assertEqual(len(params), n_layers)
-        self.assertEqual(len(params[0]), n_qubits)
+        self.assertEqual(len(params), n_qubits)
+
+
+    def test_generate_random_params_two_layers(self):
+        # Given
+        n_qubits = 4
+        topology = "line"
+        n_layers = 2
+
+        # When
+        params = generate_random_initial_params(n_qubits, n_layers, topology, seed=RNDSEED)
+
+        # Then
+        self.assertEqual(len(params), 2*n_qubits+n_qubits-1)
+
+
+    def test_generate_random_params_three_layers(self):
+        # Given
+        n_qubits = 4
+        topology = "line"
+        n_layers = 3
+
+        # When
+        params = generate_random_initial_params(n_qubits, n_layers, topology, seed=RNDSEED)
+
+        # Then
+        self.assertEqual(len(params), 4*n_qubits+n_qubits-1)
 
     def test_generate_random_params_even_layers(self):
         # Given
         n_qubits = 4
         topology = "line"
-        n_layers_list = [2, 4, 6, 8, 10, 12]
+        n_layers_list = [4, 6, 8, 10, 12]
         for n_layers in n_layers_list:
+            expected_num_params = n_qubits*n_layers + (n_qubits-1)*int(n_layers/2) + n_qubits
+
             # When
             params = generate_random_initial_params(n_qubits, n_layers, topology, seed=RNDSEED)
 
             # Then
-            self.assertEqual(len(params), n_layers)
-
-            for layer_index in range(n_layers):
-                if layer_index == 0:
-                    # Rotation layer with 2 single qubit gates for first layer
-                    self.assertEqual(len(params[layer_index]), 2*n_qubits)
-                elif layer_index%2 == 1:
-                    # Entangling layer
-                    self.assertEqual(len(params[layer_index]), n_qubits-1)
-                elif layer_index == n_layers-2:
-                    # Rotation layer with 3 single qubit gates
-                    self.assertEqual(len(params[layer_index]), 3*n_qubits)
-                else:
-                    # Rotation layer with 2 single qubit gates
-                    self.assertEqual(len(params[layer_index]), 2*n_qubits)
-
+            self.assertEqual(len(params), expected_num_params)
 
     def test_generate_random_params_odd_layers(self):
         # Given
         n_qubits = 4
         topology = "line"
-        n_layers_list = [3, 5, 7, 9, 11]
+        n_layers_list = [5, 7, 9, 11]
         for n_layers in n_layers_list:
+            expected_num_params = n_qubits*n_layers + (n_qubits-1)*int(n_layers/2) + 2*n_qubits
+
             # When
             params = generate_random_initial_params(n_qubits, n_layers, topology, seed=RNDSEED)
 
             # Then
-            self.assertEqual(len(params), n_layers)
-
-            for layer_index in range(n_layers):
-                if layer_index == 0:
-                    # Rotation layer with 2 single qubit gates for first layer
-                    self.assertEqual(len(params[layer_index]), 2*n_qubits)
-                elif layer_index%2 == 1:
-                    # Entangling layer
-                    self.assertEqual(len(params[layer_index]), n_qubits-1)
-                elif layer_index == n_layers-3:
-                    # This rotation layer has 3 single qubit gates
-                    self.assertEqual(len(params[layer_index]), 3*n_qubits)
-                else:
-                    # Rotation layer with 2 single qubit gates
-                    self.assertEqual(len(params[layer_index]), 2*n_qubits)
+            self.assertEqual(len(params), expected_num_params)
