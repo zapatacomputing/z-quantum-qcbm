@@ -9,8 +9,6 @@ from .optimization import optimize_variational_qcbm_circuit
 
 from zquantum.core.bitstring_distribution import BitstringDistribution 
 from zquantum.core.utils import ValueEstimate, RNDSEED, create_object
-from zquantum.optimizers import ScipyOptimizer
-
 
 class TestQCBM(unittest.TestCase):
 
@@ -24,7 +22,7 @@ class TestQCBM(unittest.TestCase):
              "1111": 1.0})
 
 
-    def test_qcbm_set_initial_params_scipy_forest(self):
+    def test_qcbm_set_initial_params(self):
         num_qubits = 4
         topology = "all"
         epsilon = 1e-6
@@ -48,7 +46,7 @@ class TestQCBM(unittest.TestCase):
             self.assertIn("params", evaluation.keys())
 
 
-    def test_qcbm_set_initial_params_scipy_forest_sampling(self):
+    def test_qcbm_set_initial_params_sampling(self):
         num_qubits = 4
         topology = "all"
         epsilon = 1e-6
