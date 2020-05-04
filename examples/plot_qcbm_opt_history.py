@@ -1,6 +1,3 @@
-"""Plot the VQE binding energy curve of a diatomic molecule from a Quantum
-Engine workflow result JSON."""
-
 import json
 import matplotlib
 # matplotlib.use("Agg")
@@ -8,6 +5,10 @@ import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
 import matplotlib.animation as animation
+from matplotlib.cbook import get_sample_data
+import matplotlib.gridspec as gridspec
+
+import numpy as np
 
 def get_ordered_list_of_bitstrings(num_qubits):
     bitstrings = []
@@ -45,38 +46,71 @@ for step_id in data:
                 except:
                     bitstring_dist.append(0)
             bistring_distributions.append(bitstring_dist)
-            
 
-# Plot the optimization process
-fig, ax = plt.subplots(nrows = 2, ncols=1, figsize=(16,8))
+fig = plt.figure(figsize=(16,8))
+gs = gridspec.GridSpec(nrows=8, ncols=3, width_ratios=[16,1,1])
+ax1 = fig.add_subplot(gs[:4,0])
+ax2 = fig.add_subplot(gs[5:,0])
+axs = [fig.add_subplot(gs[i,1]) for i in range(8)] + [fig.add_subplot(gs[i,2]) for i in range(8)]
 
 evals = []
 plotted_distances = []
 plotted_min_distances = []
 line_widths = []
 
+images = [np.array([0,0,0,0]),
+          np.array([0,0,0,1]),
+          np.array([0,0,1,0]),
+          np.array([0,0,1,1]),
+          np.array([0,1,0,0]),
+          np.array([0,1,0,1]),
+          np.array([0,1,1,0]),
+          np.array([0,1,1,1]),
+          np.array([1,0,0,0]),
+          np.array([1,0,0,1]),
+          np.array([1,0,1,0]),
+          np.array([1,0,1,1]),
+          np.array([1,1,0,0]),
+          np.array([1,1,0,1]),
+          np.array([1,1,1,0]),
+          np.array([1,1,1,1])]
+
 def animate(i):
     evals.append(i)
     plotted_distances.append(distances[i])
     plotted_min_distances.append(minimum_distances[i])
     line_widths.append(1)
-    ax[0].clear()
-    ax[0].set(xlabel='Evaluation Index', ylabel='Distribution Distance (clipped log-likelihood)')
-    ax[0].set_ylim([1.5, 3.5])
-    ax[0].scatter(evals, plotted_distances, color="green", linewidths=line_widths, marker=".")
-    ax[0].plot(evals, plotted_min_distances, color="purple", linewidth=2)
+    ax1.clear()
+    ax1.set(xlabel='Evaluation Index', ylabel='Clipped negative log-likelihood cost function')
+    ax1.set_ylim([1.5, 3.5])
+    ax1.scatter(evals, plotted_distances, color="green", linewidths=line_widths, marker=".")
+    ax1.plot(evals, plotted_min_distances, color="purple", linewidth=2)
 
-    ax[1].clear()
-    ax[1].set(xlabel='Bitstring', ylabel='Measured Probability')
-    ax[1].set_ylim([0, .25])
-    ax[1].bar(ordered_bitstrings, bistring_distributions[i], facecolor='green')
-    return (ax[0], ax[1])
+    ax2.clear()
+    ax2.set(xlabel='Bitstring', ylabel='Measured Probability')
+    ax2.set_ylim([0, .25])
+    ax2.bar(ordered_bitstrings, bistring_distributions[i], facecolor='green')
 
-anim = FuncAnimation(fig, animate, frames=len(bistring_distributions), interval=1)
+    if distances[i] == minimum_distances[i]:
+        normalized_distribution = np.array(bistring_distributions[i])/max(bistring_distributions[i])
+        for j in range(len(ordered_bitstrings)):
+            axs[j].clear()
+            axs[j].set_xticks(np.arange(-.5, 2, 1), minor=True)
+            axs[j].set_yticks(np.arange(-.5, 2, 1), minor=True)
+            axs[j].tick_params(axis='x', colors=(0,0,0,0))
+            axs[j].tick_params(axis='y', colors=(0,0,0,0))
+
+            axs[j].grid(which='minor', color='k', linestyle='-', linewidth=2)
+            fading_factor = normalized_distribution[j]
+            axs[j].imshow((images[j].reshape((2,2))), alpha=fading_factor, vmin=0, vmax=1, cmap='PiYG')
+
+    return tuple([ax1, ax2] + axs)
+
+anim = FuncAnimation(fig, animate, frames=700, interval=1)
 
 # # Set up formatting for the movie files
 # Writer = animation.writers['ffmpeg']
 # writer = Writer(fps=10, metadata=dict(artist='Me'), bitrate=1800)
-# anim.save('qcbm_opt.mp4', writer=writer)
+# anim.save('qcbm_opt_700_iterations.mp4', writer=writer)
 
 plt.show()
