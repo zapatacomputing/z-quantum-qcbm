@@ -7,15 +7,13 @@ spec:
       parameters:
       - name: n-qubits
       - name: n-layers
-        default: "1"
+        default: "2"
       - name: topology
         default: "all"
       - name: min-val
         default: "0."
       - name: max-val
         default: "1."
-      - name: n-par
-        default: "0"
       - name: seed
         default: "None"
       - name: command
@@ -33,11 +31,10 @@ spec:
             topology = "{{inputs.parameters.topology}}"
             min_val = {{inputs.parameters.min-val}}
             max_val = {{inputs.parameters.max-val}}
-            n_par = {{inputs.parameters.n-par}}
             seed = {{inputs.parameters.seed}}
 
             parameters = generate_random_initial_params(n_qubits, n_layers=n_layers, 
-                  topology=topology, min_val=min_val, max_val=max_val, n_par=n_par, seed=seed)
+                  topology=topology, min_val=min_val, max_val=max_val, seed=seed)
 
             save_circuit_template_params(parameters, "parameters.json")
     outputs:
@@ -51,8 +48,7 @@ spec:
     inputs:
       parameters:
       - name: n-qubits
-      - name: single-qubit-gate
-      - name: static-entangler
+      - name: n-layers
       - name: topology
         default: "all"
       - name: epsilon
@@ -86,8 +82,7 @@ spec:
             from zquantum.core.bitstring_distribution import load_bitstring_distribution
 
             n_qubits = {{inputs.parameters.n-qubits}}
-            single_qubit_gate = "{{inputs.parameters.single-qubit-gate}}"
-            static_entangler = "{{inputs.parameters.static-entangler}}"
+            n_layers = {{inputs.parameters.n-layers}}
             topology = "{{inputs.parameters.topology}}"
             epsilon = {{inputs.parameters.epsilon}}
             distance_measure = "{{inputs.parameters.distance-measure}}"
@@ -101,10 +96,8 @@ spec:
             initial_params = load_circuit_template_params("initial-parameters.json")
             target_distribution = load_bitstring_distribution("target-distribution.json")
 
-            opt_results = optimize_variational_qcbm_circuit(n_qubits,
-                single_qubit_gate, static_entangler, topology, epsilon, initial_params,
-                distance_measure, backend, optimizer,
-                target_distribution)
+            opt_results = optimize_variational_qcbm_circuit(n_qubits, n_layers, topology, epsilon,
+                initial_params, distance_measure, backend, optimizer, target_distribution)
 
             save_optimization_results(opt_results, "optimization-results.json")
             save_circuit_template_params(opt_results.opt_params, "optimized-parameters.json")

@@ -9,8 +9,6 @@ from .optimization import optimize_variational_qcbm_circuit
 
 from zquantum.core.bitstring_distribution import BitstringDistribution 
 from zquantum.core.utils import ValueEstimate, RNDSEED, create_object
-from zquantum.optimizers import ScipyOptimizer
-
 
 class TestQCBM(unittest.TestCase):
 
@@ -24,10 +22,8 @@ class TestQCBM(unittest.TestCase):
              "1111": 1.0})
 
 
-    def test_qcbm_set_initial_params_scipy_forest(self):
+    def test_qcbm_set_initial_params(self):
         num_qubits = 4
-        single_qubit_gate = "Rx"
-        static_entangler = "XX"
         topology = "all"
         epsilon = 1e-6
         initial_params = generate_random_initial_params(num_qubits, seed=RNDSEED)
@@ -36,8 +32,8 @@ class TestQCBM(unittest.TestCase):
         simulator = create_object({'module_name': 'zquantum.core.interfaces.mock_objects', 'function_name': 'MockQuantumSimulator', 'n_samples': 1})
         optimizer = create_object({'module_name': 'zquantum.core.interfaces.mock_objects', 'function_name': 'MockOptimizer'})
 
-        opt_result = optimize_variational_qcbm_circuit(num_qubits,
-            single_qubit_gate, static_entangler, topology, epsilon, initial_params,
+        opt_result = optimize_variational_qcbm_circuit(num_qubits, 2,
+            topology, epsilon, initial_params,
             distance_measure, simulator, optimizer,
             self.target_distribution)
 
@@ -50,10 +46,8 @@ class TestQCBM(unittest.TestCase):
             self.assertIn("params", evaluation.keys())
 
 
-    def test_qcbm_set_initial_params_scipy_forest_sampling(self):
+    def test_qcbm_set_initial_params_sampling(self):
         num_qubits = 4
-        single_qubit_gate = "Rx"
-        static_entangler = "XX"
         topology = "all"
         epsilon = 1e-6
         initial_params = generate_random_initial_params(num_qubits, seed=RNDSEED)
@@ -62,8 +56,8 @@ class TestQCBM(unittest.TestCase):
         simulator = create_object({'module_name': 'zquantum.core.interfaces.mock_objects', 'function_name': 'MockQuantumSimulator', 'n_samples': 1})
         optimizer = create_object({'module_name': 'zquantum.core.interfaces.mock_objects', 'function_name': 'MockOptimizer'})
 
-        opt_result = optimize_variational_qcbm_circuit(num_qubits,
-            single_qubit_gate, static_entangler, topology, epsilon, initial_params,
+        opt_result = optimize_variational_qcbm_circuit(num_qubits, 2,
+            topology, epsilon, initial_params,
             distance_measure, simulator, optimizer,
             self.target_distribution)
 

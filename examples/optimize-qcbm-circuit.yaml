@@ -11,7 +11,7 @@ resources:
   type: git
   parameters:
     url: "git@github.com:zapatacomputing/z-quantum-qcbm.git"
-    branch: "172246562-bitstring-dist-history"
+    branch: "update-ansatz"
 - name: z-quantum-optimizers
   type: git
   parameters:
@@ -57,7 +57,8 @@ spec:
           parameters:
           - n-qubits: "4"
           - seed: "1234"
-          - n-layers: "3"
+          - n-layers: "4"
+          - topology: "line"
           - min-val: "-1.57"
           - max-val: "1.57"
           - resources: [z-quantum-core, z-quantum-qcbm]
@@ -67,8 +68,7 @@ spec:
         arguments:
           parameters:
           - n-qubits: "4"
-          - single-qubit-gate: "Rx"
-          - static-entangler: "XX"
+          - n-layers: "4"
           - epsilon: "0.000001"
           - backend-specs: "{'module_name': 'qeforest.simulator', 'function_name': 'ForestSimulator', 'device_name': 'wavefunction-simulator'}"
           - optimizer-specs: "{'module_name': 'zquantum.optimizers.cma_es_optimizer', 'function_name': 'CMAESOptimizer', 'options': {'popsize': 5, 'sigma_0': 0.1, 'tolx': 1e-6}}"
