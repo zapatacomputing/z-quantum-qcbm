@@ -57,7 +57,7 @@ spec:
           - n-qubits: "4"
           - n-layers: "4"
           - seed: "1234"
-          - topology: "line"
+          - topology: "all"
           - min-val: "-1.57"
           - max-val: "1.57"
           - resources: [z-quantum-core, z-quantum-qcbm]
@@ -68,7 +68,7 @@ spec:
           parameters:
           - n-qubits: "4"
           - n-layers: "4"
-          - topology: "line"
+          - topology: "all"
           - epsilon: "0.000001"
           - backend-specs: "{'module_name': 'qeforest.simulator', 'function_name': 'ForestSimulator', 'device_name': 'wavefunction-simulator'}"
           - optimizer-specs: "{'module_name': 'zquantum.optimizers.cma_es_optimizer', 'function_name': 'CMAESOptimizer', 'options': {'popsize': 5, 'sigma_0': 0.1, 'tolx': 1e-6}}"
