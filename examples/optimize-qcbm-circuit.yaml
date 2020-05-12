@@ -11,7 +11,7 @@ resources:
   type: git
   parameters:
     url: "git@github.com:zapatacomputing/z-quantum-qcbm.git"
-    branch: "update-ansatz"
+    branch: "master"
 - name: z-quantum-optimizers
   type: git
   parameters:
@@ -45,7 +45,6 @@ spec:
     parameters:
     - s3-bucket: quantum-engine
     - s3-key: projects/z-quantum-qcbm/qcbm-opt
-    - docker-image: 'open_pack_default'
 
   templates:
 
@@ -56,26 +55,27 @@ spec:
         arguments:
           parameters:
           - n-qubits: "4"
-          - seed: "1234"
           - n-layers: "4"
+          - seed: "1234"
           - topology: "line"
           - min-val: "-1.57"
           - max-val: "1.57"
           - resources: [z-quantum-core, z-quantum-qcbm]
-          - docker-image: "{{workflow.parameters.docker-image}}"
+          - docker-image: z-quantum-default
     - - name: optimize-circuit
         template: optimize-variational-qcbm-circuit
         arguments:
           parameters:
           - n-qubits: "4"
           - n-layers: "4"
+          - topology: "line"
           - epsilon: "0.000001"
           - backend-specs: "{'module_name': 'qeforest.simulator', 'function_name': 'ForestSimulator', 'device_name': 'wavefunction-simulator'}"
           - optimizer-specs: "{'module_name': 'zquantum.optimizers.cma_es_optimizer', 'function_name': 'CMAESOptimizer', 'options': {'popsize': 5, 'sigma_0': 0.1, 'tolx': 1e-6}}"
           # - optimizer-specs: "{'module_name': 'zquantum.optimizers.scipy_optimizer', 'function_name': 'ScipyOptimizer', 'method': 'L-BFGS-B'}"
           - resources: [z-quantum-core, qe-openfermion, z-quantum-optimizers, qe-forest, z-quantum-qcbm]
-          - docker-image: "{{workflow.parameters.docker-image}}"
           - memory: 2048Mi
+          - docker-image: z-quantum-default
           artifacts:
           - initial-parameters:
               from: "{{steps.get-initial-parameters.outputs.artifacts.parameters}}"
