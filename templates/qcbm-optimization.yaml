@@ -76,6 +76,7 @@ spec:
         raw:
           data: |
             from zquantum.qcbm.cost_function import QCBMCostFunction
+            from zquantum.qcbm.ansatz import get_qcbm_ansatz
             from zquantum.core.circuit import load_circuit_template_params, save_circuit_template_params
             from zquantum.core.utils import create_object
             from zquantum.optimizers.utils import save_optimization_results
