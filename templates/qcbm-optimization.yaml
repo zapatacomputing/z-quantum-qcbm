@@ -75,7 +75,7 @@ spec:
         path: /app/python_script.py
         raw:
           data: |
-            from zquantum.qcbm.optimization import optimize_variational_qcbm_circuit
+            from zquantum.qcbm.cost_function import QCBMCostFunction
             from zquantum.core.circuit import load_circuit_template_params, save_circuit_template_params
             from zquantum.core.utils import create_object
             from zquantum.optimizers.utils import save_optimization_results
@@ -87,6 +87,8 @@ spec:
             epsilon = {{inputs.parameters.epsilon}}
             distance_measure = "{{inputs.parameters.distance-measure}}"
 
+            ansatz = get_qcbm_ansatz(n_qubits, n_layers, topology)
+
             backend_specs = {{inputs.parameters.backend-specs}}
             backend = create_object(backend_specs)
 
@@ -95,9 +97,9 @@ spec:
 
             initial_params = load_circuit_template_params("initial-parameters.json")
             target_distribution = load_bitstring_distribution("target-distribution.json")
-
-            opt_results = optimize_variational_qcbm_circuit(n_qubits, n_layers, topology, epsilon,
-                initial_params, distance_measure, backend, optimizer, target_distribution)
+            
+            cost_function = QCBMCostFunction(ansatz, backend, distance_measure, target_distribution, epsilon)
+            opt_results = optimizer.minimize(cost_function, initial_params)
 
             save_optimization_results(opt_results, "optimization-results.json")
             save_circuit_template_params(opt_results.opt_params, "optimized-parameters.json")

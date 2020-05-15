@@ -4,7 +4,7 @@ from zquantum.core.utils import ValueEstimate
 from .ansatz import build_qcbm_circuit_ion_trap
 
 def optimize_variational_qcbm_circuit(n_qubits, n_layers, topology, epsilon, initial_params, distance_measure, 
-    backend, optimizer, target_bitstring_distribution,**kwargs):
+    backend, optimizer, target_bitstring_distribution, **kwargs):
     """Optimize a quantum circuit Born machine (QCBM).
 
     Args:
