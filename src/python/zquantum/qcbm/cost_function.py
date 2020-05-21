@@ -11,22 +11,22 @@ class QCBMCostFunction(CostFunction):
 
     Args:
         ansatz (dict): dictionary representing the ansatz
-        backend (zquantu.core.interfaces.backend.QuantumBackend): backend used for QCBM evaluation
+        backend (zquantum.core.interfaces.backend.QuantumBackend): backend used for QCBM evaluation
         distance_measure (str): string describing which distance measure should be used. See zquantum.core.bitstring_distribution.evaluate_distribution_distance
         target_bitstring_distribution (zquantum.core.bitstring_distribution.BitstringDistribution): bistring distribution which QCBM aims to learn
         epsilon (float): clipping value used for calculating distribution distance
         save_evaluation_history (bool): flag indicating whether we want to store the history of all the evaluations.
-        use_analytical_gradient (bool): flag indicating whether we want to use analytical or numerical gradient.
+        gradient_type (str): parameter indicating which type of gradient should be used.
 
     Params:
         ansatz (dict): see Args
-        backend (zquantu.core.interfaces.backend.QuantumBackend): see Args
+        backend (zquantum.core.interfaces.backend.QuantumBackend): see Args
         distance_measure (str): see Args
         target_bitstring_distribution (zquantum.core.bitstring_distribution.BitstringDistribution): see Args
         epsilon (float): see Args
         evaluations_history (list): List of the tuples (parameters, value) representing all the evaluation in a chronological order.
         save_evaluation_history (bool): see Args
-        use_analytical_gradient (bool): see Args
+        gradient_type (str): see Args
     """
 
     def __init__(self,  ansatz:Dict, 
@@ -35,7 +35,7 @@ class QCBMCostFunction(CostFunction):
                         target_bitstring_distribution:BitstringDistribution,
                         epsilon:float,
                         save_evaluation_history:bool=True, 
-                        use_analytical_gradient:bool=False):
+                        gradient_type:str='finite_difference'):
         self.ansatz = ansatz
         self.backend = backend
         self.distance_measure = distance_measure
@@ -43,7 +43,7 @@ class QCBMCostFunction(CostFunction):
         self.epsilon = epsilon
         self.evaluations_history = []
         self.save_evaluation_history = save_evaluation_history
-        self.use_analytical_gradient = use_analytical_gradient
+        self.gradient_type = gradient_type
 
     def evaluate(self, parameters:np.ndarray) -> float:
         """
@@ -81,34 +81,3 @@ class QCBMCostFunction(CostFunction):
                                             epsilon=self.epsilon)
 
         return value, distribution
-
-    def get_gradient(self, parameters:np.ndarray) -> np.ndarray:
-        """
-        Evaluates the gradient of the cost function for given parameters.
-        Whether the gradient is calculated analytically (if implemented) or numerically, 
-        is indicated by `use_analytical_gradient` field.
-
-        Args:
-            parameters: parameters for which we calculate the gradient.
-
-        Returns:
-            np.ndarray: gradient vector 
-        """
-        if self.use_analytical_gradient:
-            raise NotImplementedError
-        else:
-            raise NotImplementedError
-
-    def get_numerical_gradient(self, parameters:np.ndarray) -> np.ndarray:
-        """
-        Evaluates the gradient of the cost function for given parameters.
-        Whether the gradient is calculated analytically (if implemented) or numerically, 
-        is indicated by `use_analytical_gradient` field.
-
-        Args:
-            parameters: parameters for which we calculate the gradient.
-
-        Returns:
-            np.ndarray: gradient vector 
-        """
-        raise NotImplementedError
