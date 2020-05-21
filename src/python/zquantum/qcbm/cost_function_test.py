@@ -33,6 +33,9 @@ class TestQCBMCostFunction(unittest.TestCase):
         self.assertEqual(cost_function.distance_measure, distance_measure)
         self.assertEqual(cost_function.target_bitstring_distribution, target_bitstring_distribution)
         self.assertEqual(cost_function.epsilon, epsilon)
+        self.assertEqual(cost_function.gradient_type, 'finite_difference')
+        self.assertEqual(cost_function.save_evaluation_history, True)
+        self.assertEqual(cost_function.evaluations_history, [])
 
     def test_evaluate(self):
         # Given
