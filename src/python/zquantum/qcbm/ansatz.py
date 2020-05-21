@@ -3,7 +3,15 @@ from zquantum.core.circuit import Circuit, Qubit, Gate
 
 def get_qcbm_ansatz(n_qubits, n_layers, topology):
     """
-    TODO
+    Creates a circuit template for the QCBM ion trap ansatz.
+
+    Args:
+        n_qubits (int): number of qubits in the circuit.
+        n_layers (int): number of entangling layers in the circuit.
+        topology (str): topology (str): describes topology of qubits connectivity.
+
+    Returns:
+        dict: dictionary representing the ansatz.
     """
     ansatz = {'ansatz_type': 'QCBM_ion_trap',
             'ansatz_module': 'zquantum.qcbm.ansatz',
