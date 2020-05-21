@@ -5,7 +5,7 @@ def get_qcbm_ansatz(n_qubits, n_layers, topology):
     """
     TODO
     """
-    ansatz = {'ansatz_type': 'QCMB_ion_trap',
+    ansatz = {'ansatz_type': 'QCBM_ion_trap',
             'ansatz_module': 'zquantum.qcbm.ansatz',
             'ansatz_func' : 'build_qcbm_circuit_ion_trap',
             'ansatz_kwargs' : {
