@@ -1,7 +1,29 @@
 import numpy as np
 from zquantum.core.circuit import Circuit, Qubit, Gate
 
-def get_single_qubit_layer(n_qubits, params, single_qubit_gates):
+def get_qcbm_ansatz(n_qubits, n_layers, topology):
+    """
+    Creates a circuit template for the QCBM ion trap ansatz.
+
+    Args:
+        n_qubits (int): number of qubits in the circuit.
+        n_layers (int): number of entangling layers in the circuit.
+        topology (str): topology (str): describes topology of qubits connectivity.
+
+    Returns:
+        dict: dictionary representing the ansatz.
+    """
+    ansatz = {'ansatz_type': 'QCBM_ion_trap',
+            'ansatz_module': 'zquantum.qcbm.ansatz',
+            'ansatz_func' : 'build_qcbm_circuit_ion_trap',
+            'ansatz_kwargs' : {
+                'n_qubits' : n_qubits,
+                'n_layers' : n_layers,
+                'topology' : topology}}
+    return ansatz
+
+
+def get_single_qubit_layer(params, n_qubits, single_qubit_gates):
     """Builds a layer of single-qubit gates acting on all qubits in a quantum circuit.
 
     Args:
@@ -26,7 +48,7 @@ def get_single_qubit_layer(n_qubits, params, single_qubit_gates):
     return output
 
 
-def get_all_topology(n_qubits, params, static_entangler):
+def get_all_topology(params, n_qubits, static_entangler):
     """Builds an entangling layer according to the all-to-all topology.
 
     Args:
@@ -50,7 +72,7 @@ def get_all_topology(n_qubits, params, static_entangler):
     return output
 
 
-def get_line_topology(n_qubits, params, static_entangler):
+def get_line_topology(params, n_qubits, static_entangler):
     """Builds an entangling layer according to the line topology.
 
     Args:
@@ -70,7 +92,7 @@ def get_line_topology(n_qubits, params, static_entangler):
     return output
 
 
-def get_entangling_layer(n_qubits, params, static_entangler, topology):
+def get_entangling_layer(params, n_qubits, static_entangler, topology):
     """Builds an entangling layer in the circuit.
 
     Args:
@@ -84,14 +106,14 @@ def get_entangling_layer(n_qubits, params, static_entangler, topology):
         Circuit: a zquantum.core.circuit.Circuit object
     """
     if topology == "all":
-        return get_all_topology(n_qubits, params, static_entangler)
+        return get_all_topology(params, n_qubits, static_entangler)
     elif topology == "line":
-        return get_line_topology(n_qubits, params, static_entangler)
+        return get_line_topology(params, n_qubits, static_entangler)
     else:
         raise RuntimeError("Topology: {} is not supported".format(topology))
 
 
-def build_qcbm_circuit_ion_trap(n_qubits, input_params, n_layers, topology='all'):
+def build_qcbm_circuit_ion_trap(input_params, n_qubits, n_layers, topology='all'):
     """Builds a qcbm ansatz circuit, using the ansatz in https://advances.sciencemag.org/content/5/10/eaaw9918/tab-pdf (Fig.2 - top).
 
     Args:
@@ -104,7 +126,7 @@ def build_qcbm_circuit_ion_trap(n_qubits, input_params, n_layers, topology='all'
     """
     if n_layers == 1:
         # Only one layer, should be a single layer of rotations with Rx
-        return get_single_qubit_layer(n_qubits, input_params, ["Rx"])
+        return get_single_qubit_layer(input_params, n_qubits, ["Rx"])
 
     if topology == "all":
         n_params_per_ent_layer = int((n_qubits*(n_qubits-1))/2)
@@ -118,27 +140,27 @@ def build_qcbm_circuit_ion_trap(n_qubits, input_params, n_layers, topology='all'
     for layer_index in range(n_layers):
         if layer_index == 0:
             # First layer is always 2 single qubit rotations on Rx Rz
-            circuit += get_single_qubit_layer(n_qubits, input_params[parameter_index:parameter_index+2*n_qubits], ["Rx", "Rz"])
+            circuit += get_single_qubit_layer(input_params[parameter_index:parameter_index+2*n_qubits], n_qubits, ["Rx", "Rz"])
             parameter_index += 2*n_qubits
         elif n_layers%2 == 1 and layer_index == n_layers-1:
             # Last layer for odd number of layers is rotations on Rx Rz
-            circuit += get_single_qubit_layer(n_qubits, input_params[parameter_index:parameter_index+2*n_qubits], ["Rz", "Rx"])
+            circuit += get_single_qubit_layer(input_params[parameter_index:parameter_index+2*n_qubits], n_qubits, ["Rz", "Rx"])
             parameter_index += 2*n_qubits
         elif n_layers%2 == 0 and layer_index == n_layers-2:
             # Even number of layers, second to last layer is 3 rotation layer with Rx Rz Rx
-            circuit += get_single_qubit_layer(n_qubits, input_params[parameter_index:parameter_index+3*n_qubits], ["Rx", "Rz", "Rx"])
+            circuit += get_single_qubit_layer(input_params[parameter_index:parameter_index+3*n_qubits], n_qubits, ["Rx", "Rz", "Rx"])
             parameter_index += 3*n_qubits
         elif n_layers%2 == 1 and layer_index == n_layers-3:
             # Odd number of layers, third to last layer is 3 rotation layer with Rx Rz Rx
-            circuit += get_single_qubit_layer(n_qubits, input_params[parameter_index:parameter_index+3*n_qubits], ["Rx", "Rz", "Rx"])
+            circuit += get_single_qubit_layer(input_params[parameter_index:parameter_index+3*n_qubits], n_qubits, ["Rx", "Rz", "Rx"])
             parameter_index += 3*n_qubits
         elif layer_index%2 == 1:
             # Currently on an entangling layer
-            circuit += get_entangling_layer(n_qubits, input_params[parameter_index:parameter_index+n_params_per_ent_layer], "XX", topology)
+            circuit += get_entangling_layer(input_params[parameter_index:parameter_index+n_params_per_ent_layer], n_qubits, "XX", topology)
             parameter_index += n_params_per_ent_layer
         else:
             # A normal single qubit rotation layer of Rx Rz
-            circuit += get_single_qubit_layer(n_qubits, input_params[parameter_index:parameter_index+2*n_qubits], ["Rx", "Rz"])
+            circuit += get_single_qubit_layer(input_params[parameter_index:parameter_index+2*n_qubits], n_qubits, ["Rx", "Rz"])
             parameter_index += 2*n_qubits
 
     if parameter_index != len(input_params):
@@ -172,6 +194,7 @@ def generate_random_initial_params(n_qubits, n_layers=2, topology='all', min_val
     for num_parameters in num_parameters_by_layer:
         params = np.concatenate([params, gen.uniform(min_val, max_val, num_parameters)])
     return params
+
 
 def get_number_of_parameters_by_layer(n_qubits, n_layers, topology):
     """Determine the number of parameters each layer in the ansatz needs.
