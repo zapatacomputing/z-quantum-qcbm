@@ -63,6 +63,7 @@ class TestQCBMCostFunction(unittest.TestCase):
         # Then
         self.assertEqual(type(value), float)
         self.assertIn("bitstring_distribution", history[0].keys())
+        self.assertEqual(dict, type(history[0]["bitstring_distribution"]))
         self.assertIn("value", history[0].keys())
         self.assertIn("params", history[0].keys())
 
