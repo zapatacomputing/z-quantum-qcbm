@@ -2,7 +2,7 @@ from zquantum.core.interfaces.cost_function import CostFunction
 from zquantum.core.interfaces.backend import QuantumBackend
 from zquantum.core.bitstring_distribution import BitstringDistribution, evaluate_distribution_distance
 from zquantum.core.circuit import build_ansatz_circuit
-from typing import Union, Dict
+from typing import Union, Dict, Callable
 import numpy as np
 
 class QCBMCostFunction(CostFunction):
@@ -12,7 +12,7 @@ class QCBMCostFunction(CostFunction):
     Args:
         ansatz (dict): dictionary representing the ansatz
         backend (zquantum.core.interfaces.backend.QuantumBackend): backend used for QCBM evaluation
-        distance_measure (str): string describing which distance measure should be used. See zquantum.core.bitstring_distribution.evaluate_distribution_distance
+        distance_measure (callable): function used to calculate the distance measure
         target_bitstring_distribution (zquantum.core.bitstring_distribution.BitstringDistribution): bistring distribution which QCBM aims to learn
         epsilon (float): clipping value used for calculating distribution distance
         save_evaluation_history (bool): flag indicating whether we want to store the history of all the evaluations.
@@ -21,7 +21,7 @@ class QCBMCostFunction(CostFunction):
     Params:
         ansatz (dict): see Args
         backend (zquantum.core.interfaces.backend.QuantumBackend): see Args
-        distance_measure (str): see Args
+        distance_measure (callable): see Args
         target_bitstring_distribution (zquantum.core.bitstring_distribution.BitstringDistribution): see Args
         epsilon (float): see Args
         evaluations_history (list): List of the tuples (parameters, value) representing all the evaluation in a chronological order.
@@ -31,7 +31,7 @@ class QCBMCostFunction(CostFunction):
 
     def __init__(self,  ansatz:Dict, 
                         backend:QuantumBackend, 
-                        distance_measure:str,
+                        distance_measure:Callable,
                         target_bitstring_distribution:BitstringDistribution,
                         epsilon:float,
                         save_evaluation_history:bool=True, 
