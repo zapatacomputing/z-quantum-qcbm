@@ -57,7 +57,7 @@ class QCBMCostFunction(CostFunction):
         """
         value, distribution = self._evaluate(parameters)
         if self.save_evaluation_history:
-            self.evaluations_history.append({'value':value, 'params': parameters, 'bitstring_distribution': distribution})
+            self.evaluations_history.append({'value':value, 'params': parameters, 'bitstring_distribution': distribution.distribution_dict})
         return value
         
 
