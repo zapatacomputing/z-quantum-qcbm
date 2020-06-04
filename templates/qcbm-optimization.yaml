@@ -85,7 +85,7 @@ spec:
             n_layers = {{inputs.parameters.n-layers}}
             topology = "{{inputs.parameters.topology}}"
             epsilon = {{inputs.parameters.epsilon}}
-            distance_measure = get_func_from_specs({{inputs.parameters.distance-measure}})
+            distance_measure = get_func_from_specs({{inputs.parameters.distance-measure-specs}})
 
             ansatz = get_qcbm_ansatz(n_qubits, n_layers, topology)
 
