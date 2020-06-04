@@ -1,7 +1,7 @@
 import unittest
 from .cost_function import QCBMCostFunction
 from .ansatz import get_qcbm_ansatz
-from zquantum.core.bitstring_distribution import BitstringDistribution
+from zquantum.core.bitstring_distribution import BitstringDistribution, compute_clipped_negative_log_likelihood
 from zquantum.core.utils import create_object
 import numpy as np
 
@@ -13,7 +13,7 @@ class TestQCBMCostFunction(unittest.TestCase):
         topology = "all"
         epsilon = 1e-6
         n_layers = 1
-        distance_measure = "clipped_log_likelihood"
+        distance_measure = compute_clipped_negative_log_likelihood
         ansatz = get_qcbm_ansatz(num_qubits, n_layers, topology)
         target_bitstring_distribution = BitstringDistribution(
             {"0000": 1.0, "0001": 0.0, "0010": 0.0,
@@ -44,7 +44,7 @@ class TestQCBMCostFunction(unittest.TestCase):
         epsilon = 1e-6
         n_layers = 1
         params = np.array([0, 0, 0, 0])
-        distance_measure = "clipped_log_likelihood"
+        distance_measure = compute_clipped_negative_log_likelihood
         ansatz = get_qcbm_ansatz(num_qubits, n_layers, topology)
         target_bitstring_distribution = BitstringDistribution(
             {"0000": 1.0, "0001": 0.0, "0010": 0.0,

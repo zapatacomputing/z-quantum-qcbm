@@ -52,8 +52,7 @@ spec:
       - name: topology
         default: "all"
       - name: epsilon
-      - name: distance-measure
-        default: "clipped_log_likelihood"
+      - name: distance-measure-specs
       - name: backend-specs
       - name: optimizer-specs
       - name: command
@@ -78,7 +77,7 @@ spec:
             from zquantum.qcbm.cost_function import QCBMCostFunction
             from zquantum.qcbm.ansatz import get_qcbm_ansatz
             from zquantum.core.circuit import load_circuit_template_params, save_circuit_template_params
-            from zquantum.core.utils import create_object
+            from zquantum.core.utils import create_object, get_func_from_specs
             from zquantum.optimizers.utils import save_optimization_results
             from zquantum.core.bitstring_distribution import load_bitstring_distribution
 
@@ -86,7 +85,7 @@ spec:
             n_layers = {{inputs.parameters.n-layers}}
             topology = "{{inputs.parameters.topology}}"
             epsilon = {{inputs.parameters.epsilon}}
-            distance_measure = "{{inputs.parameters.distance-measure}}"
+            distance_measure = get_func_from_specs({{inputs.parameters.distance-measure-specs}})
 
             ansatz = get_qcbm_ansatz(n_qubits, n_layers, topology)
 

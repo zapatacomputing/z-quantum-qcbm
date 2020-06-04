@@ -70,6 +70,7 @@ spec:
           - n-layers: "4"
           - topology: "all"
           - epsilon: "0.000001"
+          - distance-measure-specs: "{'module_name': 'zquantum.core.bitstring_distribution', 'function_name': 'compute_clipped_negative_log_likelihood'}"
           - backend-specs: "{'module_name': 'qeforest.simulator', 'function_name': 'ForestSimulator', 'device_name': 'wavefunction-simulator'}"
           - optimizer-specs: "{'module_name': 'zquantum.optimizers.cma_es_optimizer', 'function_name': 'CMAESOptimizer', 'options': {'popsize': 5, 'sigma_0': 0.1, 'tolx': 1e-6}}"
           # - optimizer-specs: "{'module_name': 'zquantum.optimizers.scipy_optimizer', 'function_name': 'ScipyOptimizer', 'method': 'L-BFGS-B'}"
