@@ -7,7 +7,7 @@ spec:
       parameters:
       - name: nrows
       - name: ncols
-      - name: percentage
+      - name: fraction
         default: "1.0"
       - name: method
         default: "zigzag"
@@ -22,7 +22,7 @@ spec:
             from zquantum.core.bitstring_distribution import save_bitstring_distribution
             
             distribution = get_bars_and_stripes_target_distribution( {{inputs.parameters.nrows}},
-              {{inputs.parameters.ncols}}, percentage={{inputs.parameters.percentage}}, 
+              {{inputs.parameters.ncols}}, fraction={{inputs.parameters.fraction}}, 
               method="{{inputs.parameters.method}}")
 
             save_bitstring_distribution(distribution, "distribution.json")
