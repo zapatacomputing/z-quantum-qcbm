@@ -67,7 +67,7 @@ spec:
           parameters:
           - nrows: "2"
           - ncols: "2"
-          - percentage: "1.0"
+          - fraction: "1.0"
           - method: "zigzag"
           - resources: [z-quantum-core, z-quantum-qcbm]
     - - name: optimize-circuit
