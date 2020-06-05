@@ -1,0 +1,32 @@
+spec:
+  templates:
+
+  - name: generate-bars-and-stripes-target-distribution
+    parent: generic-task
+    inputs:
+      parameters:
+      - name: nrows
+      - name: ncols
+      - name: percentage
+        default: "1.0"
+      - name: method
+        default: "zigzag"
+      - name: command
+        value: python3 main_script.py
+      artifacts:
+      - name: main-script
+        path: /app/main_script.py
+        raw:
+          data: |
+            from zquantum.qcbm.target import get_bars_and_stripes_target_distribution
+            from zquantum.core.bitstring import save_bitstring_distribution
+            
+            distribution = get_bars_and_stripes_target_distribution( {{inputs.parameters.nrows}},
+              {{inputs.parameters.ncols}}, percentage={{inputs.parameters.percentage}}, 
+              method="{{inputs.parameters.method}}")
+
+            save_bitstring_distribution(distribution, "distribution.json")
+    outputs:
+      artifacts:
+      - name: distribution
+        path: /app/distribution.json
