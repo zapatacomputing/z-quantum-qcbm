@@ -56,9 +56,11 @@ class QCBMCostFunction(CostFunction):
             value: cost function value for given parameters, either int or float.
         """
         value, distribution = self._evaluate(parameters)
-        # if self.save_evaluation_history:
-        #     self.evaluations_history.append({'value':value, 'params': parameters, 'bitstring_distribution': distribution.distribution_dict})
-        # #print(self.evaluations_history, flush=True)
+        if self.save_evaluation_history:
+            self.evaluations_history.append({'value':value})
+        #    self.evaluations_history.append({'value':value, 'params': parameters, 'bitstring_distribution': distribution.distribution_dict})
+        #print(self.evaluations_history, flush=True)
+        print(f'History length: {len(self.evaluations_history)}')
         return value
         
 
