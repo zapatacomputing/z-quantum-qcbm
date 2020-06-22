@@ -104,12 +104,12 @@ class TestQCBMCostFunction(unittest.TestCase):
         )
 
         # When
-        value = cost_function.evaluate(params)
+        value_estimate = cost_function.evaluate(params)
         history = cost_function.evaluations_history
 
         # Then
-        self.assertEqual(type(value), ValueEstimate)
-        self.assertEqual(type(value.value), float)
+        self.assertEqual(type(value_estimate), ValueEstimate)
+        self.assertEqual(type(value_estimate.value), float)
         self.assertIn("bitstring_distribution", history[0].keys())
         self.assertEqual(dict, type(history[0]["bitstring_distribution"]))
         self.assertIn("value", history[0].keys())
