@@ -1,9 +1,13 @@
 from zquantum.core.interfaces.cost_function import CostFunction
 from zquantum.core.interfaces.backend import QuantumBackend
-from zquantum.core.bitstring_distribution import BitstringDistribution, evaluate_distribution_distance
+from zquantum.core.bitstring_distribution import (
+    BitstringDistribution,
+    evaluate_distribution_distance,
+)
 from zquantum.core.circuit import build_ansatz_circuit
 from typing import Union, Dict, Callable
 import numpy as np
+
 
 class QCBMCostFunction(CostFunction):
     """
@@ -29,13 +33,16 @@ class QCBMCostFunction(CostFunction):
         gradient_type (str): see Args
     """
 
-    def __init__(self,  ansatz:Dict, 
-                        backend:QuantumBackend, 
-                        distance_measure:Callable,
-                        target_bitstring_distribution:BitstringDistribution,
-                        epsilon:float,
-                        save_evaluation_history:bool=True, 
-                        gradient_type:str='finite_difference'):
+    def __init__(
+        self,
+        ansatz: Dict,
+        backend: QuantumBackend,
+        distance_measure: Callable,
+        target_bitstring_distribution: BitstringDistribution,
+        epsilon: float,
+        save_evaluation_history: bool = True,
+        gradient_type: str = "finite_difference",
+    ):
         self.ansatz = ansatz
         self.backend = backend
         self.distance_measure = distance_measure
@@ -45,7 +52,7 @@ class QCBMCostFunction(CostFunction):
         self.save_evaluation_history = save_evaluation_history
         self.gradient_type = gradient_type
 
-    def evaluate(self, parameters:np.ndarray) -> float:
+    def evaluate(self, parameters: np.ndarray) -> float:
         """
         Evaluates the value of the cost function for given parameters and saves the results (if specified).
 
@@ -57,14 +64,13 @@ class QCBMCostFunction(CostFunction):
         """
         value, distribution = self._evaluate(parameters)
         if self.save_evaluation_history:
-            self.evaluations_history.append({'value':value})
+            self.evaluations_history.append({"value": value, "params": parameters})
         #    self.evaluations_history.append({'value':value, 'params': parameters, 'bitstring_distribution': distribution.distribution_dict})
-        #print(self.evaluations_history, flush=True)
-        print(f'History length: {len(self.evaluations_history)}')
+        # print(self.evaluations_history, flush=True)
+        print(f"History length: {len(self.evaluations_history)}")
         return value
-        
 
-    def _evaluate(self, parameters:np.ndarray) -> float:
+    def _evaluate(self, parameters: np.ndarray) -> float:
         """
         Evaluates the value of the cost function for given parameters.
 
@@ -78,9 +84,10 @@ class QCBMCostFunction(CostFunction):
         circuit = build_ansatz_circuit(self.ansatz, parameters)
         distribution = self.backend.get_bitstring_distribution(circuit)
         value = evaluate_distribution_distance(
-                                            self.target_bitstring_distribution,
-                                            distribution,
-                                            self.distance_measure,
-                                            epsilon=self.epsilon)
+            self.target_bitstring_distribution,
+            distribution,
+            self.distance_measure,
+            epsilon=self.epsilon,
+        )
 
         return value, distribution
