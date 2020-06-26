@@ -64,7 +64,7 @@ class QCBMCostFunction(CostFunction):
         """
         value, distribution = self._evaluate(parameters)
         if self.save_evaluation_history:
-            if len(self.save_evaluation_history) == 0:
+            if len(self.evaluations_history) == 0:
                 min = value
             if value < min:
                 min = value
