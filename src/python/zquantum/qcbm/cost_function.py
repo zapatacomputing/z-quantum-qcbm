@@ -74,7 +74,7 @@ class QCBMCostFunction(CostFunction):
                         "bitstring_distribution": distribution.distribution_dict,
                     }
                 )
-                print(min)
+                print("MIN!!!", min)
             else:
                 self.evaluations_history.append({"value": value, "params": parameters})
         #    self.evaluations_history.append({'value':value, 'params': parameters, 'bitstring_distribution': distribution.distribution_dict})
