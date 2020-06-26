@@ -73,7 +73,7 @@ class QCBMCostFunction(CostFunction):
                         "bitstring_distribution": distribution.distribution_dict,
                     }
                 )
-            if value < self.evaluations_history[-1]:
+            if value < self.evaluations_history[-1]["value"]:
                 self.evaluations_history.append(
                     {
                         "value": value,
