@@ -63,8 +63,9 @@ class QCBMCostFunction(CostFunction):
             value: cost function value for given parameters, either int or float.
         """
         value, distribution = self._evaluate(parameters)
-        min = 100000
         if self.save_evaluation_history:
+            if len(self.save_evaluation_history) == 0:
+                min = value
             if value < min:
                 min = value
                 self.evaluations_history.append(
