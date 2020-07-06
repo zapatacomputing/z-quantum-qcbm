@@ -1,16 +1,14 @@
 import unittest
 import numpy as np
-import cirq
 import itertools
 from pyquil import Program
 import pyquil.gates
 
 from zquantum.core.circuit import Circuit, Qubit, Gate
-from zquantum.core.utils import compare_unitary, RNDSEED
 from zquantum.core.interfaces.ansatz_test import AnsatzTests
 
 from .ansatz import QCBMAnsatz
-from .ansatz_utils import get_entangling_layer, get_single_qubit_layer
+from .ansatz_utils import get_entangling_layer
 
 
 class TestQCBMAnsatz(unittest.TestCase, AnsatzTests):

@@ -1,38 +1,5 @@
 from zquantum.core.circuit import Circuit, Gate, Qubit
 import numpy as np
-from typing import List
-
-
-def get_single_qubit_layer(
-    params: np.ndarray, n_qubits: int, single_qubit_gates: List[str]
-) -> Circuit:
-    """Builds a circuit representing a layer of single-qubit gates acting on all qubits.
-
-    Args:
-        params (numpy.array): parameters of the single-qubit gates.
-        n_qubits (int): number of qubits in the circuit.
-        single_qubit_gates (str): a list of single qubit gates to be applied to each qubit.
-
-    Returns:
-        Circuit: a zquantum.core.circuit.Circuit object
-    """
-    assert len(params) == len(single_qubit_gates) * n_qubits
-
-    circuit = Circuit()
-    circuit.qubits = [Qubit(qubit_index) for qubit_index in range(n_qubits)]
-
-    parameter_index = 0
-    for gate_type in single_qubit_gates:
-        for qubit_index in range(n_qubits):
-            # Add single_qubit_gate to each qubit
-            circuit.gates.append(
-                Gate(
-                    gate_type, [circuit.qubits[qubit_index]], [params[parameter_index]]
-                )
-            )
-            parameter_index += 1
-
-    return circuit
 
 
 def get_entangling_layer(

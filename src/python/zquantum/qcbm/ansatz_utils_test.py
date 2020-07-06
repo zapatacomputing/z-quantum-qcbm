@@ -1,15 +1,12 @@
 import unittest
 import numpy as np
-import cirq
 import itertools
 from pyquil import Program
 import pyquil.gates
 
 from zquantum.core.circuit import Circuit, Qubit, Gate
-from zquantum.core.utils import RNDSEED, compare_unitary
 
 from .ansatz_utils import (
-    get_single_qubit_layer,
     get_entangling_layer,
     get_entangling_layer_all_topology,
     get_entangling_layer_line_topology,
@@ -17,65 +14,6 @@ from .ansatz_utils import (
 
 
 class TestAnsatzUtils(unittest.TestCase):
-    def test_get_single_qubit_layer_wrong_num_params(self):
-        # Given
-        single_qubit_gates = ["Ry"]
-        n_qubits = 2
-        params = np.ones(3)
-        # When/Then
-        self.assertRaises(
-            AssertionError,
-            lambda: get_single_qubit_layer(params, n_qubits, single_qubit_gates),
-        )
-
-    def test_get_single_qubit_layer_one_gate(self):
-        # Given
-        single_qubit_gates = ["Ry"]
-        n_qubits_list = [2, 3, 4, 10]
-
-        for n_qubits in n_qubits_list:
-            # Given
-            params = [x for x in range(0, n_qubits)]
-            test = cirq.Circuit()
-            qubits = [cirq.LineQubit(x) for x in range(0, n_qubits)]
-            for i in range(0, n_qubits):
-                test.append(cirq.Ry(params[i]).on(qubits[i]))
-            u_cirq = test._unitary_()
-
-            # When
-            circ = get_single_qubit_layer(params, n_qubits, single_qubit_gates)
-            unitary = circ.to_cirq()._unitary_()
-
-            # Then
-            self.assertEqual(circ.n_multiqubit_gates, 0)
-            self.assertEqual(compare_unitary(unitary, u_cirq, tol=1e-10), True)
-
-    def test_get_single_qubit_layer_multiple_gates(self):
-        # Given
-        single_qubit_gates = ["Ry", "Rx", "Rz"]
-        n_qubits_list = [2, 3, 4, 10]
-
-        for n_qubits in n_qubits_list:
-            # Given
-            params = [x for x in range(0, 3 * n_qubits)]
-            test = cirq.Circuit()
-            qubits = [cirq.LineQubit(x) for x in range(0, n_qubits)]
-            for i in range(0, n_qubits):
-                test.append(cirq.Ry(params[i]).on(qubits[i]))
-            for i in range(0, n_qubits):
-                test.append(cirq.Rx(params[n_qubits + i]).on(qubits[i]))
-            for i in range(0, n_qubits):
-                test.append(cirq.Rz(params[2 * n_qubits + i]).on(qubits[i]))
-            u_cirq = test._unitary_()
-
-            # When
-            circ = get_single_qubit_layer(params, n_qubits, single_qubit_gates)
-            unitary = circ.to_cirq()._unitary_()
-
-            # Then
-            self.assertEqual(circ.n_multiqubit_gates, 0)
-            self.assertEqual(compare_unitary(unitary, u_cirq, tol=1e-10), True)
-
     def test_get_entangling_layer_all_topology(self):
         # Given
         n_qubits = 4
