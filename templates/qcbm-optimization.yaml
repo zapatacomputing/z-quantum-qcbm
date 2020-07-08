@@ -75,19 +75,14 @@ spec:
         raw:
           data: |
             from zquantum.qcbm.cost_function import QCBMCostFunction
-            from zquantum.qcbm.ansatz import get_qcbm_ansatz
+            from zquantum.qcbm.ansatz import QCBMAnsatz
             from zquantum.core.circuit import load_circuit_template_params, save_circuit_template_params
             from zquantum.core.utils import create_object, get_func_from_specs
             from zquantum.optimizers.utils import save_optimization_results
             from zquantum.core.bitstring_distribution import load_bitstring_distribution
 
-            n_qubits = {{inputs.parameters.n-qubits}}
-            n_layers = {{inputs.parameters.n-layers}}
-            topology = "{{inputs.parameters.topology}}"
-            epsilon = {{inputs.parameters.epsilon}}
             distance_measure = get_func_from_specs({{inputs.parameters.distance-measure-specs}})
-
-            ansatz = get_qcbm_ansatz(n_qubits, n_layers, topology)
+            ansatz = QCBMAnsatz({{inputs.parameters.n-qubits}}, {{inputs.parameters.n-layers}}, "{{inputs.parameters.topology}}")
 
             backend_specs = {{inputs.parameters.backend-specs}}
             backend = create_object(backend_specs)
@@ -98,7 +93,7 @@ spec:
             initial_params = load_circuit_template_params("initial-parameters.json")
             target_distribution = load_bitstring_distribution("target-distribution.json")
             
-            cost_function = QCBMCostFunction(ansatz, backend, distance_measure, target_distribution, epsilon)
+            cost_function = QCBMCostFunction(ansatz, backend, distance_measure, target_distribution, {{inputs.parameters.epsilon}})
             opt_results = optimizer.minimize(cost_function, initial_params)
 
             save_optimization_results(opt_results, "optimization-results.json")
