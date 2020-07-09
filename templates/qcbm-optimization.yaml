@@ -33,7 +33,7 @@ spec:
             max_val = {{inputs.parameters.max-val}}
             seed = {{inputs.parameters.seed}}
 
-            parameters = generate_random_initial_params(n_qubits, n_layers=n_layers, 
+            parameters = generate_random_initial_params(n_qubits, n_layers=n_layers,
                   topology=topology, min_val=min_val, max_val=max_val, seed=seed)
 
             save_circuit_template_params(parameters, "parameters.json")
@@ -41,7 +41,7 @@ spec:
       artifacts:
       - name: parameters
         path: /app/parameters.json
-      
+
 
   - name: optimize-variational-qcbm-circuit
     parent: generic-task
@@ -82,7 +82,7 @@ spec:
             from zquantum.core.bitstring_distribution import load_bitstring_distribution
 
             distance_measure = get_func_from_specs({{inputs.parameters.distance-measure-specs}})
-            ansatz = QCBMAnsatz({{inputs.parameters.n-qubits}}, {{inputs.parameters.n-layers}}, "{{inputs.parameters.topology}}")
+            ansatz = QCBMAnsatz({{inputs.parameters.n-layers}}, {{inputs.parameters.n-qubits}}, "{{inputs.parameters.topology}}")
 
             backend_specs = {{inputs.parameters.backend-specs}}
             backend = create_object(backend_specs)
@@ -92,7 +92,7 @@ spec:
 
             initial_params = load_circuit_template_params("initial-parameters.json")
             target_distribution = load_bitstring_distribution("target-distribution.json")
-            
+
             cost_function = QCBMCostFunction(ansatz, backend, distance_measure, target_distribution, {{inputs.parameters.epsilon}})
             opt_results = optimizer.minimize(cost_function, initial_params)
 
@@ -104,4 +104,3 @@ spec:
         path: /app/optimization-results.json
       - name: optimized-parameters
         path: /app/optimized-parameters.json
-      
