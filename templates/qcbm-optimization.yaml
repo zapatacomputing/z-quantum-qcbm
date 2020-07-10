@@ -1,48 +1,6 @@
 spec:
   templates:
 
-  - name: generate-random-qcbm-params
-    parent: generic-task
-    inputs:
-      parameters:
-      - name: n-qubits
-      - name: n-layers
-        default: "2"
-      - name: topology
-        default: "all"
-      - name: min-val
-        default: "0."
-      - name: max-val
-        default: "1."
-      - name: seed
-        default: "None"
-      - name: command
-        value: python3 main_script.py
-      artifacts:
-      - name: main-script
-        path: /app/main_script.py
-        raw:
-          data: |
-            from zquantum.qcbm.ansatz import generate_random_initial_params
-            from zquantum.core.circuit import save_circuit_template_params
-
-            n_qubits = {{inputs.parameters.n-qubits}}
-            n_layers = {{inputs.parameters.n-layers}}
-            topology = "{{inputs.parameters.topology}}"
-            min_val = {{inputs.parameters.min-val}}
-            max_val = {{inputs.parameters.max-val}}
-            seed = {{inputs.parameters.seed}}
-
-            parameters = generate_random_initial_params(n_qubits, n_layers=n_layers,
-                  topology=topology, min_val=min_val, max_val=max_val, seed=seed)
-
-            save_circuit_template_params(parameters, "parameters.json")
-    outputs:
-      artifacts:
-      - name: parameters
-        path: /app/parameters.json
-
-
   - name: optimize-variational-qcbm-circuit
     parent: generic-task
     inputs:
