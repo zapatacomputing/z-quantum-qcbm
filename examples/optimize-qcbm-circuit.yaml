@@ -45,10 +45,11 @@ spec:
     parameters:
     - s3-bucket: quantum-engine
     - s3-key: projects/z-quantum-qcbm/qcbm-opt
-  
+
     - n-qubits: "4"
     - n-layers: "4"
     - topology: "all"
+    - seed: "9"
 
   templates:
 
@@ -61,6 +62,7 @@ spec:
           - ansatz-specs: "{'module_name': 'zquantum.qcbm.ansatz', 'function_name': 'QCBMAnsatz', 'number_of_layers': {{workflow.parameters.n-layers}}, 'number_of_qubits': {{workflow.parameters.n-qubits}}, 'topology': '{{workflow.parameters.topology}}'}"
           - min-val: "-1.57"
           - max-val: "1.57"
+          - seed: "{{workflow.parameters.seed}}"
           - resources: [z-quantum-core, z-quantum-qcbm]
       - name: get-bars-and-stripes-distribution
         template: generate-bars-and-stripes-target-distribution
