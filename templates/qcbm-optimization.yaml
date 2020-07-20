@@ -53,7 +53,7 @@ spec:
             initial_params = load_circuit_template_params("initial-parameters.json")
             target_distribution = load_bitstring_distribution("target-distribution.json")
 
-            cost_function = QCBMCostFunction(ansatz, backend, distance_measure, target_distribution, distance_measure_parameters)
+            cost_function = QCBMCostFunction(ansatz, backend, distance_measure, distance_measure_parameters, target_distribution)
             opt_results = optimizer.minimize(cost_function, initial_params)
 
             save_optimization_results(opt_results, "optimization-results.json")
