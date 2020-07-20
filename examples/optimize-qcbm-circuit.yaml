@@ -46,20 +46,23 @@ spec:
     - s3-bucket: quantum-engine
     - s3-key: projects/z-quantum-qcbm/qcbm-opt
 
+    - n-qubits: "4"
+    - n-layers: "4"
+    - topology: "all"
+    - seed: "9"
+
   templates:
 
   - name: main
     steps:
     - - name: get-initial-parameters
-        template: generate-random-qcbm-params
+        template: generate-random-ansatz-params
         arguments:
           parameters:
-          - n-qubits: "4"
-          - n-layers: "4"
-          - seed: "1234"
-          - topology: "all"
+          - ansatz-specs: "{'module_name': 'zquantum.qcbm.ansatz', 'function_name': 'QCBMAnsatz', 'number_of_layers': {{workflow.parameters.n-layers}}, 'number_of_qubits': {{workflow.parameters.n-qubits}}, 'topology': '{{workflow.parameters.topology}}'}"
           - min-val: "-1.57"
           - max-val: "1.57"
+          - seed: "{{workflow.parameters.seed}}"
           - resources: [z-quantum-core, z-quantum-qcbm]
       - name: get-bars-and-stripes-distribution
         template: generate-bars-and-stripes-target-distribution
@@ -74,9 +77,9 @@ spec:
         template: optimize-variational-qcbm-circuit
         arguments:
           parameters:
-          - n-qubits: "4"
-          - n-layers: "4"
-          - topology: "all"
+          - n-qubits: "{{workflow.parameters.n-qubits}}"
+          - n-layers: "{{workflow.parameters.n-layers}}"
+          - topology: "{{workflow.parameters.topology}}"
           - epsilon: "0.000001"
           - distance-measure-specs: "{'module_name': 'zquantum.core.bitstring_distribution', 'function_name': 'compute_clipped_negative_log_likelihood'}"
           - backend-specs: "{'module_name': 'qeforest.simulator', 'function_name': 'ForestSimulator', 'device_name': 'wavefunction-simulator'}"
@@ -86,6 +89,6 @@ spec:
           - memory: 2048Mi
           artifacts:
           - initial-parameters:
-              from: "{{steps.get-initial-parameters.outputs.artifacts.parameters}}"
+              from: "{{steps.get-initial-parameters.outputs.artifacts.params}}"
           - target-distribution:
               from: "{{steps.get-bars-and-stripes-distribution.outputs.artifacts.distribution}}"

@@ -50,8 +50,10 @@ class QCBMAnsatz(Ansatz):
     def n_params_per_ent_layer(self) -> int:
         if self.topology == "all":
             return int((self.number_of_qubits * (self.number_of_qubits - 1)) / 2)
-        elif topology == "line":
+        elif self.topology == "line":
             return self.number_of_qubits - 1
+        else:
+            raise RuntimeError("Topology {} is not supported".format(self.topology))
 
     @overrides
     def _generate_circuit(self, params: Optional[np.ndarray] = None) -> Circuit:
