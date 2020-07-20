@@ -9,8 +9,8 @@ spec:
       - name: n-layers
       - name: topology
         default: "all"
-      - name: epsilon
       - name: distance-measure-specs
+      - name: distance-measure-parameters
       - name: backend-specs
       - name: optimizer-specs
       - name: command
@@ -40,6 +40,8 @@ spec:
             from zquantum.core.bitstring_distribution import load_bitstring_distribution
 
             distance_measure = get_func_from_specs({{inputs.parameters.distance-measure-specs}})
+            distance_measure_parameters = eval({{inputs.parameters.distance-measure-parameters}})
+
             ansatz = QCBMAnsatz({{inputs.parameters.n-layers}}, {{inputs.parameters.n-qubits}}, "{{inputs.parameters.topology}}")
 
             backend_specs = {{inputs.parameters.backend-specs}}
@@ -51,7 +53,7 @@ spec:
             initial_params = load_circuit_template_params("initial-parameters.json")
             target_distribution = load_bitstring_distribution("target-distribution.json")
 
-            cost_function = QCBMCostFunction(ansatz, backend, distance_measure, target_distribution, {{inputs.parameters.epsilon}})
+            cost_function = QCBMCostFunction(ansatz, backend, distance_measure, target_distribution, distance_measure_parameters)
             opt_results = optimizer.minimize(cost_function, initial_params)
 
             save_optimization_results(opt_results, "optimization-results.json")
