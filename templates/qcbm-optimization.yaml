@@ -40,7 +40,7 @@ spec:
             from zquantum.core.bitstring_distribution import load_bitstring_distribution
 
             distance_measure = get_func_from_specs({{inputs.parameters.distance-measure-specs}})
-            distance_measure_parameters = eval("{{inputs.parameters.distance-measure-parameters}}")
+            distance_measure_parameters = {{inputs.parameters.distance-measure-parameters}}
 
             ansatz = QCBMAnsatz({{inputs.parameters.n-layers}}, {{inputs.parameters.n-qubits}}, "{{inputs.parameters.topology}}")
 
