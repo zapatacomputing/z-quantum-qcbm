@@ -18,8 +18,8 @@ class QCBMCostFunction(AnsatzBasedCostFunction):
         ansatz (zquantum.core.interfaces.ansatz.Ansatz): the ansatz used to construct the variational circuits
         backend (zquantum.core.interfaces.backend.QuantumBackend): backend used for QCBM evaluation
         distance_measure (callable): function used to calculate the distance measure
+        distance_measure_parameters (dict): dictionary containing the relevant parameters for the chosen distance measure
         target_bitstring_distribution (zquantum.core.bitstring_distribution.BitstringDistribution): bistring distribution which QCBM aims to learn
-        epsilon (float): clipping value used for calculating distribution distance
         save_evaluation_history (bool): flag indicating whether we want to store the history of all the evaluations.
         gradient_type (str): parameter indicating which type of gradient should be used.
 
@@ -28,7 +28,6 @@ class QCBMCostFunction(AnsatzBasedCostFunction):
         backend (zquantum.core.interfaces.backend.QuantumBackend): see Args
         distance_measure (callable): see Args
         target_bitstring_distribution (zquantum.core.bitstring_distribution.BitstringDistribution): see Args
-        epsilon (float): see Args
         save_evaluation_history (bool): see Args
         gradient_type (str): see Args
         evaluations_history (list): List of the tuples (parameters, value) representing all the evaluation in a chronological order.
@@ -39,16 +38,16 @@ class QCBMCostFunction(AnsatzBasedCostFunction):
         ansatz: Ansatz,
         backend: QuantumBackend,
         distance_measure: Callable,
+        distance_measure_parameters: dict,
         target_bitstring_distribution: BitstringDistribution,
-        epsilon: float,
         save_evaluation_history: bool = True,
         gradient_type: str = "finite_difference",
     ):
         self.ansatz = ansatz
         self.backend = backend
         self.distance_measure = distance_measure
+        self.distance_measure_parameters = distance_measure_parameters
         self.target_bitstring_distribution = target_bitstring_distribution
-        self.epsilon = epsilon
         self.evaluations_history = []
         self.save_evaluation_history = save_evaluation_history
         self.gradient_type = gradient_type
@@ -91,7 +90,7 @@ class QCBMCostFunction(AnsatzBasedCostFunction):
             self.target_bitstring_distribution,
             distribution,
             self.distance_measure,
-            epsilon=self.epsilon,
+            distance_measure_parameters=self.distance_measure_parameters,
         )
 
         return value, distribution
