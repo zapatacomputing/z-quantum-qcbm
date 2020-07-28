@@ -3,7 +3,7 @@ import os
 
 setuptools.setup(
     name="z-quantum-qcbm",
-    version="0.1.0",
+    version="0.2.0",
     author="Zapata Computing, Inc.",
     author_email="info@zapatacomputing.com",
     description="QCBM package for Orquestra.",
