@@ -1,48 +1,6 @@
 spec:
   templates:
 
-  - name: generate-random-qcbm-params
-    parent: generic-task
-    inputs:
-      parameters:
-      - name: n-qubits
-      - name: n-layers
-        default: "2"
-      - name: topology
-        default: "all"
-      - name: min-val
-        default: "0."
-      - name: max-val
-        default: "1."
-      - name: seed
-        default: "None"
-      - name: command
-        value: python3 main_script.py
-      artifacts:
-      - name: main-script
-        path: /app/main_script.py
-        raw:
-          data: |
-            from zquantum.qcbm.ansatz import generate_random_initial_params
-            from zquantum.core.circuit import save_circuit_template_params
-
-            n_qubits = {{inputs.parameters.n-qubits}}
-            n_layers = {{inputs.parameters.n-layers}}
-            topology = "{{inputs.parameters.topology}}"
-            min_val = {{inputs.parameters.min-val}}
-            max_val = {{inputs.parameters.max-val}}
-            seed = {{inputs.parameters.seed}}
-
-            parameters = generate_random_initial_params(n_qubits, n_layers=n_layers, 
-                  topology=topology, min_val=min_val, max_val=max_val, seed=seed)
-
-            save_circuit_template_params(parameters, "parameters.json")
-    outputs:
-      artifacts:
-      - name: parameters
-        path: /app/parameters.json
-      
-
   - name: optimize-variational-qcbm-circuit
     parent: generic-task
     inputs:
@@ -51,9 +9,8 @@ spec:
       - name: n-layers
       - name: topology
         default: "all"
-      - name: epsilon
-      - name: distance-measure
-        default: "clipped_log_likelihood"
+      - name: distance-measure-specs
+      - name: distance-measure-parameters
       - name: backend-specs
       - name: optimizer-specs
       - name: command
@@ -76,19 +33,16 @@ spec:
         raw:
           data: |
             from zquantum.qcbm.cost_function import QCBMCostFunction
-            from zquantum.qcbm.ansatz import get_qcbm_ansatz
+            from zquantum.qcbm.ansatz import QCBMAnsatz
             from zquantum.core.circuit import load_circuit_template_params, save_circuit_template_params
-            from zquantum.core.utils import create_object
+            from zquantum.core.utils import create_object, get_func_from_specs
             from zquantum.optimizers.utils import save_optimization_results
             from zquantum.core.bitstring_distribution import load_bitstring_distribution
 
-            n_qubits = {{inputs.parameters.n-qubits}}
-            n_layers = {{inputs.parameters.n-layers}}
-            topology = "{{inputs.parameters.topology}}"
-            epsilon = {{inputs.parameters.epsilon}}
-            distance_measure = "{{inputs.parameters.distance-measure}}"
+            distance_measure = get_func_from_specs({{inputs.parameters.distance-measure-specs}})
+            distance_measure_parameters = {{inputs.parameters.distance-measure-parameters}}
 
-            ansatz = get_qcbm_ansatz(n_qubits, n_layers, topology)
+            ansatz = QCBMAnsatz({{inputs.parameters.n-layers}}, {{inputs.parameters.n-qubits}}, "{{inputs.parameters.topology}}")
 
             backend_specs = {{inputs.parameters.backend-specs}}
             backend = create_object(backend_specs)
@@ -98,8 +52,8 @@ spec:
 
             initial_params = load_circuit_template_params("initial-parameters.json")
             target_distribution = load_bitstring_distribution("target-distribution.json")
-            
-            cost_function = QCBMCostFunction(ansatz, backend, distance_measure, target_distribution, epsilon)
+
+            cost_function = QCBMCostFunction(ansatz, backend, distance_measure, distance_measure_parameters, target_distribution)
             opt_results = optimizer.minimize(cost_function, initial_params)
 
             save_optimization_results(opt_results, "optimization-results.json")
@@ -110,4 +64,3 @@ spec:
         path: /app/optimization-results.json
       - name: optimized-parameters
         path: /app/optimized-parameters.json
-      
