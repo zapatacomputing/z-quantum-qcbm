@@ -14,7 +14,7 @@ imports:
   type: git
   parameters:
     repository: "git@github.com:zapatacomputing/z-quantum-qcbm.git"
-    branch: "master"
+    branch: "workflow-v1"
 - name: z-quantum-optimizers
   type: git
   parameters:
@@ -57,7 +57,7 @@ steps:
   outputs:
     - name: params
       type: ansatz-params
-- name:
+- name: get-bars-and-stripes-distribution
   config:
     runtime:
       type: python3
