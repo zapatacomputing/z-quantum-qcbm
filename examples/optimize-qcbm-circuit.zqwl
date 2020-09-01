@@ -1,0 +1,135 @@
+# Workflow API version
+apiVersion: io.orquestra.workflow/1.0.0
+
+# Prefix for workflow ID
+name: qcbm-opt
+
+imports:
+- name: z-quantum-core
+  type: git
+  parameters:
+    repository: "git@github.com:zapatacomputing/z-quantum-core.git"
+    branch: "workflow-v1"
+- name: z-quantum-qcbm
+  type: git
+  parameters:
+    repository: "git@github.com:zapatacomputing/z-quantum-qcbm.git"
+    branch: "master"
+- name: z-quantum-optimizers
+  type: git
+  parameters:
+    repository: "git@github.com:zapatacomputing/z-quantum-optimizers.git"
+    branch: "master"
+- name: qe-forest
+  type: git
+  parameters:
+    repository: "git@github.com:zapatacomputing/qe-forest.git"
+    branch: "master"
+- name: qe-openfermion
+  type: git
+  parameters:
+    repository: "git@github.com:zapatacomputing/qe-openfermion.git"
+    branch: "master"
+
+steps:
+
+- name: get-initial-parameters
+  config:
+    runtime:
+      type: python3
+      imports: [z-quantum-core, z-quantum-qcbm]
+      parameters:
+        file: z-quantum-core/tasks/circuit_tasks.py
+        function: generate_random_ansatz_params
+    resources:
+      cpu: "1000m"
+      memory: "1Gi"
+      disk: "10Gi"
+  inputs:
+    - ansatz_specs: '{"module_name": "zquantum.qcbm.ansatz", "function_name": "QCBMAnsatz", "number_of_layers": 4, "number_of_qubits": 4, "topology": "all"}'
+      type: string
+    - min_value: -1.57
+      type: float
+    - max_value: 1.57
+      type: float
+    - seed: 9
+      type: int
+  outputs:
+    - name: params
+      type: ansatz-params
+- name:
+  config:
+    runtime:
+      type: python3
+      imports: [z-quantum-core, z-quantum-qcbm]
+      parameters:
+        file: z-quantum-qcbm/tasks/generate_target_distribution_task.py
+        function: generate_bars_and_stripes_target_distribution
+    resources:
+      cpu: "1000m"
+      memory: "1Gi"
+      disk: "10Gi"
+  inputs:
+    - nrows: 2
+      type: int
+    - ncols: 2
+      type: int
+    - fraction: 1.0
+      type: float
+    - method: 'zigzag'
+      type: string
+  outputs:
+    - name: distribution
+      type: bas-distribution
+
+types:
+ - ansatz-params
+ - bas-distribution
+
+
+# - - name: get-initial-parameters
+#     template: generate-random-ansatz-params
+#     arguments:
+#       parameters:
+#       - ansatz-specs: "{'module_name': 'zquantum.qcbm.ansatz', 'function_name': 'QCBMAnsatz', 'number_of_layers': {{workflow.parameters.n-layers}}, 'number_of_qubits': {{workflow.parameters.n-qubits}}, 'topology': '{{workflow.parameters.topology}}'}"
+#       - min-val: "-1.57"
+#       - max-val: "1.57"
+#       - seed: "{{workflow.parameters.seed}}"
+#       - resources: [z-quantum-core, z-quantum-qcbm]
+#   - name: get-bars-and-stripes-distribution
+#     template: generate-bars-and-stripes-target-distribution
+#     arguments:
+#       parameters:
+#       - nrows: "2"
+#       - ncols: "2"
+#       - fraction: "1.0"
+#       - method: "zigzag"
+#       - resources: [z-quantum-core, z-quantum-qcbm]
+# - name: get-bars-and-stripes-distribution
+#     template: generate-bars-and-stripes-target-distribution
+#     arguments:
+#       parameters:
+#       - nrows: "2"
+#       - ncols: "2"
+#       - fraction: "1.0"
+#       - method: "zigzag"
+#       - resources: [z-quantum-core, z-quantum-qcbm]
+# - name: optimize-circuit
+#     template: optimize-variational-qcbm-circuit
+#     arguments:
+#       parameters:
+#       - n-qubits: "{{workflow.parameters.n-qubits}}"
+#       - n-layers: "{{workflow.parameters.n-layers}}"
+#       - topology: "{{workflow.parameters.topology}}"
+#       - distance-measure-specs: "{'module_name': 'zquantum.core.bitstring_distribution', 'function_name': 'compute_clipped_negative_log_likelihood'}"
+#       - distance-measure-parameters: "{'epsilon': 1e-6}"
+#       - backend-specs: "{'module_name': 'qeforest.simulator', 'function_name': 'ForestSimulator', 'device_name': 'wavefunction-simulator'}"
+#       - optimizer-specs: "{'module_name': 'zquantum.optimizers.cma_es_optimizer', 'function_name': 'CMAESOptimizer', 'options': {'popsize': 5, 'sigma_0': 0.1, 'tolx': 1e-6}}"
+#       # - optimizer-specs: "{'module_name': 'zquantum.optimizers.scipy_optimizer', 'function_name': 'ScipyOptimizer', 'method': 'L-BFGS-B'}"
+#       - resources: [z-quantum-core, qe-openfermion, z-quantum-optimizers, qe-forest, z-quantum-qcbm]
+#       - memory: 2048Mi
+#       artifacts:
+#       - initial-parameters:
+#           from: "{{steps.get-initial-parameters.outputs.artifacts.params}}"
+#       - target-distribution:
+#           from: "{{steps.get-bars-and-stripes-distribution.outputs.artifacts.distribution}}"
