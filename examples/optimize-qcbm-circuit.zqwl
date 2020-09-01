@@ -74,7 +74,7 @@ steps:
       type: int
     - ncols: 2
       type: int
-    - fraction: 1.0
+    - fraction: 1.0000000001
       type: float
     - method: 'zigzag'
       type: string
