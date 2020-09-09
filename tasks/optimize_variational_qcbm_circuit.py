@@ -31,7 +31,7 @@ def optimize_variational_qcbm_circuit(
         ansatz,
         backend,
         distance_measure,
-        distance_measure_parameters,
+        json.loads(distance_measure_parameters),
         target_distribution,
     )
     opt_results = optimizer.minimize(cost_function, initial_parameters)
