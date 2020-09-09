@@ -17,7 +17,7 @@ def optimize_variational_qcbm_circuit(
     topology,
     backend_specs,
     optimizer_specs,
-    initial_params,
+    initial_parameters,
     target_distribution
 ):
 
@@ -25,7 +25,7 @@ def optimize_variational_qcbm_circuit(
     ansatz = QCBMAnsatz(n_layers, n_qubits, topology)
     backend = create_object(json.loads(backend_specs))
     optimizer = create_object(json.loads(optimizer_specs))
-    initial_params = load_circuit_template_params(initial_params)
+    initial_parameters = load_circuit_template_params(initial_parameters)
     target_distribution = load_bitstring_distribution(target_distribution)
     cost_function = QCBMCostFunction(
         ansatz,
@@ -34,6 +34,6 @@ def optimize_variational_qcbm_circuit(
         distance_measure_parameters,
         target_distribution,
     )
-    opt_results = optimizer.minimize(cost_function, initial_params)
+    opt_results = optimizer.minimize(cost_function, initial_parameters)
     save_optimization_results(opt_results, "qcbm-optimization-results.json")
     save_circuit_template_params(opt_results.opt_params, "optimized-parameters.json")
