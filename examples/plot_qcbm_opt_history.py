@@ -35,15 +35,20 @@ target_distribution = []
 current_minimum = 100000
 for step_id in data:
     step = data[step_id]
-    # n_qubits = int(step["inputParam:ansatz-specs"])
-    print(step["inputParam:ansatz-specs"])
-
-    # "inputParam:ansatz-specs":"{'module_name': 'zquantum.qcbm.ansatz', 'function_name': 'QCBMAnsatz', 'number_of_layers': 1, 'number_of_qubits': 4,
-    ordered_bitstrings = get_ordered_list_of_bitstrings(
-        int(step["inputParam:n-qubits"])
-    )
+    if step["class"] == "generate-random-ansatz-params":
+        number_of_qubits = int(
+            eval(step["inputParam:ansatz-specs"])["number_of_qubits"]
+        )
+    ordered_bitstrings = get_ordered_list_of_bitstrings(number_of_qubits)
     if step["class"] == "generate-bars-and-stripes-target-distribution":
         target_distribution = []
+        for key in ordered_bitstrings:
+            try:
+                target_distribution.append(
+                    step["distribution"]["bitstring_distribution"][key]
+                )
+            except:
+                target_distribution.append(0)
         exact_distance_value = entropy(target_distribution)
     elif step["class"] == "optimize-variational-qcbm-circuit":
         for evaluation in step["optimization-results"]["history"]:
@@ -103,7 +108,7 @@ def animate(i):
         xlabel="Evaluation Index",
         ylabel="Clipped negative log-likelihood cost function",
     )
-    ax1.set_ylim([exact_distance_value - 0.1, exact_distance_value + 1])
+    ax1.set_ylim([exact_distance_value - 0.1, exact_distance_value + 1.5])
     ax1.scatter(
         evals, plotted_distances, color="green", linewidths=line_widths, marker="."
     )
@@ -121,7 +126,7 @@ def animate(i):
 
     ax2.clear()
     ax2.set(xlabel="Bitstring", ylabel="Measured Probability")
-    ax2.set_ylim([0, np.max(bitstring_distributions) + 0.1])
+    ax2.set_ylim([0, np.max(bitstring_distributions)])
     ax2.bar(ordered_bitstrings, bitstring_distributions[i], facecolor="green")
     ax2.bar(
         ordered_bitstrings,
