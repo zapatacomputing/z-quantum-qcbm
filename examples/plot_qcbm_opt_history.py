@@ -126,7 +126,7 @@ def animate(i):
 
     ax2.clear()
     ax2.set(xlabel="Bitstring", ylabel="Measured Probability")
-    ax2.set_ylim([0, np.max(target_distribution) + 0.1])
+    ax2.set_ylim([0, np.max(target_distribution) + 0.05])
     ax2.bar(ordered_bitstrings, bitstring_distributions[i], facecolor="green")
     ax2.bar(
         ordered_bitstrings,
