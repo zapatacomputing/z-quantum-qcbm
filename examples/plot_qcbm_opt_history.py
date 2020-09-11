@@ -20,7 +20,7 @@ def get_ordered_list_of_bitstrings(num_qubits):
     return bitstrings
 
 # Insert the path to your JSON file here
-with open('./examples/qcbm-example.json') as f:
+with open('qcbm-opt-dc0976a4-0367-4579-b0e1-b58af0842f50.json') as f:
     data = json.load(f)
 
 # Extract lists of energies, bond lengths, and basis sets.
@@ -31,10 +31,10 @@ bistring_distributions = []
 current_minimum = 100000
 for step_id in data:
     step = data[step_id]
-    if step["class"] == "optimize-variational-qcbm-circuit":
-        ordered_bitstrings = get_ordered_list_of_bitstrings(int(step["inputParam:n-qubits"]))
-        
-        for evaluation in step["optimization-results"]["history"]:
+    if step["class"] == "optimize-circuit":
+        ordered_bitstrings = get_ordered_list_of_bitstrings(4)
+
+        for evaluation in step["qcbm-optimization-results"]["history"]:
             distances.append(evaluation["value"])
             current_minimum = min(current_minimum, evaluation["value"])
             minimum_distances.append(current_minimum)

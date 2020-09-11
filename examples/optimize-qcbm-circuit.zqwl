@@ -1,0 +1,125 @@
+# Workflow API version
+apiVersion: io.orquestra.workflow/1.0.0
+
+# Prefix for workflow ID
+name: qcbm-opt
+
+imports:
+- name: z-quantum-core
+  type: git
+  parameters:
+    repository: "git@github.com:zapatacomputing/z-quantum-core.git"
+    branch: "workflow-v1"
+- name: z-quantum-qcbm
+  type: git
+  parameters:
+    repository: "git@github.com:zapatacomputing/z-quantum-qcbm.git"
+    branch: "workflow-v1"
+- name: z-quantum-optimizers
+  type: git
+  parameters:
+    repository: "git@github.com:zapatacomputing/z-quantum-optimizers.git"
+    branch: "master"
+- name: qe-qiskit
+  type: git
+  parameters:
+    repository: "git@github.com:zapatacomputing/qe-qiskit.git"
+    branch: "master"
+- name: qe-openfermion
+  type: git
+  parameters:
+    repository: "git@github.com:zapatacomputing/qe-openfermion.git"
+    branch: "master"
+
+steps:
+
+- name: get-initial-parameters
+  config:
+    runtime:
+      type: python3
+      imports: [z-quantum-core, z-quantum-qcbm]
+      parameters:
+        file: z-quantum-core/tasks/circuit_tasks.py
+        function: generate_random_ansatz_params
+    resources:
+      cpu: "1000m"
+      memory: "1Gi"
+      disk: "10Gi"
+  inputs:
+    - ansatz_specs: '{"module_name": "zquantum.qcbm.ansatz", "function_name": "QCBMAnsatz", "number_of_layers": 4, "number_of_qubits": 4, "topology": "all"}'
+      type: string
+    - min_value: -1.57
+      type: float
+    - max_value: 1.57
+      type: float
+    - seed: 9
+      type: int
+  outputs:
+    - name: params
+      type: ansatz-params
+- name: get-bars-and-stripes-distribution
+  config:
+    runtime:
+      type: python3
+      imports: [z-quantum-core, z-quantum-qcbm]
+      parameters:
+        file: z-quantum-qcbm/tasks/generate_target_distribution_task.py
+        function: generate_bars_and_stripes_target_distribution
+    resources:
+      cpu: "1000m"
+      memory: "1Gi"
+      disk: "10Gi"
+  inputs:
+    - nrows: 2
+      type: int
+    - ncols: 2
+      type: int
+    - fraction: 1.0000000001
+      type: float
+    - method: 'zigzag'
+      type: string
+  outputs:
+    - name: distribution
+      type: bitstring-distribution
+
+- name: optimize-circuit
+  passed: [get-bars-and-stripes-distribution, get-initial-parameters]
+  config:
+    runtime:
+      type: python3
+      imports:  [z-quantum-core, qe-openfermion, z-quantum-optimizers, qe-qiskit, z-quantum-qcbm]
+      parameters:
+        file: z-quantum-qcbm/tasks/optimize_variational_qcbm_circuit.py
+        function: optimize_variational_qcbm_circuit
+    resources:
+      cpu: "1000m"
+      memory: "2Gi"
+  inputs:
+  - n_qubits: 4
+    type: int
+  - n_layers: 4
+    type: int
+  - topology: all
+    type: string
+  - distance_measure_specs: '{"module_name": "zquantum.core.bitstring_distribution", "function_name": "compute_clipped_negative_log_likelihood"}'
+    type: string
+  - distance_measure_parameters: '{"epsilon": 1e-6}'
+    type: string
+  - backend_specs: '{"module_name": "qeqiskit.simulator", "function_name": "QiskitSimulator", "device_name": "statevector_simulator"}'
+    type: string
+  - optimizer_specs: '{"module_name": "zquantum.optimizers.cma_es_optimizer", "function_name": "CMAESOptimizer", "options": {"popsize": 5, "sigma_0": 0.1, "tolx": 1e-6}}'
+    type: string
+  - initial_parameters: ((get-initial-parameters.params))
+    type: ansatz-params
+  - target_distribution: ((get-bars-and-stripes-distribution.distribution))
+    type: bitstring-distribution
+  outputs:
+    - name: qcbm-optimization-results
+      type: optimization-results
+    - name: optimized-parameters
+      type: ansatz-params
+
+types:
+ - ansatz-params
+ - bitstring-distribution
+ - optimization-results
