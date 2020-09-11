@@ -23,7 +23,7 @@ def get_ordered_list_of_bitstrings(num_qubits):
 
 
 # Insert the path to your JSON file here
-with open("./examples/qcbm-example.json") as f:
+with open("./qcbm-example.json") as f:
     data = json.load(f)
 
 # Extract target/measured bitstring distribution and distance measure values.
@@ -35,6 +35,10 @@ target_distribution = []
 current_minimum = 100000
 for step_id in data:
     step = data[step_id]
+    # n_qubits = int(step["inputParam:ansatz-specs"])
+    print(step["inputParam:ansatz-specs"])
+
+    # "inputParam:ansatz-specs":"{'module_name': 'zquantum.qcbm.ansatz', 'function_name': 'QCBMAnsatz', 'number_of_layers': 1, 'number_of_qubits': 4,
     ordered_bitstrings = get_ordered_list_of_bitstrings(
         int(step["inputParam:n-qubits"])
     )
