@@ -30,7 +30,6 @@ with open("./qcbm-example.json") as f:
 distances = []
 minimum_distances = []
 bitstring_distributions = []
-target_distribution = []
 
 current_minimum = 100000
 for step_id in data:
