@@ -76,7 +76,7 @@ steps:
       type: int
     - ncols: 2
       type: int
-    - fraction: 1.0000000001
+    - fraction: 1.0
       type: float
     - method: 'zigzag'
       type: string
@@ -109,7 +109,7 @@ steps:
     type: string
   - backend_specs: '{"module_name": "qeqiskit.simulator", "function_name": "QiskitSimulator", "device_name": "statevector_simulator"}'
     type: string
-  - optimizer_specs: '{"module_name": "zquantum.optimizers.cma_es_optimizer", "function_name": "CMAESOptimizer", "options": {"popsize": 5, "sigma_0": 0.1, "tolx": 1e-6}}'
+  - optimizer_specs: '{"module_name": "zquantum.optimizers.cma_es_optimizer", "function_name": "CMAESOptimizer", "options": {"popsize": 5, "sigma_0": 0.1, "tolx": 1e-4}}'
     type: string
   - initial_parameters: ((get-initial-parameters.params))
     type: ansatz-params
