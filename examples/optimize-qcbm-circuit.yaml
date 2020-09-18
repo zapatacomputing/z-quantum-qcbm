@@ -39,7 +39,7 @@ steps:
       type: python3
       imports: [z-quantum-core, z-quantum-qcbm]
       parameters:
-        file: z-quantum-core/tasks/circuit_tasks.py
+        file: z-quantum-core/steps/circuit.py
         function: generate_random_ansatz_params
     resources:
       cpu: "1000m"
@@ -65,7 +65,7 @@ steps:
       type: python3
       imports: [z-quantum-core, z-quantum-qcbm]
       parameters:
-        file: z-quantum-qcbm/tasks/generate_target_distribution_task.py
+        file: z-quantum-qcbm/steps/generate_target_distribution_step.py
         function: generate_bars_and_stripes_target_distribution
     resources:
       cpu: "1000m"
@@ -91,7 +91,7 @@ steps:
       type: python3
       imports:  [z-quantum-core, qe-openfermion, z-quantum-optimizers, qe-qiskit, z-quantum-qcbm]
       parameters:
-        file: z-quantum-qcbm/tasks/optimize_variational_qcbm_circuit.py
+        file: z-quantum-qcbm/steps/optimize_variational_qcbm_circuit.py
         function: optimize_variational_qcbm_circuit
     resources:
       cpu: "1000m"
