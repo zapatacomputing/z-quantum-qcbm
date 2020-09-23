@@ -23,7 +23,7 @@ def get_ordered_list_of_bitstrings(num_qubits):
 
 
 # Insert the path to your JSON file here
-with open("./qcbm-example.json") as f:
+with open("qcbm-example.json") as f:
     data = json.load(f)
 
 # Extract target/measured bitstring distribution and distance measure values.
@@ -32,14 +32,15 @@ minimum_distances = []
 bitstring_distributions = []
 
 current_minimum = 100000
+number_of_qubits = 4
 for step_id in data:
     step = data[step_id]
-    if step["class"] == "generate-random-ansatz-params":
-        number_of_qubits = int(
-            eval(step["inputParam:ansatz-specs"])["number_of_qubits"]
-        )
+    # if step["class"] == "get-initial-parameters":
+    #     number_of_qubits = int(
+    #         eval(step["inputParam:ansatz-specs"])["number_of_qubits"]
+    #     )
     ordered_bitstrings = get_ordered_list_of_bitstrings(number_of_qubits)
-    if step["class"] == "generate-bars-and-stripes-target-distribution":
+    if step["class"] == "get-bars-and-stripes-distribution":
         target_distribution = []
         for key in ordered_bitstrings:
             try:
@@ -49,8 +50,8 @@ for step_id in data:
             except:
                 target_distribution.append(0)
         exact_distance_value = entropy(target_distribution)
-    elif step["class"] == "optimize-variational-qcbm-circuit":
-        for evaluation in step["optimization-results"]["history"]:
+    elif step["class"] == "optimize-circuit":
+        for evaluation in step["qcbm-optimization-results"]["history"]:
             distances.append(evaluation["value"])
             current_minimum = min(current_minimum, evaluation["value"])
             minimum_distances.append(current_minimum)
@@ -62,7 +63,6 @@ for step_id in data:
                 except:
                     bitstring_dist.append(0)
             bitstring_distributions.append(bitstring_dist)
-
 
 fig = plt.figure(figsize=(16, 8))
 gs = gridspec.GridSpec(nrows=8, ncols=3, width_ratios=[16, 1, 1])
