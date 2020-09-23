@@ -36,10 +36,10 @@ steps:
 - name: get-initial-parameters
   config:
     runtime:
-      type: python3
+      language: python3
       imports: [z-quantum-core, z-quantum-qcbm]
       parameters:
-        file: z-quantum-core/tasks/circuit_tasks.py
+        file: z-quantum-core/steps/circuit.py
         function: generate_random_ansatz_params
     resources:
       cpu: "1000m"
@@ -62,10 +62,10 @@ steps:
 - name: get-bars-and-stripes-distribution
   config:
     runtime:
-      type: python3
+      language: python3
       imports: [z-quantum-core, z-quantum-qcbm]
       parameters:
-        file: z-quantum-qcbm/tasks/generate_target_distribution_task.py
+        file: z-quantum-qcbm/steps/generate_target_distribution_step.py
         function: generate_bars_and_stripes_target_distribution
     resources:
       cpu: "1000m"
@@ -76,7 +76,7 @@ steps:
       type: int
     - ncols: 2
       type: int
-    - fraction: 1.0000000001
+    - fraction: 1.0
       type: float
     - method: 'zigzag'
       type: string
@@ -88,10 +88,10 @@ steps:
   passed: [get-bars-and-stripes-distribution, get-initial-parameters]
   config:
     runtime:
-      type: python3
+      language: python3
       imports:  [z-quantum-core, qe-openfermion, z-quantum-optimizers, qe-qiskit, z-quantum-qcbm]
       parameters:
-        file: z-quantum-qcbm/tasks/optimize_variational_qcbm_circuit.py
+        file: z-quantum-qcbm/steps/optimize_variational_qcbm_circuit.py
         function: optimize_variational_qcbm_circuit
     resources:
       cpu: "1000m"
