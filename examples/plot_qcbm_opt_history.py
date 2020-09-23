@@ -32,11 +32,14 @@ minimum_distances = []
 bitstring_distributions = []
 
 current_minimum = 100000
+number_of_qubits = 4
 for step_id in data:
     step = data[step_id]
-    number_of_qubits = 4
+    # if step["class"] == "get-initial-parameters":
+    #     number_of_qubits = int(
+    #         eval(step["inputParam:ansatz-specs"])["number_of_qubits"]
+    #     )
     ordered_bitstrings = get_ordered_list_of_bitstrings(number_of_qubits)
-
     if step["class"] == "get-bars-and-stripes-distribution":
         target_distribution = []
         for key in ordered_bitstrings:
@@ -47,7 +50,6 @@ for step_id in data:
             except:
                 target_distribution.append(0)
         exact_distance_value = entropy(target_distribution)
-
     elif step["class"] == "optimize-circuit":
         for evaluation in step["qcbm-optimization-results"]["history"]:
             distances.append(evaluation["value"])
@@ -133,7 +135,6 @@ def animate(i):
         label="target",
     )
     ax2.legend(loc="upper right")
-
     if distances[i] == minimum_distances[i]:
         normalized_distribution = np.array(bitstring_distributions[i]) / max(
             bitstring_distributions[i]
