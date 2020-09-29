@@ -9,27 +9,27 @@ imports:
   type: git
   parameters:
     repository: "git@github.com:zapatacomputing/z-quantum-core.git"
-    branch: "master"
+    branch: "workflow-v1"
 - name: z-quantum-qcbm
   type: git
   parameters:
     repository: "git@github.com:zapatacomputing/z-quantum-qcbm.git"
-    branch: "master"
+    branch: "workflow-v1"
 - name: z-quantum-optimizers
   type: git
   parameters:
     repository: "git@github.com:zapatacomputing/z-quantum-optimizers.git"
-    branch: "master"
+    branch: "workflow-v1"
 - name: qe-qiskit
   type: git
   parameters:
     repository: "git@github.com:zapatacomputing/qe-qiskit.git"
-    branch: "master"
+    branch: "workflow-v1"
 - name: qe-openfermion
   type: git
   parameters:
     repository: "git@github.com:zapatacomputing/qe-openfermion.git"
-    branch: "master"
+    branch: "workflow-v1"
 
 steps:
 
