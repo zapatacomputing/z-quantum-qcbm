@@ -6,7 +6,6 @@ from zquantum.core.bitstring_distribution import (
     BitstringDistribution,
     evaluate_distribution_distance,
 )
-from zquantum.core.circuit import build_ansatz_circuit
 from zquantum.core.utils import ValueEstimate
 from zquantum.core.gradients import finite_differences_gradient
 from typing import Union, Callable
