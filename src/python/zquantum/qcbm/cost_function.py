@@ -1,5 +1,5 @@
 from zquantum.core.cost_function import AnsatzBasedCostFunction
-from zquantum.core.interfaces.functions import FunctionWithGradient
+from zquantum.core.interfaces.functions import function_with_gradient
 from zquantum.core.interfaces.backend import QuantumBackend
 from zquantum.core.interfaces.ansatz import Ansatz
 from zquantum.core.bitstring_distribution import (
@@ -64,7 +64,7 @@ def QCBMCostFunction(
         return ValueEstimate(value)
 
     if gradient_type == "finite_difference":
-        cost_function = FunctionWithGradient(
+        cost_function = function_with_gradient(
             cost_function, finite_differences_gradient(cost_function)
         )
     else:
