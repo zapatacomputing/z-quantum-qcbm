@@ -1,5 +1,5 @@
 from zquantum.core.cost_function import AnsatzBasedCostFunction
-from zquantum.core.interfaces.functions import function_with_gradient
+from zquantum.core.interfaces.functions import function_with_gradient, StoreArtifact
 from zquantum.core.interfaces.backend import QuantumBackend
 from zquantum.core.interfaces.ansatz import Ansatz
 from zquantum.core.bitstring_distribution import (
@@ -37,7 +37,7 @@ def QCBMCostFunction(
     """
 
     def cost_function(
-        parameters: np.ndarray, store_artifact: Callable = None
+        parameters: np.ndarray, store_artifact: StoreArtifact = None
     ) -> ValueEstimate:
         """
         Evaluates the value of the cost function for given parameters.
