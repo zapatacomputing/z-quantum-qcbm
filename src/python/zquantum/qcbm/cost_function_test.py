@@ -7,6 +7,7 @@ from zquantum.core.bitstring_distribution import (
     compute_mmd,
 )
 from zquantum.core.utils import create_object, ValueEstimate
+from zquantum.core.history.recorder import recorder
 import numpy as np
 
 param_list = [
@@ -50,36 +51,7 @@ class TestQCBMCostFunction(unittest.TestCase):
             }
         )
 
-    def test_init(self):
-        for distance_meas, distance_measure_params in param_list:
-            with self.subTest():
-                # Given
-                self.distance_measure = distance_meas
-                distance_measure_parameters = distance_measure_params
-
-            # When
-            cost_function = QCBMCostFunction(
-                self.ansatz,
-                self.backend,
-                self.distance_measure,
-                distance_measure_parameters,
-                self.target_bitstring_distribution,
-            )
-
-            # Then
-            self.assertEqual(cost_function.ansatz, self.ansatz)
-            self.assertEqual(cost_function.backend, self.backend)
-            self.assertEqual(cost_function.distance_measure, self.distance_measure)
-            self.assertEqual(
-                cost_function.target_bitstring_distribution,
-                self.target_bitstring_distribution,
-            )
-            self.assertEqual(
-                cost_function.distance_measure_parameters, distance_measure_parameters
-            )
-            self.assertEqual(cost_function.gradient_type, "finite_difference")
-            self.assertEqual(cost_function.save_evaluation_history, True)
-            self.assertEqual(cost_function.evaluations_history, [])
+        self.gradient_types = ["finite_difference"]
 
     def test_evaluate(self):
         for distance_meas, distance_measure_params in param_list:
@@ -99,13 +71,87 @@ class TestQCBMCostFunction(unittest.TestCase):
                 params = np.array([0, 0, 0, 0])
 
                 # When
-                value_estimate = cost_function.evaluate(params)
-                history = cost_function.evaluations_history
+                value_estimate = cost_function(params)
 
                 # Then
                 self.assertEqual(type(value_estimate), ValueEstimate)
                 assert isinstance(value_estimate.value, (np.floating, float))
-                self.assertIn("bitstring_distribution", history[0].keys())
-                self.assertEqual(dict, type(history[0]["bitstring_distribution"]))
-                self.assertIn("value", history[0].keys())
-                self.assertIn("params", history[0].keys())
+
+    def test_evaluate_history(self):
+        for distance_meas, distance_measure_params in param_list:
+            with self.subTest():
+                # Given
+                self.distance_measure = distance_meas
+                distance_measure_parameters = distance_measure_params
+
+                cost_function = QCBMCostFunction(
+                    self.ansatz,
+                    self.backend,
+                    self.distance_measure,
+                    distance_measure_parameters,
+                    self.target_bitstring_distribution,
+                )
+
+                cost_function = recorder(cost_function)
+
+                params = np.array([0, 0, 0, 0])
+
+                # When
+                value_estimate = cost_function(params)
+                history = cost_function.history
+
+                # Then
+                self.assertEqual(len(history), 1)
+                self.assertEqual(
+                    BitstringDistribution,
+                    type(history[0].artifacts["bitstring_distribution"]),
+                )
+                np.testing.assert_array_equal(params, history[0].params)
+                self.assertEqual(value_estimate, history[0].value)
+
+    def test_gradient(self):
+        for distance_meas, distance_measure_params in param_list:
+            for gradient_type in self.gradient_types:
+                with self.subTest():
+                    # Given
+                    self.distance_measure = distance_meas
+                    distance_measure_parameters = distance_measure_params
+
+                    cost_function = QCBMCostFunction(
+                        self.ansatz,
+                        self.backend,
+                        self.distance_measure,
+                        distance_measure_parameters,
+                        self.target_bitstring_distribution,
+                        gradient_type=gradient_type,
+                    )
+
+                    params = np.array([0, 0, 0, 0])
+
+                    # When
+                    gradient = cost_function.gradient(params)
+
+                    # Then
+                    self.assertEqual(len(params), len(gradient))
+                    for gradient_val in gradient:
+                        self.assertEqual(np.float64, type(gradient_val))
+
+    def test_error_raised_if_gradient_is_not_supported(self):
+        for distance_meas, distance_measure_params in param_list:
+            for gradient_type in self.gradient_types:
+                with self.subTest():
+                    # Given
+                    self.distance_measure = distance_meas
+                    distance_measure_parameters = distance_measure_params
+
+                    self.assertRaises(
+                        RuntimeError,
+                        lambda: QCBMCostFunction(
+                            self.ansatz,
+                            self.backend,
+                            self.distance_measure,
+                            distance_measure_parameters,
+                            self.target_bitstring_distribution,
+                            gradient_type="UNSUPPORTED GRADIENT TYPE",
+                        ),
+                    )
