@@ -5,9 +5,10 @@ from zquantum.core.circuit import (
     save_circuit_template_params,
 )
 from zquantum.core.utils import create_object, get_func_from_specs
-from zquantum.optimizers.utils import save_optimization_results
+from zquantum.core.serialization import save_optimization_results
 from zquantum.core.bitstring_distribution import load_bitstring_distribution
 import json
+
 
 def optimize_variational_qcbm_circuit(
     distance_measure_specs,
@@ -18,7 +19,7 @@ def optimize_variational_qcbm_circuit(
     backend_specs,
     optimizer_specs,
     initial_parameters,
-    target_distribution
+    target_distribution,
 ):
 
     distance_measure = get_func_from_specs(json.loads(distance_measure_specs))
