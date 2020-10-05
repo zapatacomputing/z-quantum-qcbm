@@ -52,14 +52,16 @@ for step_id in data:
         exact_distance_value = entropy(target_distribution)
     elif step["class"] == "optimize-circuit":
         for evaluation in step["qcbm-optimization-results"]["history"]:
-            distances.append(evaluation["value"])
-            current_minimum = min(current_minimum, evaluation["value"])
+            distances.append(evaluation["value"]["value"])
+            current_minimum = min(current_minimum, evaluation["value"]["value"])
             minimum_distances.append(current_minimum)
 
             bitstring_dist = []
             for key in ordered_bitstrings:
                 try:
-                    bitstring_dist.append(evaluation["bitstring_distribution"][key])
+                    bitstring_dist.append(
+                        evaluation["artifacts"]["bitstring_distribution"][key]
+                    )
                 except:
                     bitstring_dist.append(0)
             bitstring_distributions.append(bitstring_dist)
