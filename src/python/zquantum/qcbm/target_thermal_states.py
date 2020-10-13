@@ -95,8 +95,8 @@ def get_thermal_states_target_distribution(n_spins, beta, n_body_interaction):
         Z += factor
         local_exp += factor * vector 
         pair_exp += factor * np.outer(vector, vector)
-        brinary = format(num, '0' + str(n_spins) + 'b' ) 
-        n_args[brinary] = energy 
+        binary = format(num, '0' + str(n_spins) + 'b' ) 
+        n_args[binary] = energy 
     energies = n_args
     probabilities = {k: np.exp(-v * beta) / Z for k,v in n_args.items()} 
     local_exp = local_exp / Z
