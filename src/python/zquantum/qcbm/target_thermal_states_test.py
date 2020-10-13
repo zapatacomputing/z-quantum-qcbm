@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-#from zquantum.core.bitstring_distribution import BitstringDistribution
+from zquantum.core.bitstring_distribution import BitstringDistribution
 
 from target_thermal_states import (intToising, isingToint, get_random_hj, get_thermal_states_target_distribution)
 
@@ -42,7 +42,3 @@ class TestThermalTarget(unittest.TestCase):
     
 
 
-
-if __name__ == '__main__':
-    unittest.main()
-        

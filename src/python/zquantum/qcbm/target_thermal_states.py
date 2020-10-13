@@ -2,7 +2,7 @@ import itertools
 import bisect
 import numpy as np
 import matplotlib.pyplot as plt
-#from zquantum.core.bitstring_distribution import BitstringDistribution
+from zquantum.core.bitstring_distribution import BitstringDistribution
 
 
 #Global Variables
@@ -102,10 +102,9 @@ def get_thermal_states_target_distribution(n_spins, beta, n_body_interaction):
     local_exp = local_exp / Z
     pair_exp = pair_exp / Z
     assert(round(sum(probabilities.values()), Precision) == 1.)  
-    print(probabilities.keys())
-    return probabilities
+    return BitstringDistribution(probabilities)
 
-get_thermal_states_target_distribution(5, 1, 0)
+
 
 
 
