@@ -35,6 +35,11 @@ def QCBMCostFunction(
             the distance between the produced bitstring distribution and the target distribution
     """
 
+    assert (
+        int(target_bitstring_distribution.get_qubits_number())
+        == ansatz.number_of_qubits
+    )
+
     def cost_function(
         parameters: np.ndarray, store_artifact: StoreArtifact = None
     ) -> ValueEstimate:
