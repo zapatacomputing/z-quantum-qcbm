@@ -66,7 +66,9 @@ class QCBMAnsatz(Ansatz):
             Circuit
         """
         if params is None:
-            params = self.get_symbols()
+            params = np.asarray(
+                [sympy.Symbol("theta_{}".format(i)) for i in range(self.number_of_params)]
+            )
 
         assert len(params) == self.number_of_params
 
@@ -244,14 +246,3 @@ class QCBMAnsatz(Ansatz):
                 num_params_by_layer.append(self.number_of_qubits * 2)
 
         return np.asarray(num_params_by_layer)
-
-    @overrides
-    def get_symbols(self) -> List[sympy.Symbol]:
-        """
-        Returns a list of symbolic parameters used for creating the ansatz.
-        The order of the symbols should match the order in which parameters should be passed for creating executable circuit.
-        """
-        return np.asarray(
-            [sympy.Symbol("theta_{}".format(i)) for i in range(self.number_of_params)]
-        )
-
