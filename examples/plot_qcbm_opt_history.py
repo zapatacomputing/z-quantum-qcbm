@@ -23,7 +23,7 @@ def get_ordered_list_of_bitstrings(num_qubits):
 
 
 # Insert the path to your JSON file here
-with open("qcbm-example.json") as f:
+with open("workflow_result.json") as f:
     data = json.load(f)
 
 # Extract target/measured bitstring distribution and distance measure values.
@@ -35,12 +35,12 @@ current_minimum = 100000
 number_of_qubits = 4
 for step_id in data:
     step = data[step_id]
-    # if step["class"] == "get-initial-parameters":
+    # if step["stepName"] == "get-initial-parameters":
     #     number_of_qubits = int(
     #         eval(step["inputParam:ansatz-specs"])["number_of_qubits"]
     #     )
     ordered_bitstrings = get_ordered_list_of_bitstrings(number_of_qubits)
-    if step["class"] == "get-bars-and-stripes-distribution":
+    if step["stepName"] == "get-bars-and-stripes-distribution":
         target_distribution = []
         for key in ordered_bitstrings:
             try:
@@ -50,7 +50,8 @@ for step_id in data:
             except:
                 target_distribution.append(0)
         exact_distance_value = entropy(target_distribution)
-    elif step["class"] == "optimize-circuit":
+        print(exact_distance_value)
+    elif step["stepName"] == "optimize-circuit":
         for evaluation in step["qcbm-optimization-results"]["history"]:
             distances.append(evaluation["value"]["value"])
             current_minimum = min(current_minimum, evaluation["value"]["value"])
@@ -128,15 +129,25 @@ def animate(i):
     ax2.clear()
     ax2.set(xlabel="Bitstring", ylabel="Measured Probability")
     ax2.set_ylim([0, np.max(target_distribution) + 0.05])
-    ax2.bar(ordered_bitstrings, bitstring_distributions[i], facecolor="green")
+    
+    x_locations = np.arange(16)
+
+    # Create the bars at the x locations with the height of the proportions for each bitstring
+
+    ax2.bar(x_locations, bitstring_distributions[i], facecolor="green")
     ax2.bar(
-        ordered_bitstrings,
+        x_locations,
         target_distribution,
         facecolor="darkgreen",
         alpha=0.3,
         label="target",
     )
+
+    # set the tick locations as the center of the bar, then set the label to be the bitstring
+    ax2.set_xticks([x+0.4 for x in x_locations])
+    ax2.set_xticklabels(ordered_bitstrings)
     ax2.legend(loc="upper right")
+    
     if distances[i] == minimum_distances[i]:
         normalized_distribution = np.array(bitstring_distributions[i]) / max(
             bitstring_distributions[i]
