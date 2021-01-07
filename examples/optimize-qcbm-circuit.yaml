@@ -46,8 +46,13 @@ steps:
       memory: "1Gi"
       disk: "10Gi"
   inputs:
-    - ansatz_specs: '{"module_name": "zquantum.qcbm.ansatz", "function_name": "QCBMAnsatz", "number_of_layers": 4, "number_of_qubits": 4, "topology": "all"}'
-      type: string
+    - ansatz_specs:
+        module_name: zquantum.qcbm.ansatz
+        function_name: QCBMAnsatz
+        number_of_layers: 4
+        number_of_qubits: 4
+        topology: all
+      type: specs
     - min_value: -1.57
       type: float
     - max_value: 1.57
@@ -103,14 +108,22 @@ steps:
     type: int
   - topology: all
     type: string
-  - distance_measure_specs: '{"module_name": "zquantum.core.bitstring_distribution", "function_name": "compute_clipped_negative_log_likelihood"}'
-    type: string
-  - distance_measure_parameters: '{"epsilon": 1e-6}'
-    type: string
-  - backend_specs: '{"module_name": "qeqiskit.simulator", "function_name": "QiskitSimulator", "device_name": "statevector_simulator"}'
-    type: string
-  - optimizer_specs: '{"module_name": "zquantum.optimizers.cma_es_optimizer", "function_name": "CMAESOptimizer", "options": {"popsize": 5, "sigma_0": 0.1, "tolx": 1e-6, "seed": 9}}'
-    type: string
+  - distance_measure_specs:
+      module_name: zquantum.core.bitstring_distribution
+      function_name: compute_clipped_negative_log_likelihood
+    type: specs
+  - distance_measure_parameters: {"epsilon": 1.0e-6}
+    type: specs
+  - backend_specs:
+      module_name: qeqiskit.simulator
+      function_name: QiskitSimulator
+      device_name: statevector_simulator
+    type: specs
+  - optimizer_specs:
+      module_name: zquantum.optimizers.cma_es_optimizer
+      function_name: CMAESOptimizer
+      options: {"popsize": 5, "sigma_0": 0.1, "tolx": 1.0e-6, "seed": 9}
+    type: specs
   - initial_parameters: ((get-initial-parameters.params))
     type: ansatz-params
   - target_distribution: ((get-bars-and-stripes-distribution.distribution))

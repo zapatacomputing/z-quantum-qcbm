@@ -22,17 +22,31 @@ def optimize_variational_qcbm_circuit(
     target_distribution,
 ):
 
-    distance_measure = get_func_from_specs(json.loads(distance_measure_specs))
+    if isinstance(distance_measure_specs, str):
+        distance_measure_specs = json.loads(distance_measure_specs)
+    distance_measure = get_func_from_specs(distance_measure_specs)
+
     ansatz = QCBMAnsatz(n_layers, n_qubits, topology)
-    backend = create_object(json.loads(backend_specs))
-    optimizer = create_object(json.loads(optimizer_specs))
+
+    if isinstance(backend_specs, str):
+        backend_specs = json.loads(backend_specs)
+    backend = create_object(backend_specs)
+
+    if isinstance(optimizer_specs, str):
+        optimizer_specs = json.loads(optimizer_specs)
+    optimizer = create_object(optimizer_specs)
+
     initial_parameters = load_circuit_template_params(initial_parameters)
     target_distribution = load_bitstring_distribution(target_distribution)
+
+    if isinstance(distance_measure_parameters, str):
+        distance_measure_parameters = json.loads(distance_measure_parameters)
+
     cost_function = QCBMCostFunction(
         ansatz,
         backend,
         distance_measure,
-        json.loads(distance_measure_parameters),
+        distance_measure_parameters,
         target_distribution,
     )
     opt_results = optimizer.minimize(cost_function, initial_parameters)
