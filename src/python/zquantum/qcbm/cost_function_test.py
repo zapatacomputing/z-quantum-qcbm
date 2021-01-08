@@ -155,3 +155,26 @@ class TestQCBMCostFunction(unittest.TestCase):
                             gradient_type="UNSUPPORTED GRADIENT TYPE",
                         ),
                     )
+
+    def test_error_raised_if_target_distribution_and_ansatz_are_for_differing_number_of_qubits(
+        self,
+    ):
+        for distance_meas, distance_measure_params in param_list:
+            with self.subTest():
+                # Given
+                self.ansatz.number_of_qubits = 5
+
+                self.distance_measure = distance_meas
+                distance_measure_parameters = distance_measure_params
+
+                # When/Then
+                self.assertRaises(
+                    AssertionError,
+                    lambda: QCBMCostFunction(
+                        self.ansatz,
+                        self.backend,
+                        self.distance_measure,
+                        distance_measure_parameters,
+                        self.target_bitstring_distribution,
+                    ),
+                )
