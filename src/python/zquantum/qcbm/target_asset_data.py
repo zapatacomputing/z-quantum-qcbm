@@ -7,8 +7,6 @@ import numpy as np
 from pypfopt.efficient_frontier import EfficientFrontier
 from pypfopt.expected_returns import mean_historical_return
 from pypfopt.risk_models import CovarianceShrinkage, risk_matrix
-from scipy.special import comb
-from math import comb 
 from itertools import combinations
 import cvxpy as cp
 import pandas as pd
