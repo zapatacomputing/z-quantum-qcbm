@@ -73,7 +73,7 @@ def generate_initial_dataset(nbits: int, N: int, M: int):
         dataset[i, flipped_bits] = 1
         
     unique_dataset = np.unique(dataset, axis=0) 
-    unique_dataset = unique_dataset[:N]
+    unique_dataset = unique_dataset[::-1]
     for i in range(len(unique_dataset)): 
         string = ''
         for j in range(nbits): 
@@ -138,6 +138,11 @@ def cost(bitstr, returns, covs, parameters):
         cost = 1.0
     return cost
 
+def nCr(n,r):
+    f = math.factorial
+    return f(n) / f(r) / f(n-r)
+
+
 def probability(cost, T):
 
     '''Returns the probability for a given portfolio given the cost and the temperature T. 
@@ -172,8 +177,8 @@ def get_probabilities(start_date, end_date, total_assets, target_return, num_ass
         "target_return": target_return,
         "lower_bound": 0.05,
         "upper_bound": 0.9,
-        "T": np.sqrt(np.mean(new_S)),} 
-    portfolio_num = comb(total_assets, num_assets_to_choose)
+        "T": 1} 
+    portfolio_num = nCr(total_assets, num_assets_to_choose)
     possibilities = generate_initial_dataset(total_assets, portfolio_num, num_assets_to_choose)
     string_possibilities = possibilities[1]
     portfolio_string_possibilities = possibilities[2]
@@ -188,7 +193,7 @@ def get_probabilities(start_date, end_date, total_assets, target_return, num_ass
         else:  
             risk = cost(portfolio_possibilities[count],new_mu, new_S, parameters)
             where = np.where(portfolio_possibilities[count])[0]
-            prob = probability(risk, np.sqrt(np.mean(new_S[where, :][:, where])))
+            prob = probability(risk, 1)
             prob_list.append(prob)
             prob_sum += prob
             count += 1 
