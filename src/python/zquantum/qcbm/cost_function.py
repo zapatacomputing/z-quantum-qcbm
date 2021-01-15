@@ -31,7 +31,7 @@ def QCBMCostFunction(
         gradient_type (str): parameter indicating which type of gradient should be used.
 
     Returns:
-        Callable that evaluates the parameterized circuit produced by the ansatz with the given parameters and returns
+        Callable that evaluates the parametrized circuit produced by the ansatz with the given parameters and returns
             the distance between the produced bitstring distribution and the target distribution
     """
 
