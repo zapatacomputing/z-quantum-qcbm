@@ -64,6 +64,7 @@ def QCBMCostFunction(
 
         if store_artifact:
             store_artifact("bitstring_distribution", distribution)
+            store_artifact("number_of_circuits_run", backend.number_of_circuits_run)
 
         return ValueEstimate(value)
 
