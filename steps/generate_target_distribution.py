@@ -22,6 +22,6 @@ def get_thermal_target_training_set(n_spins, beta, instances):
     
     save_bitstring_distribution_set(training_data_set_distributions, "distribution_set.json" )
 
-
+get_thermal_states_target_distribution(2, 1, 1)
 
 

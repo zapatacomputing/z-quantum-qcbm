@@ -187,10 +187,6 @@ def get_sample_Bitstring_Dist(n_samples, n_spins, beta, seed_dist, seed_sample):
     probabilities = thermal_sample_distribution(n_samples, n_spins, beta, seed_dist, seed_sample)
     return BitstringDistribution(probabilities) 
 
-
-print(thermal_sample_distribution(1000, 5, 1, 1, 1).values())
-#print(thermal_target_distribution(5, 1, 1).values())      
-        
             
             
         
