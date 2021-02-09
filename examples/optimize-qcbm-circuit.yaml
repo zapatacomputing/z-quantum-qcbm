@@ -41,8 +41,13 @@ steps:
       memory: "1Gi"
       disk: "10Gi"
   inputs:
-    - ansatz_specs: '{"module_name": "zquantum.qcbm.ansatz", "function_name": "QCBMAnsatz", "number_of_layers": 4, "number_of_qubits": 4, "topology": "all"}'
-      type: string
+    - ansatz_specs:
+        module_name: zquantum.qcbm.ansatz
+        function_name: QCBMAnsatz
+        number_of_layers: 0
+        number_of_qubits: 4
+        topology: all
+      type: specs
     - min_value: -1.57
       type: float
     - max_value: 1.57
