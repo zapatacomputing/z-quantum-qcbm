@@ -1,4 +1,3 @@
-from zquantum.core.cost_function import AnsatzBasedCostFunction
 from zquantum.core.interfaces.functions import function_with_gradient, StoreArtifact
 from zquantum.core.interfaces.backend import QuantumBackend
 from zquantum.core.interfaces.ansatz import Ansatz

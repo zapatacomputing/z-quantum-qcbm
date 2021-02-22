@@ -54,8 +54,6 @@ steps:
       type: float
     - seed: 9
       type: int
-    - number_of_parameters: "None"
-      type: string
   outputs:
     - name: params
       type: ansatz-params
