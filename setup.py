@@ -8,7 +8,9 @@ setuptools.setup(
     author_email="info@zapatacomputing.com",
     description="QCBM package for Orquestra.",
     url="https://github.com/zapatacomputing/z-quantum-qcbm ",
-    packages=["zquantum.qcbm"],
+    packages=setuptools.find_namespace_packages(
+        include=["zquantum.*"], where="src/python"
+    ),
     package_dir={"": "src/python"},
     classifiers=(
         "Programming Language :: Python :: 3",
