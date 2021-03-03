@@ -38,6 +38,8 @@ class QCBMAnsatz(Ansatz):
         super().__init__(number_of_layers)
         self._number_of_qubits = number_of_qubits
         self._topology = topology
+        if number_of_layers == 0:
+            raise ValueError("QCBMAnsatz is only defined for number_of_layers > 0.")
 
     @property
     def number_of_params(self) -> int:
