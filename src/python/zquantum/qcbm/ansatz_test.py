@@ -344,7 +344,7 @@ class TestQCBMAnsatz(AnsatzTests):
         # Then
         assert circuit == expected_circuit
 
-    def test_ansatz_circuit_sevenumber_of_layers(self, number_of_qubits, topology):
+    def test_ansatz_circuit_seven_layers(self, number_of_qubits, topology):
         # Given
         number_of_layers = 7
         ansatz = QCBMAnsatz(
