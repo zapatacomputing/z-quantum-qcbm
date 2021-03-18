@@ -9,7 +9,7 @@ from zquantum.core.interfaces.ansatz_utils import (
 )
 from typing import Optional, List
 from .ansatz_utils import get_entangling_layer
-from ..utils import SCHEMA_VERSION
+from zquantum.core.utils import SCHEMA_VERSION
 
 
 from overrides import overrides
