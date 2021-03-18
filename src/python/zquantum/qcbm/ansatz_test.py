@@ -1,4 +1,4 @@
-import unittest
+import pytest
 import numpy as np
 import itertools
 from pyquil import Program
@@ -11,99 +11,132 @@ from .ansatz import QCBMAnsatz
 from .ansatz_utils import get_entangling_layer
 
 
-class TestQCBMAnsatz(unittest.TestCase, AnsatzTests):
-    def setUp(self):
-        self.n_layers = 2
-        self.n_qubits = 4
-        self.topology = "all"
-        self.ansatz = QCBMAnsatz(self.n_layers, self.n_qubits, self.topology)
+class TestQCBMAnsatz(AnsatzTests):
+    @pytest.fixture
+    def number_of_qubits(self):
+        return 4
 
-    def test_get_executable_circuit_too_many_parameters(self):
-        # Given
-        params = [
-            np.ones(2 * self.n_qubits),
-            np.ones(int((self.n_qubits * (self.n_qubits - 1)) / 2)),
-            np.ones(2 * self.n_qubits),
-        ]
-        params = np.concatenate(params)
+    @pytest.fixture
+    def topology(self):
+        return "all"
 
-        # When/Then
-        self.assertRaises(
-            ValueError, lambda: self.ansatz.get_executable_circuit(params),
+    @pytest.fixture
+    def ansatz(self, number_of_qubits, topology):
+        return QCBMAnsatz(
+            number_of_layers=2,
+            number_of_qubits=number_of_qubits,
+            topology=topology,
         )
 
-    def test_ansatz_circuit_one_layer(self):
+    def test_get_executable_circuit_too_many_parameters(
+        self, number_of_qubits, topology
+    ):
         # Given
-        n_layers = 1
-        n_qubits = 4
-        topology = "all"
-        ansatz = QCBMAnsatz(n_layers, n_qubits, topology)
-        params = [np.ones(n_qubits)]
-
-        expected_pycircuit = Program()
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RX(params[0][i], i))
-        expected_circuit = Circuit(expected_pycircuit)
-
-        params = np.concatenate(params)
-        n_layers = 1
-
-        # When
-        circuit = ansatz.get_executable_circuit(params)
-
-        # Then
-        self.assertEqual(circuit, expected_circuit)
-
-    def test_ansatz_circuit_two_layers(self):
-        # Given
-        n_layers = 2
-        n_qubits = 4
-        topology = "all"
-        ansatz = QCBMAnsatz(n_layers, n_qubits, topology)
-        params = [np.ones(2 * n_qubits), np.ones(int((n_qubits * (n_qubits - 1)) / 2))]
-
-        expected_pycircuit = Program()
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RX(params[0][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[0][i + n_qubits], i))
-        expected_circuit = Circuit(expected_pycircuit)
-        expected_circuit += get_entangling_layer(params[1], n_qubits, "XX", topology)
-
-        params = np.concatenate(params)
-
-        # When
-        circuit = ansatz.get_executable_circuit(params)
-
-        # Then
-        self.assertEqual(circuit, expected_circuit)
-
-    def test_ansatz_circuit_three_layers(self):
-        # Given
-        n_layers = 3
-        n_qubits = 4
-        topology = "all"
-        ansatz = QCBMAnsatz(n_layers, n_qubits, topology)
         params = [
-            np.ones(2 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
-            np.ones(2 * n_qubits),
+            np.ones(2 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.ones(2 * number_of_qubits),
+        ]
+        params = np.concatenate(params)
+        ansatz = QCBMAnsatz(
+            number_of_layers=2,
+            number_of_qubits=number_of_qubits,
+            topology=topology,
+        )
+        # When/Then
+        with pytest.raises(ValueError):
+            ansatz.get_executable_circuit(params),
+
+    def test_ansatz_circuit_one_layer(self, number_of_qubits, topology):
+        # Given
+        number_of_layers = 1
+        ansatz = QCBMAnsatz(
+            number_of_layers=number_of_layers,
+            number_of_qubits=number_of_qubits,
+            topology=topology,
+        )
+
+        params = [np.ones(number_of_qubits)]
+
+        expected_pycircuit = Program()
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(pyquil.gates.RX(params[0][i], i))
+        expected_circuit = Circuit(expected_pycircuit)
+
+        params = np.concatenate(params)
+
+        # When
+        circuit = ansatz.get_executable_circuit(params)
+
+        # Then
+        assert circuit == expected_circuit
+
+    def test_ansatz_circuit_two_layers(self, number_of_qubits, topology):
+        # Given
+        number_of_layers = 2
+        ansatz = QCBMAnsatz(
+            number_of_layers=number_of_layers,
+            number_of_qubits=number_of_qubits,
+            topology=topology,
+        )
+
+        params = [
+            np.ones(2 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
         ]
 
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RX(params[0][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[0][i + n_qubits], i))
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RZ(params[0][i + number_of_qubits], i)
+            )
+        expected_circuit = Circuit(expected_pycircuit)
+        expected_circuit += get_entangling_layer(
+            params[1], number_of_qubits, "XX", topology
+        )
+
+        params = np.concatenate(params)
+
+        # When
+        circuit = ansatz.get_executable_circuit(params)
+
+        # Then
+        assert circuit == expected_circuit
+
+    def test_ansatz_circuit_three_layers(self, number_of_qubits, topology):
+        # Given
+        number_of_layers = 3
+        ansatz = QCBMAnsatz(
+            number_of_layers=number_of_layers,
+            number_of_qubits=number_of_qubits,
+            topology=topology,
+        )
+        params = [
+            np.ones(2 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.ones(2 * number_of_qubits),
+        ]
+
+        expected_pycircuit = Program()
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(pyquil.gates.RX(params[0][i], i))
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RZ(params[0][i + number_of_qubits], i)
+            )
         expected_first_layer = Circuit(expected_pycircuit)
         expected_second_layer = get_entangling_layer(
-            params[1], n_qubits, "XX", topology
+            params[1], number_of_qubits, "XX", topology
         )
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RZ(params[2][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RX(params[2][i + n_qubits], i))
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RX(params[2][i + number_of_qubits], i)
+            )
         expected_third_layer = Circuit(expected_pycircuit)
         expected_circuit = (
             expected_first_layer + expected_second_layer + expected_third_layer
@@ -115,42 +148,49 @@ class TestQCBMAnsatz(unittest.TestCase, AnsatzTests):
         circuit = ansatz.get_executable_circuit(params)
 
         # Then
-        self.assertEqual(circuit, expected_circuit)
+        assert circuit == expected_circuit
 
-    def test_ansatz_circuit_four_layers(self):
+    def test_ansatz_circuit_four_layers(self, number_of_qubits, topology):
         # Given
-        n_layers = 4
-        n_qubits = 4
-        topology = "all"
-        ansatz = QCBMAnsatz(n_layers, n_qubits, topology)
+        number_of_layers = 4
+        ansatz = QCBMAnsatz(
+            number_of_layers=number_of_layers,
+            number_of_qubits=number_of_qubits,
+            topology=topology,
+        )
+
         params = [
-            np.ones(2 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
-            np.ones(3 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
+            np.ones(2 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.ones(3 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
         ]
 
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RX(params[0][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[0][i + n_qubits], i))
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RZ(params[0][i + number_of_qubits], i)
+            )
         expected_first_layer = Circuit(expected_pycircuit)
         expected_second_layer = get_entangling_layer(
-            params[1], n_qubits, "XX", topology
+            params[1], number_of_qubits, "XX", topology
         )
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RX(params[2][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[2][i + n_qubits], i))
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(
-                pyquil.gates.RX(params[2][i + 2 * n_qubits], i)
+                pyquil.gates.RZ(params[2][i + number_of_qubits], i)
+            )
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RX(params[2][i + 2 * number_of_qubits], i)
             )
         expected_third_layer = Circuit(expected_pycircuit)
         expected_fourth_layer = get_entangling_layer(
-            params[3], n_qubits, "XX", topology
+            params[3], number_of_qubits, "XX", topology
         )
         expected_circuit = (
             expected_first_layer
@@ -165,49 +205,57 @@ class TestQCBMAnsatz(unittest.TestCase, AnsatzTests):
         circuit = ansatz.get_executable_circuit(params)
 
         # Then
-        self.assertEqual(circuit, expected_circuit)
+        assert circuit == expected_circuit
 
-    def test_ansatz_circuit_five_layers(self):
+    def test_ansatz_circuit_five_layers(self, number_of_qubits, topology):
         # Given
-        n_layers = 5
-        n_qubits = 4
-        topology = "all"
-        ansatz = QCBMAnsatz(n_layers, n_qubits, topology)
+        number_of_layers = 5
+        ansatz = QCBMAnsatz(
+            number_of_layers=number_of_layers,
+            number_of_qubits=number_of_qubits,
+            topology=topology,
+        )
         params = [
-            np.ones(2 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
-            np.ones(3 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
-            np.ones(2 * n_qubits),
+            np.ones(2 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.ones(3 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.ones(2 * number_of_qubits),
         ]
 
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RX(params[0][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[0][i + n_qubits], i))
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RZ(params[0][i + number_of_qubits], i)
+            )
         expected_first_layer = Circuit(expected_pycircuit)
         expected_second_layer = get_entangling_layer(
-            params[1], n_qubits, "XX", topology
+            params[1], number_of_qubits, "XX", topology
         )
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RX(params[2][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[2][i + n_qubits], i))
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(
-                pyquil.gates.RX(params[2][i + 2 * n_qubits], i)
+                pyquil.gates.RZ(params[2][i + number_of_qubits], i)
+            )
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RX(params[2][i + 2 * number_of_qubits], i)
             )
         expected_third_layer = Circuit(expected_pycircuit)
         expected_fourth_layer = get_entangling_layer(
-            params[3], n_qubits, "XX", topology
+            params[3], number_of_qubits, "XX", topology
         )
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RZ(params[4][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RX(params[4][i + n_qubits], i))
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RX(params[4][i + number_of_qubits], i)
+            )
         expected_fifth_layer = Circuit(expected_pycircuit)
         expected_circuit = (
             expected_first_layer
@@ -223,52 +271,62 @@ class TestQCBMAnsatz(unittest.TestCase, AnsatzTests):
         circuit = ansatz.get_executable_circuit(params)
 
         # Then
-        self.assertEqual(circuit, expected_circuit)
+        assert circuit == expected_circuit
 
-    def test_ansatz_circuit_six_layers(self):
+    def test_ansatz_circuit_six_layers(self, number_of_qubits, topology):
         # Given
-        n_layers = 6
-        n_qubits = 4
-        topology = "all"
-        ansatz = QCBMAnsatz(n_layers, n_qubits, topology)
+        number_of_layers = 6
+        ansatz = QCBMAnsatz(
+            number_of_layers=number_of_layers,
+            number_of_qubits=number_of_qubits,
+            topology=topology,
+        )
         params = [
-            np.ones(2 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
-            np.ones(2 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
-            np.ones(3 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
+            np.ones(2 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.ones(2 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.ones(3 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
         ]
 
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RX(params[0][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[0][i + n_qubits], i))
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RZ(params[0][i + number_of_qubits], i)
+            )
         expected_first_layer = Circuit(expected_pycircuit)
         expected_second_layer = get_entangling_layer(
-            params[1], n_qubits, "XX", topology
+            params[1], number_of_qubits, "XX", topology
         )
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RX(params[2][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[2][i + n_qubits], i))
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RZ(params[2][i + number_of_qubits], i)
+            )
         expected_third_layer = Circuit(expected_pycircuit)
         expected_fourth_layer = get_entangling_layer(
-            params[3], n_qubits, "XX", topology
+            params[3], number_of_qubits, "XX", topology
         )
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RX(params[4][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[4][i + n_qubits], i))
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(
-                pyquil.gates.RX(params[4][i + 2 * n_qubits], i)
+                pyquil.gates.RZ(params[4][i + number_of_qubits], i)
+            )
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RX(params[4][i + 2 * number_of_qubits], i)
             )
         expected_fifth_layer = Circuit(expected_pycircuit)
-        expected_sixth_layer = get_entangling_layer(params[5], n_qubits, "XX", topology)
+        expected_sixth_layer = get_entangling_layer(
+            params[5], number_of_qubits, "XX", topology
+        )
         expected_circuit = (
             expected_first_layer
             + expected_second_layer
@@ -284,58 +342,70 @@ class TestQCBMAnsatz(unittest.TestCase, AnsatzTests):
         circuit = ansatz.get_executable_circuit(params)
 
         # Then
-        self.assertEqual(circuit, expected_circuit)
+        assert circuit == expected_circuit
 
-    def test_ansatz_circuit_seven_layers(self):
+    def test_ansatz_circuit_seven_layers(self, number_of_qubits, topology):
         # Given
-        n_layers = 7
-        n_qubits = 4
-        topology = "all"
-        ansatz = QCBMAnsatz(n_layers, n_qubits, topology)
+        number_of_layers = 7
+        ansatz = QCBMAnsatz(
+            number_of_layers=number_of_layers,
+            number_of_qubits=number_of_qubits,
+            topology=topology,
+        )
         params = [
-            np.ones(2 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
-            np.ones(2 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
-            np.ones(3 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
-            np.ones(2 * n_qubits),
+            np.ones(2 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.ones(2 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.ones(3 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.ones(2 * number_of_qubits),
         ]
 
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RX(params[0][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[0][i + n_qubits], i))
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RZ(params[0][i + number_of_qubits], i)
+            )
         expected_first_layer = Circuit(expected_pycircuit)
         expected_second_layer = get_entangling_layer(
-            params[1], n_qubits, "XX", topology
+            params[1], number_of_qubits, "XX", topology
         )
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RX(params[2][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[2][i + n_qubits], i))
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RZ(params[2][i + number_of_qubits], i)
+            )
         expected_third_layer = Circuit(expected_pycircuit)
         expected_fourth_layer = get_entangling_layer(
-            params[3], n_qubits, "XX", topology
+            params[3], number_of_qubits, "XX", topology
         )
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RX(params[4][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[4][i + n_qubits], i))
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(
-                pyquil.gates.RX(params[4][i + 2 * n_qubits], i)
+                pyquil.gates.RZ(params[4][i + number_of_qubits], i)
+            )
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RX(params[4][i + 2 * number_of_qubits], i)
             )
         expected_fifth_layer = Circuit(expected_pycircuit)
-        expected_sixth_layer = get_entangling_layer(params[5], n_qubits, "XX", topology)
+        expected_sixth_layer = get_entangling_layer(
+            params[5], number_of_qubits, "XX", topology
+        )
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RZ(params[6][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RX(params[6][i + n_qubits], i))
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RX(params[6][i + number_of_qubits], i)
+            )
         expected_seventh_layer = Circuit(expected_pycircuit)
         expected_circuit = (
             expected_first_layer
@@ -353,61 +423,75 @@ class TestQCBMAnsatz(unittest.TestCase, AnsatzTests):
         circuit = ansatz.get_executable_circuit(params)
 
         # Then
-        self.assertEqual(circuit, expected_circuit)
+        assert circuit == expected_circuit
 
-    def test_ansatz_circuit_eight_layers(self):
+    def test_ansatz_circuit_eight_layers(self, number_of_qubits, topology):
         # Given
-        n_layers = 8
-        n_qubits = 4
-        topology = "all"
-        ansatz = QCBMAnsatz(n_layers, n_qubits, topology)
+        number_of_layers = 8
+        ansatz = QCBMAnsatz(
+            number_of_layers=number_of_layers,
+            number_of_qubits=number_of_qubits,
+            topology=topology,
+        )
         params = [
-            np.ones(2 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
-            np.ones(2 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
-            np.ones(2 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
-            np.ones(3 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
+            np.ones(2 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.ones(2 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.ones(2 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.ones(3 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
         ]
 
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RX(params[0][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[0][i + n_qubits], i))
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RZ(params[0][i + number_of_qubits], i)
+            )
         expected_first_layer = Circuit(expected_pycircuit)
         expected_second_layer = get_entangling_layer(
-            params[1], n_qubits, "XX", topology
+            params[1], number_of_qubits, "XX", topology
         )
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RX(params[2][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[2][i + n_qubits], i))
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RZ(params[2][i + number_of_qubits], i)
+            )
         expected_third_layer = Circuit(expected_pycircuit)
         expected_fourth_layer = get_entangling_layer(
-            params[3], n_qubits, "XX", topology
+            params[3], number_of_qubits, "XX", topology
         )
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RX(params[4][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[4][i + n_qubits], i))
-        expected_fifth_layer = Circuit(expected_pycircuit)
-        expected_sixth_layer = get_entangling_layer(params[5], n_qubits, "XX", topology)
-        expected_pycircuit = Program()
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RX(params[6][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[6][i + n_qubits], i))
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(
-                pyquil.gates.RX(params[6][i + 2 * n_qubits], i)
+                pyquil.gates.RZ(params[4][i + number_of_qubits], i)
+            )
+        expected_fifth_layer = Circuit(expected_pycircuit)
+        expected_sixth_layer = get_entangling_layer(
+            params[5], number_of_qubits, "XX", topology
+        )
+        expected_pycircuit = Program()
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(pyquil.gates.RX(params[6][i], i))
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RZ(params[6][i + number_of_qubits], i)
+            )
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RX(params[6][i + 2 * number_of_qubits], i)
             )
         expected_seventh_layer = Circuit(expected_pycircuit)
-        expected_eigth_layer = get_entangling_layer(params[7], n_qubits, "XX", topology)
+        expected_eigth_layer = get_entangling_layer(
+            params[7], number_of_qubits, "XX", topology
+        )
         expected_circuit = (
             expected_first_layer
             + expected_second_layer
@@ -425,67 +509,83 @@ class TestQCBMAnsatz(unittest.TestCase, AnsatzTests):
         circuit = ansatz.get_executable_circuit(params)
 
         # Then
-        self.assertEqual(circuit, expected_circuit)
+        assert circuit == expected_circuit
 
-    def test_ansatz_circuit_nine_layers(self):
+    def test_ansatz_circuit_nine_layers(self, number_of_qubits, topology):
         # Given
-        n_layers = 9
-        n_qubits = 4
-        topology = "all"
-        ansatz = QCBMAnsatz(n_layers, n_qubits, topology)
+        number_of_layers = 9
+        ansatz = QCBMAnsatz(
+            number_of_layers=number_of_layers,
+            number_of_qubits=number_of_qubits,
+            topology=topology,
+        )
         params = [
-            np.ones(2 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
-            np.ones(2 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
-            np.ones(2 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
-            np.ones(3 * n_qubits),
-            np.ones(int((n_qubits * (n_qubits - 1)) / 2)),
-            np.ones(2 * n_qubits),
+            np.ones(2 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.ones(2 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.ones(2 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.ones(3 * number_of_qubits),
+            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.ones(2 * number_of_qubits),
         ]
 
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RX(params[0][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[0][i + n_qubits], i))
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RZ(params[0][i + number_of_qubits], i)
+            )
         expected_first_layer = Circuit(expected_pycircuit)
         expected_second_layer = get_entangling_layer(
-            params[1], n_qubits, "XX", topology
+            params[1], number_of_qubits, "XX", topology
         )
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RX(params[2][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[2][i + n_qubits], i))
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RZ(params[2][i + number_of_qubits], i)
+            )
         expected_third_layer = Circuit(expected_pycircuit)
         expected_fourth_layer = get_entangling_layer(
-            params[3], n_qubits, "XX", topology
+            params[3], number_of_qubits, "XX", topology
         )
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RX(params[4][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[4][i + n_qubits], i))
-        expected_fifth_layer = Circuit(expected_pycircuit)
-        expected_sixth_layer = get_entangling_layer(params[5], n_qubits, "XX", topology)
-        expected_pycircuit = Program()
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RX(params[6][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RZ(params[6][i + n_qubits], i))
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(
-                pyquil.gates.RX(params[6][i + 2 * n_qubits], i)
+                pyquil.gates.RZ(params[4][i + number_of_qubits], i)
+            )
+        expected_fifth_layer = Circuit(expected_pycircuit)
+        expected_sixth_layer = get_entangling_layer(
+            params[5], number_of_qubits, "XX", topology
+        )
+        expected_pycircuit = Program()
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(pyquil.gates.RX(params[6][i], i))
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RZ(params[6][i + number_of_qubits], i)
+            )
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RX(params[6][i + 2 * number_of_qubits], i)
             )
         expected_seventh_layer = Circuit(expected_pycircuit)
-        expected_eigth_layer = get_entangling_layer(params[7], n_qubits, "XX", topology)
+        expected_eigth_layer = get_entangling_layer(
+            params[7], number_of_qubits, "XX", topology
+        )
         expected_pycircuit = Program()
-        for i in range(n_qubits):
+        for i in range(number_of_qubits):
             expected_pycircuit += Program(pyquil.gates.RZ(params[8][i], i))
-        for i in range(n_qubits):
-            expected_pycircuit += Program(pyquil.gates.RX(params[8][i + n_qubits], i))
+        for i in range(number_of_qubits):
+            expected_pycircuit += Program(
+                pyquil.gates.RX(params[8][i + number_of_qubits], i)
+            )
         expected_ninth_layer = Circuit(expected_pycircuit)
         expected_circuit = (
             expected_first_layer
@@ -505,5 +605,4 @@ class TestQCBMAnsatz(unittest.TestCase, AnsatzTests):
         circuit = ansatz.get_executable_circuit(params)
 
         # Then
-        self.assertEqual(circuit, expected_circuit)
-
+        assert circuit == expected_circuit
