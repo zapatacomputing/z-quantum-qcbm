@@ -1,5 +1,6 @@
 import numpy as np
 import sympy
+import json
 from zquantum.core.circuit import Circuit, Qubit, Gate, create_layer_of_gates
 from zquantum.core.interfaces.ansatz import Ansatz
 from zquantum.core.interfaces.ansatz_utils import (
@@ -8,6 +9,8 @@ from zquantum.core.interfaces.ansatz_utils import (
 )
 from typing import Optional, List
 from .ansatz_utils import get_entangling_layer
+from ..utils import SCHEMA_VERSION
+
 
 from overrides import overrides
 
@@ -246,3 +249,75 @@ class QCBMAnsatz(Ansatz):
                 num_params_by_layer.append(self.number_of_qubits * 2)
 
         return np.asarray(num_params_by_layer)
+
+
+    def to_dict(self):
+        """Creates a dictionary representing a QCBM ansatz.
+
+        Returns:
+            dictionary (dict): the dictionary
+        """
+        dictionary = {
+            "schema": SCHEMA_VERSION + "-qcbm_ansatz",
+            "number_of_layers": self.number_of_layers,
+            "number_of_qubits": self.number_of_qubits,
+            "topology": self.topology
+        }
+
+        return dictionary
+    
+
+    def from_dict(self, dictionary):
+        """Loads information of the qcbm_ansatz from a dictionary. This corresponds to the
+        number of layers, number of qubits, and topplogy.
+
+        Args:
+            dictionary (dict): the dictionary
+
+        Returns:
+            A QCBM_Ansatz object
+        """
+        output = QCBMAnsatz(dictionary["number_of_layers"],dictionary["number_of_qubits"], dictionary["topology"])
+        return output
+
+
+def save_qcbm_ansatz_set(
+    qcbm_ansatz_set: [QCBMAnsatz], filename: str
+) -> None:
+    """Save a set of qcbm_ansatz to a file.
+        
+    Args:
+        qcbm_ansatz_set (list): a list ansatz to be saved
+        file (str): the name of the file
+    """
+    dictionary = {}
+    dictionary["schema"] = SCHEMA_VERSION + "-qcbm-ansatz-set"
+    dictionary["qcbm_ansatz"] = []
+        
+    for ansatz in qcbm_ansatz_set:
+        dictionary["qcbm_ansatz"].append(ansatz.to_dict())
+
+    with open(filename, "w") as f:
+        f.write(json.dumps(dictionary, indent=2))
+
+
+def load_qcbm_ansatz_set(file: str) -> [QCBMAnsatz]:
+    """Load a list of qcbm_ansatz from a json file using a schema.
+
+    Arguments:
+        file (str): the name of the file
+
+    Returns:
+        object: a list of qcbm_ansatz loaded from the file
+    """
+    if isinstance(file, str):
+        with open(file, "r") as f:
+            data = json.load(f)
+    else:
+        data = json.load(file)
+        
+    qcbm_ansatz_list = []
+    for i in range(len(data["qcbm_ansatz"])): 
+        qcbm_ansatz_list.append((data["qcbm_ansatz"][i]).from_dict())
+        
+    return qcbm_ansatz_list 
