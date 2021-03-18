@@ -65,13 +65,15 @@ def thermal_target_distribution(n_spins, beta, seed_dist):
     '''Generates thermal states target distribution 
     Args: 
         n_spins (int): positive number of spins in the Ising system
-        beta (int): parameter in energy expression for (1 / kT) for the boltzman distribution 
+        beta (int): parameter in energy expression for (1 / T) for the boltzman distribution 
         seed_dist (int): seed integer in order to keep track of the created random target distributions 
     Returns:
        probabilities (dict): keys are binary string representations and values are corresponding probabilities (floats)
        '''
     Z = 0
     h, J = get_random_hj(n_spins, seed_dist)
+    print("h = " + str(h))
+    print("J = " + str(J))
     n_args = dict() 
     for num in range(int(2 ** n_spins)): 
         vector = intToising(num, n_spins) 
@@ -85,11 +87,13 @@ def thermal_target_distribution(n_spins, beta, seed_dist):
         energy = round(energy, Precision) 
         factor = np.exp(energy*beta)
         Z += factor
+        print("j = " + str(Z))
         binary = format(num, '0' + str(n_spins) + 'b' )
         reverse = binary[len(binary)::-1]
         n_args[reverse] = energy 
     probabilities = {k: np.exp(v * beta) / Z for k,v in n_args.items()} 
     assert(round(sum(probabilities.values()), Precision) == 1.)  
+    print(probabilities)
     return probabilities
 
 
@@ -189,5 +193,4 @@ def get_sample_Bitstring_Dist(n_samples, n_spins, beta, seed_dist, seed_sample):
 
             
             
-        
         

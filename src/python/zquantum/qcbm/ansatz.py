@@ -41,8 +41,6 @@ class QCBMAnsatz(Ansatz):
         super().__init__(number_of_layers)
         self._number_of_qubits = number_of_qubits
         self._topology = topology
-        if number_of_layers == 0:
-            raise ValueError("QCBMAnsatz is only defined for number_of_layers > 0.")
 
     @property
     def number_of_params(self) -> int:
@@ -251,7 +249,6 @@ class QCBMAnsatz(Ansatz):
                 num_params_by_layer.append(self.number_of_qubits * 2)
 
         return np.asarray(num_params_by_layer)
-
 
     def to_dict(self):
         """Creates a dictionary representing a QCBM ansatz.
