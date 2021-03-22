@@ -281,7 +281,7 @@ class QCBMAnsatz(Ansatz):
 
 
 def save_qcbm_ansatz_set(
-    qcbm_ansatz_set: [QCBMAnsatz], filename: str
+    qcbm_ansatz_set: List[QCBMAnsatz], filename: str
 ) -> None:
     """Save a set of qcbm_ansatz to a file.
         
@@ -300,7 +300,7 @@ def save_qcbm_ansatz_set(
         f.write(json.dumps(dictionary, indent=2))
 
 
-def load_qcbm_ansatz_set(file: str) -> [QCBMAnsatz]:
+def load_qcbm_ansatz_set(file: str) -> List[QCBMAnsatz]:
     """Load a list of qcbm_ansatz from a json file using a schema.
 
     Arguments:
