@@ -1,6 +1,6 @@
 import unittest
 import numpy as np
-from target_thermal_states import (
+from .target_thermal_states import (
     int2ising,
     ising2int,
     get_random_hamiltonian_parameters,
@@ -18,19 +18,6 @@ from zquantum.core.bitstring_distribution.distance_measures.mmd import compute_m
 
 SEED = 14943
 
-        self.assertEqual(
-            round(
-                sum(
-                    list(
-                        thermal_target_distribution(
-                            self.n_spins, self.beta, self.seed_dist
-                        ).values()
-                    )
-                ),
-                self.Precision,
-            ),
-            1,
-        )
 
 class TestThermalTarget(unittest.TestCase):
     def test_int2ising(self):
@@ -225,79 +212,31 @@ class TestThermalTarget(unittest.TestCase):
             target_bitstring_distribution.distribution_dict, target_distribution
         )
 
-    # def test_samples_from_distribution(self):
-    #     # Given
-    #     n_samples = 1000
-    #     n_spins = 4
-    #     temperature = 1.0
-    #     distance_measure = {"epsilon": 1e-6}
-    #     np.random.seed(SEED)
-    #     external_fields = np.random.rand(n_spins)
-    #     two_body_couplings = np.random.rand(n_spins, n_spins)
-    #     hamiltonian_parameters = [external_fields, two_body_couplings]
-    #     np.random.seed(SEED)
-    #     actual = get_target_bitstring_distribution(
-    #         n_spins, temperature, hamiltonian_parameters
-    #     )
-    #     np.random.seed(SEED)
-    #     model = get_sampled_bitstring_distribution(
-    #         n_samples, n_spins, temperature, hamiltonian_parameters
-    #     )
-
-    #     # When
-    #     mmd = compute_mmd(actual, model, distance_measure)
-
-    #     # Then
-    #     self.assertLess(mmd, 1e-4)
-
-    def test_thermal_sample_distribution(self):
-        self.assertEqual(
-            list(
-                thermal_sample_distribution(
-                    self.n_samples,
-                    self.n_spins,
-                    self.beta,
-                    self.seed_dist,
-                    self.seed_sample,
-                ).keys()
-            ),
-            (
-                [
-                    "00000",
-                    "10000",
-                    "01000",
-                    "11000",
-                    "00100",
-                    "10100",
-                    "01100",
-                    "11100",
-                    "00010",
-                    "10010",
-                    "01010",
-                    "11010",
-                    "00110",
-                    "10110",
-                    "01110",
-                    "11110",
-                    "00001",
-                    "10001",
-                    "01001",
-                    "11001",
-                    "00101",
-                    "10101",
-                    "01101",
-                    "11101",
-                    "00011",
-                    "10011",
-                    "01011",
-                    "11011",
-                    "00111",
-                    "10111",
-                    "01111",
-                    "11111",
-                ]
-            ),
+    def test_samples_from_distribution(self):
+        # Given
+        n_samples = 10000
+        n_spins = 4
+        temperature = 1.0
+        distance_measure = {"epsilon": 1e-6}
+        np.random.seed(SEED)
+        external_fields = np.random.rand(n_spins)
+        two_body_couplings = np.random.rand(n_spins, n_spins)
+        hamiltonian_parameters = [external_fields, two_body_couplings]
+        np.random.seed(SEED)
+        actual = get_target_bitstring_distribution(
+            n_spins, temperature, hamiltonian_parameters
         )
+        np.random.seed(SEED)
+        model = get_sampled_bitstring_distribution(
+            n_samples, n_spins, temperature, hamiltonian_parameters
+        )
+
+        # When
+        mmd = compute_mmd(actual, model, distance_measure)
+
+        # Then
+        self.assertLess(mmd, 1e-4)
+
 
 if __name__ == "__main__":
     unittest.main()
