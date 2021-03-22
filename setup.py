@@ -16,5 +16,5 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ),
-    install_requires=["z-quantum-core", "bs4", "PyPortfolioOpt"],
+    install_requires=["z-quantum-core"],
 )
