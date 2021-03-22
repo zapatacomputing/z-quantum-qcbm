@@ -1,11 +1,8 @@
-import itertools
 import bisect
-import numpy as np
-import matplotlib.pyplot as plt
-from zquantum.core.bitstring_distribution import BitstringDistribution
-
-from zquantum.core.utils import dec2bin, bin2dec, convert_tuples_to_bitstrings
 import typing
+import numpy as np
+from zquantum.core.bitstring_distribution import BitstringDistribution
+from zquantum.core.utils import dec2bin, bin2dec, convert_tuples_to_bitstrings
 
 
 def int2ising(number: int, length: int) -> typing.List[int]:

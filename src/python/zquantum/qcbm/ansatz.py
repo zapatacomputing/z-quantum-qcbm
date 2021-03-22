@@ -17,7 +17,10 @@ class QCBMAnsatz(Ansatz):
     topology = ansatz_property("topology")
 
     def __init__(
-        self, number_of_layers: int, number_of_qubits: int, topology: str = "all",
+        self,
+        number_of_layers: int,
+        number_of_qubits: int,
+        topology: str = "all",
     ):
         """
         An ansatz implementation used for running the Quantum Circuit Born Machine.
@@ -308,7 +311,5 @@ def load_qcbm_ansatz_set(file: str) -> List[QCBMAnsatz]:
                 topology=item["topology"],
             )
         )
-    # for i in range(len(data["qcbm_ansatz"])):
-    #     qcbm_ansatz_set.append((data["qcbm_ansatz"][i]).from_dict())
 
     return qcbm_ansatz_set

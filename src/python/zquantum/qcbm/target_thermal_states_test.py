@@ -1,5 +1,8 @@
 import unittest
 import numpy as np
+from zquantum.core.utils import dec2bin, convert_tuples_to_bitstrings
+from zquantum.core.bitstring_distribution import BitstringDistribution
+from zquantum.core.bitstring_distribution.distance_measures.mmd import compute_mmd
 from .target_thermal_states import (
     int2ising,
     ising2int,
@@ -11,9 +14,6 @@ from .target_thermal_states import (
     get_thermal_sampled_distribution,
     get_sampled_bitstring_distribution,
 )
-from zquantum.core.utils import dec2bin, convert_tuples_to_bitstrings
-from zquantum.core.bitstring_distribution import BitstringDistribution
-from zquantum.core.bitstring_distribution.distance_measures.mmd import compute_mmd
 
 
 SEED = 14943
@@ -120,7 +120,9 @@ class TestThermalTarget(unittest.TestCase):
         )
 
         # Then
-        self.assertTrue(type(target_bitstring_distribution) == BitstringDistribution)
+        self.assertTrue(
+            isinstance(target_bitstring_distribution, BitstringDistribution)
+        )
         print()
         self.assertDictEqual(
             target_bitstring_distribution.distribution_dict, target_distribution
@@ -206,7 +208,9 @@ class TestThermalTarget(unittest.TestCase):
         )
 
         # Then
-        self.assertTrue(type(target_bitstring_distribution) == BitstringDistribution)
+        self.assertTrue(
+            isinstance(target_bitstring_distribution, BitstringDistribution)
+        )
         print()
         self.assertDictEqual(
             target_bitstring_distribution.distribution_dict, target_distribution
