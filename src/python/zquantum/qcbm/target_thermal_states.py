@@ -4,193 +4,220 @@ import numpy as np
 import matplotlib.pyplot as plt
 from zquantum.core.bitstring_distribution import BitstringDistribution
 
-#Global Variables
-Precision = 8 
-DType = np.float32 
-prob_data_cutoff = 1e-8
-CLIP = 1e-6
-distance_measure_params = {"epsilon": 1e-6}
+from zquantum.core.utils import dec2bin, bin2dec, convert_tuples_to_bitstrings
+import typing
 
 
-def intToising(num, n_spins): 
-    '''Converts an integer into a 1D vector of Ising variables +-1 
-    Args: 
-        num (int): positive number to be converted into its corresponding Ising representation 
-        n_spins (int): positive number of spins in the Ising system
-    Returns: 
-        1D Array of Ising varaibles +-1 '''
-    
-    assert(num < 2**n_spins) 
-    s = format(num, '0' + str(n_spins) + 'b' ) 
-    vector = np.asarray([2.0*int(c)-1. for c in s]) 
-    return vector
-
-
-def isingToint(vector): 
-
-    '''Converts a 1D vector of Ising variables +-1 into an integer
-    Args: 
-        vector (1D Array): Ising variables +\-1
+def int2ising(number: int, length: int) -> typing.List[int]:
+    """Converts an integer into a +/-1s bitstring (also called Ising bitstring).
+    Args:
+        number: positive number to be converted into its corresponding Ising bitstring representation
+        length: length of the Ising bitstring (i.e. positive number of spins in the Ising system)
     Returns:
-        (int): positive number representation of Ising variables'''
+        Ising bitstring representation (1D array of +/-1)."""
 
-    vector = (np.asarray(vector) + 1.0) / 2 
-    s = ''.join(str(int(e)) for e in vector) 
-    num = int(s,2) 
-    return num
-
+    binary_bitstring = dec2bin(number, length)
+    ising_bitstring = [bit * 2 - 1 for bit in binary_bitstring]
+    return ising_bitstring
 
 
-def get_random_hj(n_spins, seed_dist ): 
-    '''Generates random h, J, and where h and J are arrays of random coefficients sampled from a normal distribution with zero mean and sqrt(n_spins) sd 
-    Args: 
-        n_spins (int): positive number of spins in the Ising system
-        seed_dist (int): seed integer in order to keep track of the created random target distributions 
+def ising2int(ising_bitstring: typing.List[int]) -> int:
+    """Converts a +/-1s bitstring (also called Ising bitstring) into an integer.
+    Args:
+        ising_bitstring: 1D array of +/-1.
     Returns:
-       h (1D Array): list of random coefficients sampled from a normal distribution with zero mean and sqrt(n_spins) sd
-       J (Array): n_spin x n_spin array of coefficients sampled from a normal distribution with zero mean and sqrt(n_spins) sd
-       '''
-    np.random.seed(seed_dist)
-    h = np.zeros((n_spins))
-    J = np.zeros((n_spins,n_spins))
+        Integer number representation of the Ising bitstring."""
+
+    binary_bitstring = [int((bit + 1) / 2) for bit in ising_bitstring]
+    number = bin2dec(binary_bitstring)
+    return number
+
+
+def get_random_hamiltonian_parameters(n_spins: int) -> typing.Tuple:
+    """Generates random h, J, and where h and J are arrays of random coefficients sampled from a normal distribution with zero mean and sqrt(n_spins) sd.
+    For reproducibilty, fix random generator seed in the higher level from which this function is called.
+    Args:
+        n_spins: positive number of spins in the Ising system.
+    Returns:
+       external_fields: n_spin coefficients sampled from a normal distribution with zero mean and sqrt(n_spins) sd
+       two_body_couplings: n_spin x n_spin array of coefficients sampled from a normal distribution with zero mean and sqrt(n_spins) sd
+    """
+    external_fields = np.zeros((n_spins))
+    two_body_couplings = np.zeros((n_spins, n_spins))
     for i in range(n_spins):
-        h[i] = np.random.normal(0, np.sqrt(n_spins))
+        external_fields[i] = np.random.normal(0, np.sqrt(n_spins))
         for j in range(i, n_spins):
-            if i==j: continue
-            J[i,j] = J[j,i] = np.random.normal(0, np.sqrt(n_spins))
-    return h, J
+            if i == j:
+                continue
+            two_body_couplings[i, j] = two_body_couplings[j, i] = np.random.normal(
+                0, np.sqrt(n_spins)
+            )
+    return external_fields, two_body_couplings
 
 
-def thermal_target_distribution(n_spins, beta, seed_dist): 
-    '''Generates thermal states target distribution 
-    Args: 
-        n_spins (int): positive number of spins in the Ising system
-        beta (int): parameter in energy expression for (1 / T) for the boltzman distribution 
-        seed_dist (int): seed integer in order to keep track of the created random target distributions 
+def get_thermal_target_distribution_dict(
+    n_spins: int,
+    temperature: float,
+    hamiltonian_parameters: typing.List[np.array],  # TODO: add docstring
+) -> typing.Dict:
+    """Generates thermal states target distribution, saved in a dict where keys are bitstrings and
+    values are corresponding probabilities according to the Boltzmann Distribution formula.
+
+    Args:
+        n_spins: positive number of spins in the Ising system
+        temperature: temperature factor in the boltzman distribution
+        hamiltonian_parameters: values of hamiltonian parameters, namely external fields and two body couplings.
+
     Returns:
-       probabilities (dict): keys are binary string representations and values are corresponding probabilities (floats)
-       '''
-    Z = 0
-    h, J = get_random_hj(n_spins, seed_dist)
-    print("h = " + str(h))
-    print("J = " + str(J))
-    n_args = dict() 
-    for num in range(int(2 ** n_spins)): 
-        vector = intToising(num, n_spins) 
-        energy = 0 
-        for i in range(n_spins): 
-            energy -= vector[i] * h[i] 
-            for j in range(n_spins): 
-                if j == i+1: 
-                    energy -= vector[i] * vector[j] * J[i,j]
-                else: continue
-        energy = round(energy, Precision) 
-        factor = np.exp(energy*beta)
-        Z += factor
-        print("j = " + str(Z))
-        binary = format(num, '0' + str(n_spins) + 'b' )
-        reverse = binary[len(binary)::-1]
-        n_args[reverse] = energy 
-    probabilities = {k: np.exp(v * beta) / Z for k,v in n_args.items()} 
-    assert(round(sum(probabilities.values()), Precision) == 1.)  
-    print(probabilities)
-    return probabilities
+       Thermal target distribution.
+    """
+    partition_function = 0
+    external_fields, two_body_couplings = hamiltonian_parameters
+    beta = 1.0 / temperature
+    distribution = {}
+
+    for spin in range(int(2 ** n_spins)):
+        ising_bitstring = int2ising(spin, n_spins)
+        energy = 0
+        for i in range(n_spins):
+            energy -= ising_bitstring[i] * external_fields[i]
+            for j in range(n_spins):
+                if j == i + 1:
+                    energy -= (
+                        ising_bitstring[i]
+                        * ising_bitstring[j]
+                        * two_body_couplings[i, j]
+                    )
+                else:
+                    continue
+        boltzmann_factor = np.exp(energy * beta)
+        partition_function += boltzmann_factor
+
+        binary_bitstring = convert_tuples_to_bitstrings([dec2bin(spin, n_spins)])[-1]
+        reverse_bitstring = binary_bitstring[len(binary_bitstring) :: -1]
+        distribution[reverse_bitstring] = boltzmann_factor
+
+    normalized_distribution = {
+        key: value / partition_function for key, value in distribution.items()
+    }
+
+    return normalized_distribution
 
 
-def get_target_Bitstring_Dist(n_spins, beta, seed_dist): 
-    '''Generates thermal states target data in BitStringDistribution object 
+def get_target_bitstring_distribution(
+    n_spins: int,
+    temperature: float,
+    hamiltonian_parameters: typing.List[np.array],  # TODO: add docstring
+) -> BitstringDistribution:
+    """Generates thermal states target data as BitStringDistribution object
 
-        n_spins (int): positive number of spins in the Ising system
-        beta (int): parameter in energy expression for (1 / kT) for the boltzman distribution 
-        seed_dist (int): seed integer in order to keep track of the created random target distributions 
+    Args:
+        n_spins: positive number of spins in the Ising system
+        temperature: temperature factor in the boltzman distribution
+
     Returns:
-       probabilities (BitstringDistribution): keys are binary string representations and values are corresponding probabilities (floats)
-       '''
-    return BitstringDistribution(thermal_target_distribution(n_spins, beta, seed_dist))
+       Thermal target Bistring Distribution.
+    """
+    return BitstringDistribution(
+        get_thermal_target_distribution_dict(
+            n_spins, temperature, hamiltonian_parameters
+        )
+    )
 
 
+def cumulate(
+    n_spins: int,
+    temperature: float,
+    hamiltonian_parameters: typing.List[np.array],  # TODO: add docstring
+) -> typing.List[float]:
+    """Generates array of cumulative probabilities from target_distribution.
+    Args:
+        n_spins: positive number of spins in the Ising system
+        temperature: temperature factor in the boltzman distribution
 
-def cumulate(n_spins, beta, seed_dist):
-    '''Generates array of cumulative probabilities from target_distribution
-    Args: 
-        n_spins (int): positive number of spins in the Ising system
-        beta (int): parameter in energy expression for (1 / kT) for the boltzman distribution 
-        seed_dist (int): seed integer in order to keep track of the created random target distributions  
     Returns:
-       cumulative (1D array): elements are cumulative probabilities from the target distribution (floats)
-       '''
-    probabilities = thermal_target_distribution(n_spins, beta, seed_dist)
-    assert(probabilities)
+       List of cumulative probabilities from the target distribution.
+    """
+    probabilities = get_thermal_target_distribution_dict(
+        n_spins, temperature, hamiltonian_parameters
+    )
     cumulative = []
-    tot = 0.
+    tot = 0.0
     for i in range(len(probabilities.keys())):
         tot += list(probabilities.values())[i]
         cumulative.append(tot)
-    return cumulative 
+    return cumulative
 
 
-#sample from the inverse cumulative partition function
-def sample(n_samples, n_spins, beta, seed_dist, seed_sample):
-    '''Generates samples from the original target distribution in the form of a list of ising vectors
-    Args: 
-        n_samples (int): the number of samples from the original distribution
-        n_spins (int): positive number of spins in the Ising system
-        beta (int): parameter in energy expression for (1 / kT) for the boltzman distribution 
-        seed_dist (int): seed integer in order to keep track of the created random target distributions 
-        seed_sample (int): seed intin order to keep track of the random distribution samples 
+# Sample from the inverse cumulative partition function
+def sample(
+    n_samples: int,
+    n_spins: int,
+    temperature: float,
+    hamiltonian_parameters: typing.List[np.array],  # TODO: add docstring
+) -> np.array:
+    """Generates samples from the original target distribution in the form of a list of ising vectors
+    Args:
+        n_samples: the number of samples from the original distribution
+        n_spins: positive number of spins in the Ising system
+        temperature: temperature factor in the boltzman distribution
     Returns:
-       samples (2D asarray): array of sample n_spin ising vectors 
-       '''
-    cumulative = cumulate(n_spins, beta, seed_dist)
-    samples = np.zeros((n_samples,n_spins))
+       samples: array of sample n_spin ising vectors
+    """
+    cumulative = cumulate(n_spins, temperature, hamiltonian_parameters)
+    samples = np.zeros((n_samples, n_spins))
     y = np.zeros(n_samples)
-    np.random.seed(seed_sample)
-    for i in range(n_samples): 
-        y[i] = np.random.uniform(low=0,high=1) 
-    for i in range(len(y)): 
+    for i in range(n_samples):
+        y[i] = np.random.uniform(low=0, high=1)
+    for i in range(len(y)):
         idx = bisect.bisect_right(cumulative, y[i])
-        vector = intToising(idx, n_spins)
-        samples[i,:] = vector
+        ising_bitstring = int2ising(idx, n_spins)
+        samples[i, :] = ising_bitstring
     return np.asarray(samples)
 
-def thermal_sample_distribution(n_samples, n_spins, beta, seed_dist, seed_sample): 
-    '''Generates thermal states sample distribution
-    Args: 
-        n_samples (int): the number of samples from the original distribution
-        n_spins (int): positive number of spins in the Ising system
-        beta (int): parameter in energy expression for (1 / kT) for the boltzman distribution 
-        seed_dist (int): seed integer in order to keep track of the created random target distributions 
-        seed_sample (int): seed intin order to keep track of the random distribution samples 
-    Returns:
-       historgram_samples (dict): keys are binary string representations and values are corresponding probabilities (floats)
-       '''
-    n_args = dict()
-    samples = sample(n_samples, n_spins, beta, seed_dist, seed_sample)
-    histogram_samples = [0 for _ in range(2**n_spins)]
-    for s in samples: 
-        idx = isingToint(s)
-        histogram_samples[idx] += 1 / float(n_samples) 
-    for num in range(int(2 ** n_spins)): 
-        binary = format(num, '0' + str(n_spins) + 'b' )
-        reverse = binary[len(binary)::-1]
-        n_args[reverse] = histogram_samples[num]
-    assert(round(sum(n_args.values()), Precision) )
-    return n_args 
 
-def get_sample_Bitstring_Dist(n_samples, n_spins, beta, seed_dist, seed_sample): 
-    '''Generates thermal states sample distribution as BitstringDistribution object
-    Args: 
-        n_samples (int): the number of samples from the original distribution
-        n_spins (int): positive number of spins in the Ising system
-        beta (int): parameter in energy expression for (1 / kT) for the boltzman distribution 
-        seed_dist (int): seed integer in order to keep track of the created random target distributions 
-        seed_sample (int): seed intin order to keep track of the random distribution samples 
+def get_thermal_sampled_distribution(
+    n_samples: int,
+    n_spins: int,
+    temperature: float,
+    hamiltonian_parameters: typing.List[np.array],  # TODO: add docstring
+) -> typing.Dict:
+    """Generates thermal states sample distribution
+    Args:
+        n_samples: the number of samples from the original distribution
+        n_spins: positive number of spins in the Ising system
+        temperature: temperature factor in the boltzman distribution
     Returns:
-       historgram_samples (BitstringDistribution): keys are binary string representations and values are corresponding probabilities (floats)
-       '''
-    probabilities = thermal_sample_distribution(n_samples, n_spins, beta, seed_dist, seed_sample)
-    return BitstringDistribution(probabilities) 
+       histogram_samples: keys are binary string representations and values are corresponding probabilities.
+    """
+    sample_distribution_dict = {}
+    samples = sample(n_samples, n_spins, temperature, hamiltonian_parameters)
+    histogram_samples = np.zeros(2 ** n_spins)
+    for s in samples:
+        idx = ising2int(s)
+        histogram_samples[idx] += 1.0 / n_samples
+    for spin in range(int(2 ** n_spins)):
+        binary_bitstring = convert_tuples_to_bitstrings([dec2bin(spin, n_spins)])[-1]
+        reverse_bitstring = binary_bitstring[len(binary_bitstring) :: -1]
+        sample_distribution_dict[reverse_bitstring] = histogram_samples[spin]
+    return sample_distribution_dict
 
-            
-            
-        
+
+def get_sampled_bitstring_distribution(
+    n_samples: int,
+    n_spins: int,
+    temperature: float,
+    hamiltonian_parameters: typing.List[np.array],  # TODO: add docstring
+) -> BitstringDistribution:
+    """Generates thermal states sample distribution as BitstringDistribution object
+    Args:
+        n_samples: the number of samples from the original distribution
+        n_spins : positive number of spins in the Ising system
+        temperature: temperature factor in the boltzman distribution
+    Returns:
+        Sampled Bitstring Distribution.
+    """
+    probabilities = get_thermal_sampled_distribution(
+        n_samples, n_spins, temperature, hamiltonian_parameters
+    )
+    return BitstringDistribution(probabilities)
