@@ -1,13 +1,17 @@
-import pytest
+import json
+from unittest import mock
+from io import StringIO
 import numpy as np
-import itertools
+import pytest
 from pyquil import Program
 import pyquil.gates
 
-from zquantum.core.circuit import Circuit, Qubit, Gate
+from zquantum.core.circuit import Circuit
 from zquantum.core.interfaces.ansatz_test import AnsatzTests
+from zquantum.core.utils import SCHEMA_VERSION
 
-from .ansatz import QCBMAnsatz
+
+from .ansatz import QCBMAnsatz, load_qcbm_ansatz_set, save_qcbm_ansatz_set
 from .ansatz_utils import get_entangling_layer
 
 
@@ -45,7 +49,7 @@ class TestQCBMAnsatz(AnsatzTests):
         )
         # When/Then
         with pytest.raises(ValueError):
-            ansatz.get_executable_circuit(params),
+            ansatz.get_executable_circuit(params)
 
     def test_ansatz_circuit_one_layer(self, number_of_qubits, topology):
         # Given
@@ -606,3 +610,67 @@ class TestQCBMAnsatz(AnsatzTests):
 
         # Then
         assert circuit == expected_circuit
+
+    @pytest.fixture
+    def mock_open(self):
+        mock_open = mock.mock_open()
+        with mock.patch("qcbm.ansatz.open", mock_open):
+            yield mock_open
+
+    def test_saving_qcbm_ansatz_set_opens_file_for_writing_using_context_manager(
+        self,
+        mock_open,
+    ):
+        """Saving qcbm ansatz set opens file for writing using context manager."""
+        ansatzes = [
+            QCBMAnsatz(number_of_layers=2, number_of_qubits=4, topology="all"),
+            QCBMAnsatz(number_of_layers=4, number_of_qubits=8, topology="line"),
+        ]
+        save_qcbm_ansatz_set(ansatzes, "/some/path/to/ansatz/set.json")
+
+        mock_open.assert_called_once_with("/some/path/to/ansatz/set.json", "w")
+        mock_open().__enter__.assert_called_once()
+        mock_open().__exit__.assert_called_once()
+
+    def test_saving_qcbm_ansatz_set_writes_correct_json_data_to_file(self, mock_open):
+        """Saving qcbm ansatz set writes correct list of json dictionaries to file."""
+        ansatzes = [
+            QCBMAnsatz(number_of_layers=2, number_of_qubits=4, topology="all"),
+            QCBMAnsatz(number_of_layers=4, number_of_qubits=8, topology="line"),
+        ]
+
+        expected_dict = {
+            "qcbm_ansatz": [ansatz.to_dict() for ansatz in ansatzes],
+            "schema": SCHEMA_VERSION + "-qcbm-ansatz-set",
+        }
+
+        save_qcbm_ansatz_set(ansatzes, "/some/path/to/ansatz/set.json")
+
+        written_data = mock_open().__enter__().write.call_args[0][0]
+        assert json.loads(written_data) == expected_dict
+
+    def test_saved_qcbm_ansatz_set_can_be_loaded(self, mock_open):
+        """Saved qcbm ansatz set can be loaded to obtain the same ansatz set."""
+        fake_file = StringIO()
+        mock_open().__enter__.return_value = fake_file
+        ansatzes = [
+            QCBMAnsatz(number_of_layers=2, number_of_qubits=4, topology="all"),
+            QCBMAnsatz(number_of_layers=4, number_of_qubits=8, topology="line"),
+        ]
+
+        save_qcbm_ansatz_set(ansatzes, "ansatzes.json")
+        fake_file.seek(0)
+
+        loaded_ansatzes = load_qcbm_ansatz_set(fake_file)
+        assert all(
+            (
+                ansatz.to_dict()[key] == loaded_ansatz.to.dict()[key]
+                for key in ansatz.to_dict().keys()
+            )
+            for ansatz, loaded_ansatz in zip(ansatzes, loaded_ansatzes)
+        )
+
+        assert all(
+            ansatz.to_dict().keys() == loaded_ansatz.to_dict().keys()
+            for ansatz, loaded_ansatz in zip(ansatzes, loaded_ansatzes)
+        )
