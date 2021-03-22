@@ -5,9 +5,7 @@ import sympy
 from overrides import overrides
 from zquantum.core.circuit import Circuit, create_layer_of_gates
 from zquantum.core.interfaces.ansatz import Ansatz
-from zquantum.core.interfaces.ansatz_utils import (
-    ansatz_property,
-)
+from zquantum.core.interfaces.ansatz_utils import ansatz_property
 from zquantum.core.utils import SCHEMA_VERSION
 from .ansatz_utils import get_entangling_layer
 
@@ -19,10 +17,7 @@ class QCBMAnsatz(Ansatz):
     topology = ansatz_property("topology")
 
     def __init__(
-        self,
-        number_of_layers: int,
-        number_of_qubits: int,
-        topology: str = "all",
+        self, number_of_layers: int, number_of_qubits: int, topology: str = "all",
     ):
         """
         An ansatz implementation used for running the Quantum Circuit Born Machine.
@@ -41,6 +36,8 @@ class QCBMAnsatz(Ansatz):
         super().__init__(number_of_layers)
         self._number_of_qubits = number_of_qubits
         self._topology = topology
+        if number_of_layers == 0:
+            raise ValueError("QCBMAnsatz is only defined for number_of_layers > 0.")
 
     @property
     def number_of_params(self) -> int:
@@ -267,23 +264,6 @@ class QCBMAnsatz(Ansatz):
         }
 
         return dictionary
-
-    # def from_dict(self, dictionary):
-    #     """Loads information of the qcbm_ansatz from a dictionary. This corresponds to the
-    #     number of layers, number of qubits, and topplogy.
-
-    #     Args:
-    #         dictionary (dict): the dictionary
-
-    #     Returns:
-    #         A QCBM_Ansatz object
-    #     """
-    #     output = QCBMAnsatz(
-    #         dictionary["number_of_layers"],
-    #         dictionary["number_of_qubits"],
-    #         dictionary["topology"],
-    #     )
-    #     return output
 
 
 def save_qcbm_ansatz_set(qcbm_ansatz_set: List[QCBMAnsatz], filename: str) -> None:
