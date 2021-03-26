@@ -52,6 +52,7 @@ def bars_and_stripes_zigzag(nrows, ncols):
     for h in itertools.product([0,1], repeat=ncols):
         pic = np.repeat([h], nrows, 0)
         data.append(pic.ravel().tolist())
+        
           
     for h in itertools.product([0,1], repeat=nrows):
         pic = np.repeat([h], ncols, 1)
@@ -79,4 +80,26 @@ def get_num_bars_and_stripes_patterns(nrows, ncols) -> int:
             num_patterns += math.factorial(dimension) // (math.factorial(dimension-num_choices) * math.factorial(num_choices))
 
     return num_patterns
+
+def bars_and_stripes_random(nrows, ncols):
+    ''' Generates bars and stripes data in a random pattern
+    Args: 
+        nrows (int): number of rows in BAS dataset 
+        ncols (int): number of columns in BAS dataset
+    Returns: 
+        Array of list of BAS pattern. 
+    '''
+
+    data = bars_and_stripes_zigzag(nrows, ncols)
+    randomlist = random.sample(range(0, len(data[0])), len(data[0])) 
+    new_data = []
+    for i in range(len(data)): 
+        rip_list = []
+        for j in range(len(data[i])): 
+            rip_list.append(data[i][randomlist[j]]) 
+        new_data.append(rip_list) 
+
+    new_data = np.unique(np.asarray(new_data), axis=0)
+    print(randomlist)
+    return new_data
 
