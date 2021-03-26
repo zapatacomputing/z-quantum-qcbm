@@ -6,7 +6,7 @@ from typing import List
 
 from zquantum.core.bitstring_distribution import BitstringDistribution
 
-def get_bars_and_stripes_target_distribution(nrows, ncols, fraction=1., method):
+def get_bars_and_stripes_target_distribution(nrows, ncols, method, fraction=1.):
     ''' Generates bars and stripes (BAS) data in zigzag pattern
     Args: 
         nrows (int): number of rows in BAS dataset 
