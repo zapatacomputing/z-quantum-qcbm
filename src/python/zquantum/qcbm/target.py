@@ -103,6 +103,5 @@ def bars_and_stripes_random(nrows, ncols):
         new_data.append(rip_list) 
 
     new_data = np.unique(np.asarray(new_data), axis=0)
-    print(randomlist)
     return new_data
 
