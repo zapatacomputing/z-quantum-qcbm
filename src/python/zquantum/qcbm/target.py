@@ -18,6 +18,9 @@ def get_bars_and_stripes_target_distribution(nrows, ncols, fraction=1., method="
     '''
     if method == "zigzag":
         data = bars_and_stripes_zigzag(nrows, ncols)
+    
+    if method == "random": 
+        data = bars_and_stripes_random(nrows, ncols)
     else:
         raise RuntimeError("Method: {} is not supported for generated a target distribution for bars and stripes".format(method))
 
