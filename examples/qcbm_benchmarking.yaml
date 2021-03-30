@@ -14,7 +14,7 @@ imports:
   type: git
   parameters:
     repository: "git@github.com:zapatacomputing/z-quantum-qcbm.git"
-    branch: "thermal_target_data"
+    branch: "random_pattern"
 - name: z-quantum-optimizers
   type: git
   parameters:
