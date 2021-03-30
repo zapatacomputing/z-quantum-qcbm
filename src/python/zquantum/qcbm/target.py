@@ -105,3 +105,6 @@ def bars_and_stripes_random(nrows, ncols):
     new_data = np.unique(np.asarray(new_data), axis=0)
     return new_data
 
+print(bars_and_stripes_random(3, 3) ) 
+print(bars_and_stripes_zigzag(3, 3) ) 
+

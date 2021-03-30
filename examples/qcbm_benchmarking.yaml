@@ -1,0 +1,50 @@
+# Workflow API version
+apiVersion: io.orquestra.workflow/1.0.0
+
+# Prefix for workflow ID
+name: qcbm-sequence-benchmarking 
+
+imports:
+- name: z-quantum-core
+  type: git
+  parameters:
+    repository: "git@github.com:zapatacomputing/z-quantum-core.git"
+    branch: "master"
+- name: z-quantum-qcbm
+  type: git
+  parameters:
+    repository: "git@github.com:zapatacomputing/z-quantum-qcbm.git"
+    branch: "thermal_target_data"
+- name: z-quantum-optimizers
+  type: git
+  parameters:
+    repository: "git@github.com:zapatacomputing/z-quantum-optimizers.git"
+    branch: "master"
+- name: qe-qulacs
+  type: git
+  parameters:
+    repository: "git@github.com:zapatacomputing/qe-qulacs.git"
+    branch: "master"
+
+steps:
+
+- name: get-outputs
+  config:
+    runtime:
+      language: python3
+      imports: [z-quantum-core, z-quantum-qcbm, qe-qulacs]
+      parameters:
+        file: z-quantum-qcbm/steps/sequence_generalization_benchmarking.py
+        function: get_results 
+    resources:
+      cpu: "1000m"
+      memory: "1Gi"
+      disk: "10Gi"
+  outputs:
+    - name: qcbm-optimization-results
+      type: optimization-results
+    - name: optimized-parameters
+      type: ansatz-params
+types:
+ - ansatz-params
+ - optimization-results
