@@ -64,7 +64,8 @@ def get_results():
     distance_measure_specs = '{"module_name": "zquantum.core.bitstring_distribution", "function_name": "compute_mmd"}'
     distance_measure_parameters = '{"epsilon": 1e-6}'
     backend_specs = '{"module_name": "qequlacs.simulator", "function_name": "QulacsSimulator"}'
-    optimizer_specs = '{"module_name": "zquantum.optimizers", "function_name": "ScipyOptimizer", "method": "L-BFGS-B", "options": {"maxfun": 100, "keep_value_history": "True"}}'
+    optimizer_specs = '{"module_name": "zquantum.optimizers.cma_es_optimizer", "function_name": "CMAESOptimizer", "options": {"popsize": 5, "sigma_0": 0.1, "tolx": 0.000001, "seed": 9}'
+
 
     distance_measure = get_func_from_specs(json.loads(distance_measure_specs))
     ansatz = QCBMAnsatz(n_layers, n_qubits, topology)
