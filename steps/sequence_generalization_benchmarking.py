@@ -28,7 +28,7 @@ def test_random(test_string):
         if key == test_string: 
             random_representation.distribution_dict[key] = 0.0
         else: 
-            random_representation.distribution_dict[key] = 1 / 6
+            random_representation.distribution_dict[key] = 1 / 5
     return random_representation
 
 
@@ -37,7 +37,7 @@ def test_zigzag(test_string):
         if key == test_string: 
             zigzag_representation.distribution_dict[key] = 0.0
         else: 
-            zigzag_representation.distribution_dict[key] = 1 / 6
+            zigzag_representation.distribution_dict[key] = 1 / 5
     return zigzag_representation
 
 
@@ -63,14 +63,16 @@ def get_results():
     topology = "all"
     distance_measure_specs = '{"module_name": "zquantum.core.bitstring_distribution", "function_name": "compute_mmd"}'
     distance_measure_parameters = '{"epsilon": 1e-6}'
-    backend_specs = '{"module_name": "qequlacs.simulator", "function_name": "QulacsSimulator"}'
-    optimizer_specs = '{"module_name": "zquantum.optimizers.cma_es_optimizer", "function_name": "CMAESOptimizer"}'
+    backend_specs = '{"module_name": "qeqiskit.simulator", "function_name": "QiskitSimulator", "device_name": "statevector_simulator"}'
+
+
+    optimizer_specs = {"module_name": "zquantum.optimizers", "function_name": "ScipyOptimizer", "method": "L-BFGS-B", "options": {"maxfun": 100, "keep_value_history": "True"}}
 
 
     distance_measure = get_func_from_specs(json.loads(distance_measure_specs))
     ansatz = QCBMAnsatz(n_layers, n_qubits, topology)
     backend = create_object(json.loads(backend_specs))
-    optimizer = create_object(json.loads(optimizer_specs))
+    optimizer = create_object(optimizer_specs)
 
     generation_dict = {}
 
@@ -91,7 +93,6 @@ def get_results():
         generation_dict[list(zigzag_representation.distribution_dict.keys())[i]] = generation_prob 
         save_optimization_results(opt_results, "qcbm-optimization-results.json" + str(i))
         save_circuit_template_params(opt_results.opt_params, "optimized-parameters.json" + str(i))
-        
 
 
 
