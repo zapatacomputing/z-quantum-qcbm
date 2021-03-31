@@ -43,8 +43,6 @@ steps:
   outputs:
     - name: qcbm-optimization-results
       type: optimization-results
-    - name: optimized-parameters
-      type: ansatz-params
+
 types:
- - ansatz-params
  - optimization-results
