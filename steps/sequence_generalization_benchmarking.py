@@ -7,6 +7,7 @@ from zquantum.core.circuit import (
     load_circuit_template_params,
     save_circuit_template_params,
 )
+import zquantum.optimizers
 from zquantum.core.utils import create_object, get_func_from_specs
 from zquantum.core.bitstring_distribution import load_bitstring_distribution, compute_mmd
 from zquantum.qcbm.target import (
