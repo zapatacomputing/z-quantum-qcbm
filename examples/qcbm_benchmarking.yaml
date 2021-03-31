@@ -20,10 +20,10 @@ imports:
   parameters:
     repository: "git@github.com:zapatacomputing/z-quantum-optimizers.git"
     branch: "master"
-- name: qe-qulacs
+- name: qe-qiskit 
   type: git
   parameters:
-    repository: "git@github.com:zapatacomputing/qe-qulacs.git"
+    repository: "git@github.com:zapatacomputing/qe-qiskit.git"
     branch: "master"
 
 steps:
@@ -32,7 +32,7 @@ steps:
   config:
     runtime:
       language: python3
-      imports: [z-quantum-core, z-quantum-qcbm, qe-qulacs]
+      imports: [z-quantum-core, z-quantum-qcbm, qe-qiskit]
       parameters:
         file: z-quantum-qcbm/steps/sequence_generalization_benchmarking.py
         function: get_results 

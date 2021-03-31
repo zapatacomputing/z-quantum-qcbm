@@ -15,8 +15,8 @@ from zquantum.qcbm.target import (
 from zquantum.core.serialization import save_optimization_results
 from zquantum.core.bitstring_distribution import save_bitstring_distribution
 
-nrows = 2
-ncols = 2
+nrows = 3
+ncols = 3
 fraction = 1.0
 
 random_representation = _get_bars_and_stripes_target_distribution(nrows, ncols, "random", fraction)
@@ -28,7 +28,7 @@ def test_random(test_string):
         if key == test_string: 
             random_representation.distribution_dict[key] = 0.0
         else: 
-            random_representation.distribution_dict[key] = 1 / 5
+            random_representation.distribution_dict[key] = 1 / 13
     return random_representation
 
 
@@ -37,13 +37,13 @@ def test_zigzag(test_string):
         if key == test_string: 
             zigzag_representation.distribution_dict[key] = 0.0
         else: 
-            zigzag_representation.distribution_dict[key] = 1 / 5
+            zigzag_representation.distribution_dict[key] = 1 / 13
     return zigzag_representation
 
 
 def get_results():
 
-    ansatz_specs = '{"module_name": "zquantum.qcbm.ansatz", "function_name": "QCBMAnsatz", "number_of_layers": 2, "number_of_qubits": 4, "topology": "all"}'
+    ansatz_specs = '{"module_name": "zquantum.qcbm.ansatz", "function_name": "QCBMAnsatz", "number_of_layers": 6, "number_of_qubits": 9, "topology": "all"}'
     min_value = -1.57
     max_value = 1.57
     seed = 9
@@ -58,8 +58,8 @@ def get_results():
         np.random.seed(seed)
     initial_parameters = np.random.uniform(min_value, max_value, number_of_params)
 
-    n_qubits = 4
-    n_layers = 2
+    n_qubits = 9
+    n_layers = 6
     topology = "all"
     distance_measure_specs = '{"module_name": "zquantum.core.bitstring_distribution", "function_name": "compute_mmd"}'
     distance_measure_parameters = '{"epsilon": 1e-6}'
