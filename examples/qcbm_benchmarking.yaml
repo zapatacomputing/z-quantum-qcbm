@@ -32,7 +32,7 @@ steps:
   config:
     runtime:
       language: python3
-      imports: [z-quantum-core, z-quantum-qcbm, qe-qiskit]
+      imports: [z-quantum-core, z-quantum-qcbm, qe-qiskit,z-quantum-optimizers]
       parameters:
         file: z-quantum-qcbm/steps/sequence_generalization_benchmarking.py
         function: get_results 
