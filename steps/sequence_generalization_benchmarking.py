@@ -92,8 +92,8 @@ def get_results():
         qcbm_data = backend.get_bitstring_distribution(circuit)
         generation_prob = qcbm_data.distribution_dict[list(zigzag_representation.distribution_dict.keys())[i]]
         generation_dict[list(zigzag_representation.distribution_dict.keys())[i]] = generation_prob 
-        
+    print(qcbm_data) 
     save_optimization_results(generation_dict, "qcbm-optimization-results.json")
     
-
+print(get_results()) 
 
