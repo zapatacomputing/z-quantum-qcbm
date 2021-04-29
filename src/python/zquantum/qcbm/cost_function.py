@@ -52,7 +52,8 @@ def QCBMCostFunction(
             (float): cost function value for given parameters
             zquantum.core.bitstring_distribution.BitstringDistribution: distribution obtained
         """
-        circuit = ansatz.get_executable_circuit(parameters)
+        # circuit = ansatz.get_executable_circuit(parameters)
+        circuit = ansatz._generate_circuit(parameters)
         distribution = backend.get_bitstring_distribution(circuit)
         value = evaluate_distribution_distance(
             target_bitstring_distribution,
