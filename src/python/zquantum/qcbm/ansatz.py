@@ -19,7 +19,11 @@ class QCBMAnsatz(Ansatz):
     topology = ansatz_property("topology")
 
     def __init__(
-        self, number_of_layers: int, number_of_qubits: int, topology: str = "all",
+        self,
+        number_of_layers: int,
+        number_of_qubits: int,
+        topology: str = "all",
+        **topology_kwargs
     ):
         """
         An ansatz implementation used for running the Quantum Circuit Born Machine.
@@ -38,6 +42,8 @@ class QCBMAnsatz(Ansatz):
         super().__init__(number_of_layers)
         self._number_of_qubits = number_of_qubits
         self._topology = topology
+        self._topology_kwargs = topology_kwargs
+
         if number_of_layers == 0:
             raise ValueError("QCBMAnsatz is only defined for number_of_layers > 0.")
 
@@ -52,8 +58,21 @@ class QCBMAnsatz(Ansatz):
     def n_params_per_ent_layer(self) -> int:
         if self.topology == "all":
             return int((self.number_of_qubits * (self.number_of_qubits - 1)) / 2)
-        elif self.topology == "line":
+        elif self.topology == "line" or self.topology == "star":
             return self.number_of_qubits - 1
+        elif self.topology == "graph":
+            count = 0
+            for qubit1_index in range(0, self._number_of_qubits - 1):
+                for qubit2_index in range(qubit1_index, self._number_of_qubits):
+                    if self._topology_kwargs["adjacency_matrix"][qubit1_index][
+                        qubit2_index
+                    ]:
+                        count += 1
+                    if self._topology_kwargs["adjacency_matrix"][qubit2_index][
+                        qubit1_index
+                    ]:
+                        count += 1
+            return count
         else:
             raise RuntimeError("Topology {} is not supported".format(self.topology))
 
@@ -69,7 +88,10 @@ class QCBMAnsatz(Ansatz):
         """
         if params is None:
             params = np.asarray(
-                [sympy.Symbol("theta_{}".format(i)) for i in range(self.number_of_params)]
+                [
+                    sympy.Symbol("theta_{}".format(i))
+                    for i in range(self.number_of_params)
+                ]
             )
 
         assert len(params) == self.number_of_params
@@ -185,6 +207,7 @@ class QCBMAnsatz(Ansatz):
                     self.number_of_qubits,
                     "XX",
                     self.topology,
+                    self._topology_kwargs,
                 )
                 parameter_index += self.n_params_per_ent_layer
             else:
@@ -211,7 +234,7 @@ class QCBMAnsatz(Ansatz):
         """Determine the number of parameters needed for each layer in the ansatz
 
         Returns:
-            A 1D array of integers 
+            A 1D array of integers
         """
         if self.number_of_layers == 1:
             # If only one layer, then only need parameters for a single layer of Rx gates

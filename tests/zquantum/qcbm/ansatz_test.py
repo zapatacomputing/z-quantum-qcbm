@@ -7,8 +7,8 @@ import pyquil.gates
 from zquantum.core.circuit import Circuit, Qubit, Gate
 from zquantum.core.interfaces.ansatz_test import AnsatzTests
 
-from zquantum.qcbm.ansatz import QCBMAnsatz
-from zquantum.qcbm.ansatz_utils import get_entangling_layer
+from .ansatz import QCBMAnsatz
+from .ansatz_utils import get_entangling_layer
 
 
 class TestQCBMAnsatz(AnsatzTests):
@@ -94,7 +94,7 @@ class TestQCBMAnsatz(AnsatzTests):
             )
         expected_circuit = Circuit(expected_pycircuit)
         expected_circuit += get_entangling_layer(
-            params[1], number_of_qubits, "XX", topology
+            params[1], number_of_qubits, "XX", topology, topology_kwargs=dict()
         )
 
         params = np.concatenate(params)
@@ -128,7 +128,7 @@ class TestQCBMAnsatz(AnsatzTests):
             )
         expected_first_layer = Circuit(expected_pycircuit)
         expected_second_layer = get_entangling_layer(
-            params[1], number_of_qubits, "XX", topology
+            params[1], number_of_qubits, "XX", topology, topology_kwargs=dict()
         )
         expected_pycircuit = Program()
         for i in range(number_of_qubits):

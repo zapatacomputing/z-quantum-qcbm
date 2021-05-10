@@ -6,7 +6,7 @@ import pyquil.gates
 
 from zquantum.core.circuit import Circuit, Qubit, Gate
 
-from zquantum.qcbm.ansatz_utils import (
+from .ansatz_utils import (
     get_entangling_layer,
     get_entangling_layer_all_topology,
     get_entangling_layer_line_topology,
@@ -125,4 +125,3 @@ class TestAnsatzUtils(unittest.TestCase):
             RuntimeError,
             lambda: get_entangling_layer(params, n_qubits, static_entangler, topology),
         )
-
