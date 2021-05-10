@@ -1,5 +1,6 @@
 from zquantum.core.circuit import Circuit, Gate, Qubit
 import numpy as np
+import time
 
 
 def get_entangling_layer(
