@@ -61,18 +61,21 @@ class QCBMAnsatz(Ansatz):
         elif self.topology == "line" or self.topology == "star":
             return self.number_of_qubits - 1
         elif self.topology == "graph":
-            count = 0
-            for qubit1_index in range(0, self._number_of_qubits - 1):
-                for qubit2_index in range(qubit1_index, self._number_of_qubits):
-                    if self._topology_kwargs["adjacency_matrix"][qubit1_index][
-                        qubit2_index
-                    ]:
-                        count += 1
-                    if self._topology_kwargs["adjacency_matrix"][qubit2_index][
-                        qubit1_index
-                    ]:
-                        count += 1
-            return count
+            if "adjacency_matrix" in self._topology_kwargs.keys():
+                count = 0
+                for qubit1_index in range(0, self._number_of_qubits - 1):
+                    for qubit2_index in range(qubit1_index, self._number_of_qubits):
+                        if self._topology_kwargs["adjacency_matrix"][qubit1_index][
+                            qubit2_index
+                        ]:
+                            count += 1
+                        if self._topology_kwargs["adjacency_matrix"][qubit2_index][
+                            qubit1_index
+                        ]:
+                            count += 1
+                return count
+            elif "adjacency_list" in self._topology_kwargs.keys():
+                return self._topology_kwargs["adjacency_list"].shape[1]
         else:
             raise RuntimeError("Topology {} is not supported".format(self.topology))
 
