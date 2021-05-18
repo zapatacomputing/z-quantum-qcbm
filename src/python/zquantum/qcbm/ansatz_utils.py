@@ -44,7 +44,7 @@ def get_entangling_layer_all_topology(
 
 
 def get_entangling_layer_line_topology(
-    params: np.ndarray, n_qubits: int, entangling_gate: str
+    params: np.ndarray, n_qubits: int, entangling_gate: GatePrototype
 ) -> Circuit:
     """Builds a circuit representing an entangling layer according to the line topology.
 
