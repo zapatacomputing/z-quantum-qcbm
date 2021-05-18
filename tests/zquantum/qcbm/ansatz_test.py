@@ -30,9 +30,9 @@ class TestQCBMAnsatz(AnsatzTests):
     ):
         # Given
         params = [
-            np.ones(2 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
-            np.ones(2 * number_of_qubits),
+            np.random.rand(2 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(2 * number_of_qubits),
         ]
         params = np.concatenate(params)
         ansatz = QCBMAnsatz(
@@ -53,7 +53,7 @@ class TestQCBMAnsatz(AnsatzTests):
             topology=topology,
         )
 
-        params = [np.ones(number_of_qubits)]
+        params = [np.random.rand(number_of_qubits)]
 
         expected_circuit = Circuit()
         for i in range(number_of_qubits):
@@ -77,8 +77,8 @@ class TestQCBMAnsatz(AnsatzTests):
         )
 
         params = [
-            np.ones(2 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(2 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
         ]
 
         expected_circuit = Circuit()
@@ -107,9 +107,9 @@ class TestQCBMAnsatz(AnsatzTests):
             topology=topology,
         )
         params = [
-            np.ones(2 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
-            np.ones(2 * number_of_qubits),
+            np.random.rand(2 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(2 * number_of_qubits),
         ]
 
         expected_first_layer = Circuit()
@@ -150,10 +150,10 @@ class TestQCBMAnsatz(AnsatzTests):
         )
 
         params = [
-            np.ones(2 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
-            np.ones(3 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(2 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(3 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
         ]
 
         expected_first_layer = Circuit()
@@ -170,9 +170,9 @@ class TestQCBMAnsatz(AnsatzTests):
         for i in range(number_of_qubits):
             expected_third_layer += RX(params[2][i])(i)
         for i in range(number_of_qubits):
-            expected_third_layer += RZ(params[2][i])(i)
+            expected_third_layer += RZ(params[2][i + number_of_qubits])(i)
         for i in range(number_of_qubits):
-            expected_third_layer += RX(params[2][i + number_of_qubits])(i)
+            expected_third_layer += RX(params[2][i + 2 * number_of_qubits])(i)
 
         expected_fourth_layer = get_entangling_layer(
             params[3], number_of_qubits, XX, topology
@@ -201,11 +201,11 @@ class TestQCBMAnsatz(AnsatzTests):
             topology=topology,
         )
         params = [
-            np.ones(2 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
-            np.ones(3 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
-            np.ones(2 * number_of_qubits),
+            np.random.rand(2 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(3 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(2 * number_of_qubits),
         ]
 
         expected_first_layer = Circuit()
@@ -222,9 +222,9 @@ class TestQCBMAnsatz(AnsatzTests):
         for i in range(number_of_qubits):
             expected_third_layer += RX(params[2][i])(i)
         for i in range(number_of_qubits):
-            expected_third_layer += RZ(params[2][i])(i)
+            expected_third_layer += RZ(params[2][i + number_of_qubits])(i)
         for i in range(number_of_qubits):
-            expected_third_layer += RX(params[2][i + number_of_qubits])(i)
+            expected_third_layer += RX(params[2][i + 2 * number_of_qubits])(i)
 
         expected_fourth_layer = get_entangling_layer(
             params[3], number_of_qubits, XX, topology
@@ -260,12 +260,12 @@ class TestQCBMAnsatz(AnsatzTests):
             topology=topology,
         )
         params = [
-            np.ones(2 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
-            np.ones(2 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
-            np.ones(3 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(2 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(2 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(3 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
         ]
 
         expected_first_layer = Circuit()
@@ -282,7 +282,7 @@ class TestQCBMAnsatz(AnsatzTests):
         for i in range(number_of_qubits):
             expected_third_layer += RX(params[2][i])(i)
         for i in range(number_of_qubits):
-            expected_third_layer += RZ(params[2][i])(i)
+            expected_third_layer += RZ(params[2][i + number_of_qubits])(i)
 
         expected_fourth_layer = get_entangling_layer(
             params[3], number_of_qubits, XX, topology
@@ -324,13 +324,13 @@ class TestQCBMAnsatz(AnsatzTests):
             topology=topology,
         )
         params = [
-            np.ones(2 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
-            np.ones(2 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
-            np.ones(3 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
-            np.ones(2 * number_of_qubits),
+            np.random.rand(2 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(2 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(3 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(2 * number_of_qubits),
         ]
 
         expected_first_layer = Circuit()
@@ -347,7 +347,7 @@ class TestQCBMAnsatz(AnsatzTests):
         for i in range(number_of_qubits):
             expected_third_layer += RX(params[2][i])(i)
         for i in range(number_of_qubits):
-            expected_third_layer += RZ(params[2][i])(i)
+            expected_third_layer += RZ(params[2][i + number_of_qubits])(i)
 
         expected_fourth_layer = get_entangling_layer(
             params[3], number_of_qubits, XX, topology
@@ -396,14 +396,14 @@ class TestQCBMAnsatz(AnsatzTests):
             topology=topology,
         )
         params = [
-            np.ones(2 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
-            np.ones(2 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
-            np.ones(2 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
-            np.ones(3 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(2 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(2 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(2 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(3 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
         ]
 
         expected_first_layer = Circuit()
@@ -420,7 +420,7 @@ class TestQCBMAnsatz(AnsatzTests):
         for i in range(number_of_qubits):
             expected_third_layer += RX(params[2][i])(i)
         for i in range(number_of_qubits):
-            expected_third_layer += RZ(params[2][i])(i)
+            expected_third_layer += RZ(params[2][i + number_of_qubits])(i)
 
         expected_fourth_layer = get_entangling_layer(
             params[3], number_of_qubits, XX, topology
@@ -473,15 +473,15 @@ class TestQCBMAnsatz(AnsatzTests):
             topology=topology,
         )
         params = [
-            np.ones(2 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
-            np.ones(2 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
-            np.ones(2 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
-            np.ones(3 * number_of_qubits),
-            np.ones(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
-            np.ones(2 * number_of_qubits),
+            np.random.rand(2 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(2 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(2 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(3 * number_of_qubits),
+            np.random.rand(int((number_of_qubits * (number_of_qubits - 1)) / 2)),
+            np.random.rand(2 * number_of_qubits),
         ]
 
         expected_first_layer = Circuit()
@@ -498,7 +498,7 @@ class TestQCBMAnsatz(AnsatzTests):
         for i in range(number_of_qubits):
             expected_third_layer += RX(params[2][i])(i)
         for i in range(number_of_qubits):
-            expected_third_layer += RZ(params[2][i])(i)
+            expected_third_layer += RZ(params[2][i + number_of_qubits])(i)
 
         expected_fourth_layer = get_entangling_layer(
             params[3], number_of_qubits, XX, topology
