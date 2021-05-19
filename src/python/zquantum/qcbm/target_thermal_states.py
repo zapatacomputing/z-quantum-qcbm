@@ -67,6 +67,7 @@ def get_thermal_target_distribution_dict(
 
     Returns:
        Thermal target distribution.
+       Number of positive spins in the spin state. 
     """
     partition_function = 0
     external_fields, two_body_couplings = hamiltonian_parameters
@@ -190,14 +191,22 @@ def get_thermal_sampled_distribution(
     sample_distribution_dict = {}
     samples = sample(n_samples, n_spins, temperature, hamiltonian_parameters)
     histogram_samples = np.zeros(2 ** n_spins)
+    pos_spins_list = []
     for s in samples:
         idx = ising2int(s)
         histogram_samples[idx] += 1.0 / n_samples
+        pos_spins = 0 
+        for elem in s: 
+            if elem == 1.0: 
+                pos_spins += 1 
+        pos_spins_list.insert(idx,pos_spins)
+
     for spin in range(int(2 ** n_spins)):
         binary_bitstring = convert_tuples_to_bitstrings([dec2bin(spin, n_spins)])[-1]
         reverse_bitstring = binary_bitstring[len(binary_bitstring) :: -1]
         sample_distribution_dict[reverse_bitstring] = histogram_samples[spin]
-    return sample_distribution_dict
+
+    return sample_distribution_dict, pos_spins_list
 
 
 def get_sampled_bitstring_distribution(
@@ -216,5 +225,8 @@ def get_sampled_bitstring_distribution(
     """
     probabilities = get_thermal_sampled_distribution(
         n_samples, n_spins, temperature, hamiltonian_parameters
-    )
-    return BitstringDistribution(probabilities)
+    )[0]
+    spin_mapping = get_thermal_sampled_distribution(
+        n_samples, n_spins, temperature, hamiltonian_parameters
+    )[1]
+    return BitstringDistribution(probabilities), spin_mapping
