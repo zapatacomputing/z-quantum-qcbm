@@ -38,4 +38,8 @@ jobs:
           python3 -m pip install .
           python3 -m pip install pytest-cov
           python3 -m pytest --cov=zquantum.qcbm tests/
-          
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
