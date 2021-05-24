@@ -37,5 +37,5 @@ jobs:
           python3 -m pip install z-quantum-core/
           python3 -m pip install .
           python3 -m pip install pytest-cov
-          python3 -m pytest --cov=zquantum.qcbm .
+          python3 -m pytest --cov=zquantum.qcbm tests/
           
