@@ -1,4 +1,4 @@
-# Orquestra Quantum Circuit Born Machine
+# Orque stra Quantum Circuit Born Machine
 
 [![codecov](https://codecov.io/gh/zapatacomputing/z-quantum-qcbm/branch/master/graph/badge.svg?token=nLDcbGF5DU)](https://codecov.io/gh/zapatacomputing/z-quantum-qcbm)
 
