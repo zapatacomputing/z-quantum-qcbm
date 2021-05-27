@@ -1,8 +1,8 @@
 from zquantum.qcbm.cost_function import QCBMCostFunction
 from zquantum.qcbm.ansatz import QCBMAnsatz
-from zquantum.core.circuit import (
-    load_circuit_template_params,
-    save_circuit_template_params,
+from zquantum.core.serialization import (
+    load_array,
+    save_array,
 )
 from zquantum.core.utils import create_object, get_func_from_specs
 from zquantum.core.serialization import save_optimization_results
