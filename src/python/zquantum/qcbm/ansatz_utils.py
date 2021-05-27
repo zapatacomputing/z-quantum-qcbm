@@ -38,9 +38,8 @@ def get_entangling_layer(
         ):
             raise RuntimeError("Only one of adjacency list/matrix can be specified.")
         if "adjacency_matrix" in topology_kwargs.keys():
-            if adjacency_matrix and not np.array_equal(
-                adjacency_matrix, adjacency_matrix.T
-            ):
+            adjacency_matrix = topology_kwargs["adjacency_matrix"]
+            if np.array_equal(adjacency_matrix, adjacency_matrix.T):
                 print("Warning: This matrix is not symmetric.")
         else:
             adjacency_matrix = adjacency_list_to_matrix(
