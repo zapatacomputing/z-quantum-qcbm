@@ -1,6 +1,5 @@
 from zquantum.core.circuit import Circuit, Gate, Qubit
 import numpy as np
-import networkx as nx
 
 
 def get_entangling_layer(
@@ -105,6 +104,7 @@ def get_entangling_layer_star_topology(
         params (numpy.array): parameters of the circuit.
         n_qubits (int): number of qubits in the circuit.
         entangling_gate (str): gate specification for the entangling layer.
+        center_qubit (int): the center qubit of the star topology.
 
     Returns:
         Circuit: a zquantum.core.circuit.Circuit object
@@ -132,12 +132,13 @@ def get_entangling_layer_graph_topology(
         params (numpy.array): parameters of the circuit.
         n_qubits (int): number of qubits in the circuit.
         entangling_gate (str): gate specification for the entangling layer.
+        adjacency_matrix: (numpy.array): adjacency matrix for the entangling layer.
 
     Returns:
         Circuit: a zquantum.core.circuit.Circuit object
     """
-    # make sure adjacency matrix has correct dimensions + is symmetric
     assert adjacency_matrix.shape[0] == adjacency_matrix.shape[1] == n_qubits
+
     circuit = Circuit()
     circuit.qubits = [Qubit(qubit_index) for qubit_index in range(n_qubits)]
     i = 0
@@ -159,6 +160,15 @@ def get_entangling_layer_graph_topology(
 
 
 def adjacency_list_to_matrix(n_qubits: int, adj_list: np.ndarray):
+    """Converts an adjacency list to an adjacency matrix.
+
+    Args:
+        n_qubits (int): number of qubits in the circuit.
+        adjacency_list: (numpy.array): adjacency list for the entangling layer.
+
+    Returns:
+        adj_matrix: a numpy.array object
+    """
     assert adj_list.shape[1] == 2
     adj_matrix = np.zeros((n_qubits, n_qubits))
     for pair in adj_list:
