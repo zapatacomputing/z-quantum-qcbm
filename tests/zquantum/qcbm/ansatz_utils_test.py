@@ -6,7 +6,7 @@ import pyquil.gates
 
 from zquantum.core.circuit import Circuit, Qubit, Gate
 
-from .ansatz_utils import (
+from zquantum.qcbm.ansatz_utils import (
     get_entangling_layer,
     get_entangling_layer_all_topology,
     get_entangling_layer_line_topology,

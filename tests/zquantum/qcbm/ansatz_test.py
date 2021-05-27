@@ -7,8 +7,8 @@ import pyquil.gates
 from zquantum.core.circuit import Circuit, Qubit, Gate
 from zquantum.core.interfaces.ansatz_test import AnsatzTests
 
-from .ansatz import QCBMAnsatz
-from .ansatz_utils import get_entangling_layer
+from zquantum.qcbm.ansatz import QCBMAnsatz
+from zquantum.qcbm.ansatz_utils import get_entangling_layer
 
 
 class TestQCBMAnsatz(AnsatzTests):
