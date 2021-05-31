@@ -1,6 +1,6 @@
 import unittest
-from .cost_function import QCBMCostFunction
-from .ansatz import QCBMAnsatz
+from zquantum.qcbm.cost_function import QCBMCostFunction
+from zquantum.qcbm.ansatz import QCBMAnsatz
 from zquantum.core.bitstring_distribution import (
     BitstringDistribution,
     compute_clipped_negative_log_likelihood,
