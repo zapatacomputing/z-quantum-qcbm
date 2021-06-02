@@ -36,7 +36,7 @@ def optimize_variational_qcbm_circuit(
         optimizer_specs = json.loads(optimizer_specs)
     optimizer = create_object(optimizer_specs)
 
-    initial_parameters = load_circuit_template_params(initial_parameters)
+    initial_parameters = load_array(initial_parameters)
     target_distribution = load_bitstring_distribution(target_distribution)
 
     if isinstance(distance_measure_parameters, str):
@@ -51,4 +51,4 @@ def optimize_variational_qcbm_circuit(
     )
     opt_results = optimizer.minimize(cost_function, initial_parameters)
     save_optimization_results(opt_results, "qcbm-optimization-results.json")
-    save_circuit_template_params(opt_results.opt_params, "optimized-parameters.json")
+    save_array(opt_results.opt_params, "optimized-parameters.json")
