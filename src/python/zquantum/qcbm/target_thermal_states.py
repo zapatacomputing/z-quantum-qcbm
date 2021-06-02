@@ -174,6 +174,7 @@ def sample(
     return np.asarray(samples)
 
 
+
 def get_thermal_sampled_distribution(
     n_samples: int,
     n_spins: int,
@@ -207,6 +208,9 @@ def get_thermal_sampled_distribution(
         sample_distribution_dict[reverse_bitstring] = histogram_samples[spin]
 
     return sample_distribution_dict, pos_spins_list
+
+
+
 
 
 def get_sampled_bitstring_distribution(

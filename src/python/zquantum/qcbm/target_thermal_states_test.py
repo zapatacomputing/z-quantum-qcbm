@@ -3,7 +3,7 @@ import numpy as np
 from zquantum.core.utils import dec2bin, convert_tuples_to_bitstrings
 from zquantum.core.bitstring_distribution import BitstringDistribution
 from zquantum.core.bitstring_distribution.distance_measures.mmd import compute_mmd
-from .target_thermal_states import (
+from target_thermal_states import (
     int2ising,
     ising2int,
     get_random_hamiltonian_parameters,
@@ -178,7 +178,7 @@ class TestThermalTarget(unittest.TestCase):
         # When
         sample_distribution = get_thermal_sampled_distribution(
             n_samples, n_spins, temperature, hamiltonian_parameters
-        )
+        )[0]
 
         # Then
         self.assertListEqual(
@@ -199,13 +199,13 @@ class TestThermalTarget(unittest.TestCase):
         np.random.seed(SEED)
         target_distribution = get_thermal_sampled_distribution(
             n_samples, n_spins, temperature, hamiltonian_parameters
-        )
+        )[0]
 
         # When
         np.random.seed(SEED)
         target_bitstring_distribution = get_sampled_bitstring_distribution(
             n_samples, n_spins, temperature, hamiltonian_parameters
-        )
+        )[0]
 
         # Then
         self.assertTrue(
@@ -233,7 +233,7 @@ class TestThermalTarget(unittest.TestCase):
         np.random.seed(SEED)
         model = get_sampled_bitstring_distribution(
             n_samples, n_spins, temperature, hamiltonian_parameters
-        )
+        )[0]
 
         # When
         mmd = compute_mmd(actual, model, distance_measure)
