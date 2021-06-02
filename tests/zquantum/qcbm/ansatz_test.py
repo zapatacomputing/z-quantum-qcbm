@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 
-from zquantum.core.wip.circuits import Circuit, RX, RZ, XX
+from zquantum.core.circuits import Circuit, RX, RZ, XX
 from zquantum.core.interfaces.ansatz_test import AnsatzTests
 
 from zquantum.qcbm.ansatz import QCBMAnsatz

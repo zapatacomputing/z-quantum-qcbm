@@ -1,7 +1,7 @@
 import numpy as np
 import sympy
 
-from zquantum.core.wip.circuits import Circuit, create_layer_of_gates, RX, RZ, XX
+from zquantum.core.circuits import Circuit, create_layer_of_gates, RX, RZ, XX
 from zquantum.core.interfaces.ansatz import Ansatz
 from zquantum.core.interfaces.ansatz_utils import (
     ansatz_property,
