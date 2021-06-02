@@ -1,4 +1,4 @@
-from zquantum.core.wip.circuits import Circuit, GatePrototype
+from zquantum.core.circuits import Circuit, GatePrototype
 import numpy as np
 
 

@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from zquantum.core.wip.circuits import XX
+from zquantum.core.circuits import XX
 
 from zquantum.qcbm.ansatz_utils import (
     get_entangling_layer,
