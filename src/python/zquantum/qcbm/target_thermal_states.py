@@ -92,8 +92,8 @@ def get_thermal_target_distribution_dict(
         partition_function += boltzmann_factor
 
         binary_bitstring = convert_tuples_to_bitstrings([dec2bin(spin, n_spins)])[-1]
-        reverse_bitstring = binary_bitstring[len(binary_bitstring) :: -1]
-        distribution[reverse_bitstring] = boltzmann_factor
+        #reverse_bitstring = binary_bitstring[len(binary_bitstring) :: -1]
+        distribution[binary_bitstring] = boltzmann_factor
 
     normalized_distribution = {
         key: value / partition_function for key, value in distribution.items()
