@@ -10,6 +10,9 @@ from zquantum.qcbm.ansatz_utils import (
     get_entangling_layer,
     get_entangling_layer_all_topology,
     get_entangling_layer_line_topology,
+    get_entangling_layer_star_topology,
+    get_entangling_layer_graph_topology,
+    adjacency_list_to_matrix,
 )
 
 
@@ -75,6 +78,180 @@ class TestAnsatzUtils(unittest.TestCase):
         # XX on 2, 3
         self.assertEqual(ent_layer.gates[2].qubits[0].index, 2)
         self.assertEqual(ent_layer.gates[2].qubits[1].index, 3)
+
+    def test_get_entangling_layer_star_topology(self):
+        # Given
+        n_qubits = 4
+        single_qubit_gate = "Rx"
+        static_entangler = "XX"
+        topology = "star"
+        center_qubit = 1
+        params = np.asarray([0, 0, 0])
+
+        # When
+        ent_layer = get_entangling_layer_star_topology(
+            params, n_qubits, static_entangler, center_qubit
+        )
+
+        # Then
+        for gate in ent_layer.gates:
+            self.assertTrue(gate.name, "XX")
+
+        # XX on 0, 1
+        self.assertEqual(ent_layer.gates[0].qubits[0].index, 0)
+        self.assertEqual(ent_layer.gates[0].qubits[1].index, 1)
+        # XX on 1, 2
+        self.assertEqual(ent_layer.gates[1].qubits[0].index, 1)
+        self.assertEqual(ent_layer.gates[1].qubits[1].index, 2)
+        # XX on 1, 3
+        self.assertEqual(ent_layer.gates[2].qubits[0].index, 1)
+        self.assertEqual(ent_layer.gates[2].qubits[1].index, 3)
+
+    def test_get_entangling_layer_graph_topology_matrix1(self):
+        # Given
+        n_qubits = 4
+        single_qubit_gate = "Rx"
+        static_entangler = "XX"
+        topology = "graph"
+        connectivity = np.asarray(
+            [[0, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 0, 0]]
+        )
+        params = np.asarray([0, 0])
+
+        # When
+        ent_layer = get_entangling_layer_graph_topology(
+            params, n_qubits, static_entangler, adjacency_matrix=connectivity
+        )
+
+        # Then
+        for gate in ent_layer.gates:
+            self.assertTrue(gate.name, "XX")
+
+        # XX on 0, 1
+        self.assertEqual(ent_layer.gates[0].qubits[0].index, 0)
+        self.assertEqual(ent_layer.gates[0].qubits[1].index, 1)
+        # XX on 2, 3
+        self.assertEqual(ent_layer.gates[1].qubits[0].index, 2)
+        self.assertEqual(ent_layer.gates[1].qubits[1].index, 3)
+
+    def test_get_entangling_layer_graph_topology_graph1(self):
+        # Given
+        n_qubits = 4
+        single_qubit_gate = "Rx"
+        static_entangler = "XX"
+        topology = "graph"
+        connectivity = adjacency_list_to_matrix(n_qubits, np.array([[1, 0], [3, 2]]))
+        params = np.asarray([0, 0])
+
+        # When
+        ent_layer = get_entangling_layer_graph_topology(
+            params, n_qubits, static_entangler, adjacency_matrix=connectivity
+        )
+
+        # Then
+        for gate in ent_layer.gates:
+            self.assertTrue(gate.name, "XX")
+
+        # XX on 0, 1
+        self.assertEqual(ent_layer.gates[0].qubits[0].index, 0)
+        self.assertEqual(ent_layer.gates[0].qubits[1].index, 1)
+        # XX on 2, 3
+        self.assertEqual(ent_layer.gates[1].qubits[0].index, 2)
+        self.assertEqual(ent_layer.gates[1].qubits[1].index, 3)
+
+    def test_get_entangling_layer_graph_topology_matrix2(self):
+        # Given
+        n_qubits = 4
+        single_qubit_gate = "Rx"
+        static_entangler = "XX"
+        topology = "graph"
+        connectivity = np.asarray(
+            [[1, 1, 0, 1], [0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 0, 0]]
+        )
+        params = np.asarray([0, 0, 0])
+
+        # When
+        ent_layer = get_entangling_layer_graph_topology(
+            params, n_qubits, static_entangler, adjacency_matrix=connectivity
+        )
+
+        # Then
+        for gate in ent_layer.gates:
+            self.assertTrue(gate.name, "XX")
+
+        # XX on 0, 1
+        self.assertEqual(ent_layer.gates[0].qubits[0].index, 0)
+        self.assertEqual(ent_layer.gates[0].qubits[1].index, 1)
+        # XX on 0, 3
+        self.assertEqual(ent_layer.gates[1].qubits[0].index, 0)
+        self.assertEqual(ent_layer.gates[1].qubits[1].index, 3)
+        # XX on 2, 3
+        self.assertEqual(ent_layer.gates[2].qubits[0].index, 2)
+        self.assertEqual(ent_layer.gates[2].qubits[1].index, 3)
+
+    def test_get_entangling_layer_graph_topology_graph2(self):
+        # Given
+        n_qubits = 4
+        single_qubit_gate = "Rx"
+        static_entangler = "XX"
+        topology = "graph"
+        connectivity = adjacency_list_to_matrix(
+            n_qubits, np.array([[0, 1], [2, 3], [0, 3]])
+        )
+        params = np.asarray([0, 0, 0])
+
+        # When
+        ent_layer = get_entangling_layer_graph_topology(
+            params, n_qubits, static_entangler, adjacency_matrix=connectivity
+        )
+
+        # Then
+        for gate in ent_layer.gates:
+            self.assertTrue(gate.name, "XX")
+
+        # XX on 0, 1
+        self.assertEqual(ent_layer.gates[0].qubits[0].index, 0)
+        self.assertEqual(ent_layer.gates[0].qubits[1].index, 1)
+        # XX on 0, 3
+        self.assertEqual(ent_layer.gates[1].qubits[0].index, 0)
+        self.assertEqual(ent_layer.gates[1].qubits[1].index, 3)
+        # XX on 2, 3
+        self.assertEqual(ent_layer.gates[2].qubits[0].index, 2)
+        self.assertEqual(ent_layer.gates[2].qubits[1].index, 3)
+
+    def test_get_entangling_layer_graph_topology_bad_matrix1(self):
+        # Given
+        n_qubits = 4
+        single_qubit_gate = "Rx"
+        static_entangler = "XX"
+        topology = "graph"
+        connectivity = np.asarray([[1, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1]])
+        params = np.asarray([0, 0])
+
+        # When
+        self.assertRaises(
+            Exception,
+            lambda: get_entangling_layer_graph_topology(
+                params, n_qubits, static_entangler, adjacency_matrix=connectivity
+            ),
+        )
+
+    def test_get_entangling_layer_graph_topology_bad_matrix2(self):
+        # Given
+        n_qubits = 4
+        single_qubit_gate = "Rx"
+        static_entangler = "XX"
+        topology = "graph"
+        connectivity = np.asarray([[1, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1]])
+        params = np.asarray([0, 0])
+
+        # When
+        self.assertRaises(
+            Exception,
+            lambda: get_entangling_layer_graph_topology(
+                params, n_qubits, static_entangler, adjacency_matrix=connectivity
+            ),
+        )
 
     def test_get_entangling_layer_toplogy_supported(self):
         # Given
