@@ -1,5 +1,6 @@
 import numpy as np
 import sympy
+import json
 
 from zquantum.core.circuits import Circuit, create_layer_of_gates, RX, RZ, XX
 from zquantum.core.interfaces.ansatz import Ansatz
@@ -11,6 +12,10 @@ from typing import Optional, List
 from .ansatz_utils import get_entangling_layer
 
 from overrides import overrides
+
+
+ANSATZ_SCHEMA = "zquantum.qcbm.ansatz.v1"
+ANSATZSET_SCHEMA = "zquantum.qcbm.ansatzset.v1"
 
 
 class QCBMAnsatz(Ansatz):
@@ -263,7 +268,7 @@ class QCBMAnsatz(Ansatz):
             dictionary (dict): the dictionary
         """
         dictionary = {
-            "schema": SCHEMA_VERSION + "-qcbm_ansatz",
+            "schema": ANSATZ_SCHEMA,
             "number_of_layers": self.number_of_layers,
             "number_of_qubits": self.number_of_qubits,
             "topology": self.topology,
@@ -279,12 +284,10 @@ def save_qcbm_ansatz_set(qcbm_ansatz_set: List[QCBMAnsatz], filename: str) -> No
         qcbm_ansatz_set (list): a list ansatz to be saved
         file (str): the name of the file
     """
-    dictionary = {}
-    dictionary["schema"] = SCHEMA_VERSION + "-qcbm-ansatz-set"
-    dictionary["qcbm_ansatz"] = []
-
-    for ansatz in qcbm_ansatz_set:
-        dictionary["qcbm_ansatz"].append(ansatz.to_dict())
+    dictionary = {
+        "schema": ANSATZSET_SCHEMA,
+        "qcbm_ansatz": [ansatz.to_dict() for ansatz in qcbm_ansatz_set]
+    }
 
     with open(filename, "w") as f:
         f.write(json.dumps(dictionary, indent=2))
