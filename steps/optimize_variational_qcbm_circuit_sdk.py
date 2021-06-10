@@ -101,7 +101,7 @@ if __name__ == "__main__":
         seed=rng_seed,
     )
 
-    # wf.local_run(log_level=logging.INFO)
+    wf.local_run(log_level=logging.INFO)
     wf.validate()
     wf.print_workflow()
     wf.submit()
