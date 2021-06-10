@@ -14,12 +14,20 @@ from zquantum.qcbm.ansatz import QCBMAnsatz
 from zquantum.qcbm.cost_function import QCBMCostFunction
 
 
+@qe.step(
+    resource_def=qe.ResourceDefinition(cpu="1000m", memory="2Gi", disk="10Gi"),
+    custom_name="generate-init-params",
+)
 def generate_random_initial_parameters(
     min_value: float, max_value: float, number_of_parameters: int
 ) -> np.ndarray:
     return np.random.uniform(min_value, max_value, number_of_parameters)
 
 
+@qe.step(
+    resource_def=qe.ResourceDefinition(cpu="1000m", memory="1Gi", disk="10Gi"),
+    custom_name="generate-target-distribution",
+)
 def generate_target_distribution(
     nrows: int, ncols: int, fraction: float = 1.0, method: str = "zigzag"
 ) -> BitstringDistribution:
