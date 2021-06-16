@@ -1,10 +1,6 @@
-import unittest
+import pytest
 import numpy as np
-import itertools
-from pyquil import Program
-import pyquil.gates
-
-from zquantum.core.circuit import Circuit, Qubit, Gate
+from zquantum.core.circuits import XX
 
 from zquantum.qcbm.ansatz_utils import (
     get_entangling_layer,
@@ -16,11 +12,11 @@ from zquantum.qcbm.ansatz_utils import (
 )
 
 
-class TestAnsatzUtils(unittest.TestCase):
+class TestAnsatzUtils:
     def test_get_entangling_layer_all_topology(self):
         # Given
         n_qubits = 4
-        static_entangler = "XX"
+        static_entangler = XX
         topology = "all"
         params = np.asarray([0, 0, 0, 0, 0, 0])
 
@@ -34,23 +30,17 @@ class TestAnsatzUtils(unittest.TestCase):
             self.assertTrue(gate.name, "XX")
 
         # XX on 0, 1
-        self.assertEqual(ent_layer.gates[0].qubits[0].index, 0)
-        self.assertEqual(ent_layer.gates[0].qubits[1].index, 1)
+        assert ent_layer.operations[0].qubit_indices == (0, 1)
         # XX on 0, 2
-        self.assertEqual(ent_layer.gates[1].qubits[0].index, 0)
-        self.assertEqual(ent_layer.gates[1].qubits[1].index, 2)
+        assert ent_layer.operations[1].qubit_indices == (0, 2)
         # XX on 0, 3
-        self.assertEqual(ent_layer.gates[2].qubits[0].index, 0)
-        self.assertEqual(ent_layer.gates[2].qubits[1].index, 3)
+        assert ent_layer.operations[2].qubit_indices == (0, 3)
         # XX on 1, 2
-        self.assertEqual(ent_layer.gates[3].qubits[0].index, 1)
-        self.assertEqual(ent_layer.gates[3].qubits[1].index, 2)
+        assert ent_layer.operations[3].qubit_indices == (1, 2)
         # XX on 1, 3
-        self.assertEqual(ent_layer.gates[4].qubits[0].index, 1)
-        self.assertEqual(ent_layer.gates[4].qubits[1].index, 3)
+        assert ent_layer.operations[4].qubit_indices == (1, 3)
         # XX on 2, 3
-        self.assertEqual(ent_layer.gates[5].qubits[0].index, 2)
-        self.assertEqual(ent_layer.gates[5].qubits[1].index, 3)
+        assert ent_layer.operations[5].qubit_indices == (2, 3)
 
     def test_get_entangling_layer_line_topology(self):
         # Given
@@ -70,14 +60,11 @@ class TestAnsatzUtils(unittest.TestCase):
             self.assertTrue(gate.name, "XX")
 
         # XX on 0, 1
-        self.assertEqual(ent_layer.gates[0].qubits[0].index, 0)
-        self.assertEqual(ent_layer.gates[0].qubits[1].index, 1)
+        assert ent_layer.operations[0].qubit_indices == (0, 1)
         # XX on 1, 2
-        self.assertEqual(ent_layer.gates[1].qubits[0].index, 1)
-        self.assertEqual(ent_layer.gates[1].qubits[1].index, 2)
+        assert ent_layer.operations[1].qubit_indices == (1, 2)
         # XX on 2, 3
-        self.assertEqual(ent_layer.gates[2].qubits[0].index, 2)
-        self.assertEqual(ent_layer.gates[2].qubits[1].index, 3)
+        assert ent_layer.operations[2].qubit_indices == (2, 3)
 
     def test_get_entangling_layer_star_topology(self):
         # Given
@@ -98,14 +85,11 @@ class TestAnsatzUtils(unittest.TestCase):
             self.assertTrue(gate.name, "XX")
 
         # XX on 0, 1
-        self.assertEqual(ent_layer.gates[0].qubits[0].index, 0)
-        self.assertEqual(ent_layer.gates[0].qubits[1].index, 1)
+        assert ent_layer.operations[0].qubit_indices == (0, 1)
         # XX on 1, 2
-        self.assertEqual(ent_layer.gates[1].qubits[0].index, 1)
-        self.assertEqual(ent_layer.gates[1].qubits[1].index, 2)
-        # XX on 1, 3
-        self.assertEqual(ent_layer.gates[2].qubits[0].index, 1)
-        self.assertEqual(ent_layer.gates[2].qubits[1].index, 3)
+        assert ent_layer.operations[1].qubit_indices == (1, 2)
+        # XX on 2, 3
+        assert ent_layer.operations[2].qubit_indices == (1, 3)
 
     def test_get_entangling_layer_graph_topology_matrix1(self):
         # Given
@@ -128,11 +112,9 @@ class TestAnsatzUtils(unittest.TestCase):
             self.assertTrue(gate.name, "XX")
 
         # XX on 0, 1
-        self.assertEqual(ent_layer.gates[0].qubits[0].index, 0)
-        self.assertEqual(ent_layer.gates[0].qubits[1].index, 1)
+        assert ent_layer.operations[0].qubit_indices == (0, 1)
         # XX on 2, 3
-        self.assertEqual(ent_layer.gates[1].qubits[0].index, 2)
-        self.assertEqual(ent_layer.gates[1].qubits[1].index, 3)
+        assert ent_layer.operations[1].qubit_indices == (2, 3)
 
     def test_get_entangling_layer_graph_topology_graph1(self):
         # Given
@@ -153,11 +135,9 @@ class TestAnsatzUtils(unittest.TestCase):
             self.assertTrue(gate.name, "XX")
 
         # XX on 0, 1
-        self.assertEqual(ent_layer.gates[0].qubits[0].index, 0)
-        self.assertEqual(ent_layer.gates[0].qubits[1].index, 1)
+        assert ent_layer.operations[0].qubit_indices == (0, 1)
         # XX on 2, 3
-        self.assertEqual(ent_layer.gates[1].qubits[0].index, 2)
-        self.assertEqual(ent_layer.gates[1].qubits[1].index, 3)
+        assert ent_layer.operations[1].qubit_indices == (2, 3)
 
     def test_get_entangling_layer_graph_topology_matrix2(self):
         # Given
@@ -180,14 +160,11 @@ class TestAnsatzUtils(unittest.TestCase):
             self.assertTrue(gate.name, "XX")
 
         # XX on 0, 1
-        self.assertEqual(ent_layer.gates[0].qubits[0].index, 0)
-        self.assertEqual(ent_layer.gates[0].qubits[1].index, 1)
-        # XX on 0, 3
-        self.assertEqual(ent_layer.gates[1].qubits[0].index, 0)
-        self.assertEqual(ent_layer.gates[1].qubits[1].index, 3)
+        assert ent_layer.operations[0].qubit_indices == (0, 1)
+        # XX on 1, 2
+        assert ent_layer.operations[1].qubit_indices == (0, 3)
         # XX on 2, 3
-        self.assertEqual(ent_layer.gates[2].qubits[0].index, 2)
-        self.assertEqual(ent_layer.gates[2].qubits[1].index, 3)
+        assert ent_layer.operations[2].qubit_indices == (2, 3)
 
     def test_get_entangling_layer_graph_topology_graph2(self):
         # Given
@@ -210,14 +187,11 @@ class TestAnsatzUtils(unittest.TestCase):
             self.assertTrue(gate.name, "XX")
 
         # XX on 0, 1
-        self.assertEqual(ent_layer.gates[0].qubits[0].index, 0)
-        self.assertEqual(ent_layer.gates[0].qubits[1].index, 1)
-        # XX on 0, 3
-        self.assertEqual(ent_layer.gates[1].qubits[0].index, 0)
-        self.assertEqual(ent_layer.gates[1].qubits[1].index, 3)
+        assert ent_layer.operations[0].qubit_indices == (0, 1)
+        # XX on 1, 2
+        assert ent_layer.operations[1].qubit_indices == (0, 3)
         # XX on 2, 3
-        self.assertEqual(ent_layer.gates[2].qubits[0].index, 2)
-        self.assertEqual(ent_layer.gates[2].qubits[1].index, 3)
+        assert ent_layer.operations[2].qubit_indices == (2, 3)
 
     def test_get_entangling_layer_graph_topology_bad_matrix1(self):
         # Given
