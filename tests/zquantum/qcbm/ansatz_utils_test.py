@@ -281,7 +281,7 @@ class TestAnsatzUtils:
         # When
         assert test_ansatz.n_params_per_ent_layer == 4
 
-    def test_qubit_count_graph(self):
+    def test_qubit_count_graph1(self):
         # Given
         test_ansatz = QCBMAnsatz(
             4,
@@ -293,3 +293,54 @@ class TestAnsatzUtils:
         )
         # When
         assert test_ansatz.n_params_per_ent_layer == 3
+
+    def test_qubit_count_graph2(self):
+        # Given
+        test_ansatz = QCBMAnsatz(
+            4,
+            4,
+            "graph",
+            adjacency_list=np.asarray([[[0, 1], [2, 3], [0, 3]]]),
+        )
+        # When
+        assert test_ansatz.n_params_per_ent_layer == 3
+
+    def test_default_star_qubit(self):
+        # Given
+        default_layer = get_entangling_layer(np.asarray([0, 0, 0]), 4, XX, "star")
+        # XX on 0, 1
+        assert default_layer.operations[0].qubit_indices == (0, 1)
+        # XX on 0, 2
+        assert default_layer.operations[1].qubit_indices == (0, 2)
+        # XX on 0, 3
+        assert default_layer.operations[2].qubit_indices == (0, 3)
+
+    def test_graph_symmetry(self):
+        adjacency_matrix = np.asarray(
+            [[1, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1]]
+        )
+
+        # When
+        assert not np.array_equal(adjacency_matrix, adjacency_matrix.T)
+
+    def test_graph_kwargs(self):
+        # Given
+        n_qubits = 4
+        single_qubit_gate = RX
+        static_entangler = XX
+        topology = "graph"
+        connectivity = np.asarray(
+            [[1, 1, 0, 1], [0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 0, 0]]
+        )
+        connectivity2 = np.asarray([[[0, 1], [2, 3], [0, 3]]])
+        params = np.asarray([0, 0, 0])
+
+        with pytest.raises(TypeError):
+            _ = get_entangling_layer(
+                params,
+                n_qubits,
+                static_entangler,
+                topology,
+                connectivity,
+                connectivity2,
+            )
