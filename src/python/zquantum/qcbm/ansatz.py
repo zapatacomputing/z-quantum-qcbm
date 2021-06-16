@@ -1,6 +1,7 @@
 import numpy as np
 import sympy
-from zquantum.core.circuit import Circuit, Qubit, Gate, create_layer_of_gates
+
+from zquantum.core.circuits import Circuit, create_layer_of_gates, RX, RZ, XX
 from zquantum.core.interfaces.ansatz import Ansatz
 from zquantum.core.interfaces.ansatz_utils import (
     ansatz_property,
@@ -27,12 +28,10 @@ class QCBMAnsatz(Ansatz):
     ):
         """
         An ansatz implementation used for running the Quantum Circuit Born Machine.
-
         Args:
             number_of_layers (int): number of entangling layers in the circuit.
             number_of_qubits (int): number of qubits in the circuit.
             topology (str): the topology representing the connectivity of the qubits.
-
         Attributes:
             number_of_qubits (int): See Args
             number_of_layers (int): See Args
@@ -43,7 +42,6 @@ class QCBMAnsatz(Ansatz):
         self._number_of_qubits = number_of_qubits
         self._topology = topology
         self._topology_kwargs = topology_kwargs
-
         if number_of_layers == 0:
             raise ValueError("QCBMAnsatz is only defined for number_of_layers > 0.")
 
@@ -82,37 +80,38 @@ class QCBMAnsatz(Ansatz):
     @overrides
     def _generate_circuit(self, params: Optional[np.ndarray] = None) -> Circuit:
         """Builds a qcbm ansatz circuit, using the ansatz in https://advances.sciencemag.org/content/5/10/eaaw9918/tab-pdf (Fig.2 - top).
-
         Args:
             params (numpy.array): input parameters of the circuit (1d array).
-
         Returns:
             Circuit
         """
         if params is None:
             params = np.asarray(
-                [sympy.Symbol(f"theta_{i}") for i in range(self.number_of_params)]
+                [
+                    sympy.Symbol("theta_{}".format(i))
+                    for i in range(self.number_of_params)
+                ]
             )
 
         assert len(params) == self.number_of_params
 
         if self.number_of_layers == 1:
-            # Only one layer, should be a single layer of rotations with Rx
-            return create_layer_of_gates(self.number_of_qubits, "Rx", params)
+            # Only one layer, should be a single layer of rotations with RX
+            return create_layer_of_gates(self.number_of_qubits, RX, params)
 
         circuit = Circuit()
         parameter_index = 0
         for layer_index in range(self.number_of_layers):
             if layer_index == 0:
-                # First layer is always 2 single qubit rotations on Rx Rz
+                # First layer is always 2 single qubit rotations on RX RZ
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
-                    "Rx",
+                    RX,
                     params[parameter_index : parameter_index + self.number_of_qubits],
                 )
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
-                    "Rz",
+                    RZ,
                     params[
                         parameter_index
                         + self.number_of_qubits : parameter_index
@@ -124,15 +123,15 @@ class QCBMAnsatz(Ansatz):
                 self.number_of_layers % 2 == 1
                 and layer_index == self.number_of_layers - 1
             ):
-                # Last layer for odd number of layers is rotations on Rx Rz
+                # Last layer for odd number of layers is rotations on RX RZ
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
-                    "Rz",
+                    RZ,
                     params[parameter_index : parameter_index + self.number_of_qubits],
                 )
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
-                    "Rx",
+                    RX,
                     params[
                         parameter_index
                         + self.number_of_qubits : parameter_index
@@ -144,15 +143,15 @@ class QCBMAnsatz(Ansatz):
                 self.number_of_layers % 2 == 0
                 and layer_index == self.number_of_layers - 2
             ):
-                # Even number of layers, second to last layer is 3 rotation layer with Rx Rz Rx
+                # Even number of layers, second to last layer is 3 rotation layer with RX RZ RX
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
-                    "Rx",
+                    RX,
                     params[parameter_index : parameter_index + self.number_of_qubits],
                 )
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
-                    "Rz",
+                    RZ,
                     params[
                         parameter_index
                         + self.number_of_qubits : parameter_index
@@ -161,7 +160,7 @@ class QCBMAnsatz(Ansatz):
                 )
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
-                    "Rx",
+                    RX,
                     params[
                         parameter_index
                         + 2 * self.number_of_qubits : parameter_index
@@ -173,15 +172,15 @@ class QCBMAnsatz(Ansatz):
                 self.number_of_layers % 2 == 1
                 and layer_index == self.number_of_layers - 3
             ):
-                # Odd number of layers, third to last layer is 3 rotation layer with Rx Rz Rx
+                # Odd number of layers, third to last layer is 3 rotation layer with RX RZ RX
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
-                    "Rx",
+                    RX,
                     params[parameter_index : parameter_index + self.number_of_qubits],
                 )
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
-                    "Rz",
+                    RZ,
                     params[
                         parameter_index
                         + self.number_of_qubits : parameter_index
@@ -190,7 +189,7 @@ class QCBMAnsatz(Ansatz):
                 )
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
-                    "Rx",
+                    RX,
                     params[
                         parameter_index
                         + 2 * self.number_of_qubits : parameter_index
@@ -205,21 +204,20 @@ class QCBMAnsatz(Ansatz):
                         parameter_index : parameter_index + self.n_params_per_ent_layer
                     ],
                     self.number_of_qubits,
-                    "XX",
+                    XX,
                     self.topology,
-                    self._topology_kwargs,
                 )
                 parameter_index += self.n_params_per_ent_layer
             else:
-                # A normal single qubit rotation layer of Rx Rz
+                # A normal single qubit rotation layer of RX RZ
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
-                    "Rx",
+                    RX,
                     params[parameter_index : parameter_index + self.number_of_qubits],
                 )
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
-                    "Rz",
+                    RZ,
                     params[
                         parameter_index
                         + self.number_of_qubits : parameter_index
@@ -232,12 +230,11 @@ class QCBMAnsatz(Ansatz):
 
     def get_number_of_parameters_by_layer(self) -> np.ndarray:
         """Determine the number of parameters needed for each layer in the ansatz
-
         Returns:
             A 1D array of integers
         """
         if self.number_of_layers == 1:
-            # If only one layer, then only need parameters for a single layer of Rx gates
+            # If only one layer, then only need parameters for a single layer of RX gates
             return np.asarray([self.number_of_qubits])
 
         num_params_by_layer = []
