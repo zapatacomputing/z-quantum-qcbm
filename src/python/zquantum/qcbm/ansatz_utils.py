@@ -12,13 +12,10 @@ def get_entangling_layer(
     """Builds an entangling layer in the circuit.
 
     Args:
-        params (numpy.array): parameters of the circuit.
-        n_qubits (int): number of qubits in the circuit.
-        entangling_gate (str): gate specification for the entangling layer.
-        topology (str): describes connectivity of the qubits in the desired circuit
-
-    Returns:
-        Circuit: a zquantum.core.circuit.Circuit object
+        params: parameters of the circuit.
+        n_qubits: number of qubits in the circuit.
+        entangling_gate: gate specification for the entangling layer.
+        topology: describes connectivity of the qubits in the desired circuit
     """
     if topology == "all":
         return get_entangling_layer_all_topology(params, n_qubits, entangling_gate)
@@ -59,12 +56,9 @@ def get_entangling_layer_all_topology(
     """Builds a circuit representing an entangling layer according to the all-to-all topology.
 
     Args:
-        params (numpy.array): parameters of the circuit.
-        n_qubits (int): number of qubits in the circuit.
-        entangling_gate (str): gate specification for the entangling layer.
-
-    Returns:
-        Circuit: a zquantum.core.circuit.Circuit object
+        params: parameters of the circuit.
+        n_qubits: number of qubits in the circuit.
+        entangling_gate: gate specification for the entangling layer.
     """
 
     assert params.shape[0] == int((n_qubits * (n_qubits - 1)) / 2)
@@ -80,10 +74,9 @@ def get_entangling_layer_line_topology(
     """Builds a circuit representing an entangling layer according to the line topology.
 
     Args:
-        params (numpy.array): parameters of the circuit.
-        n_qubits (int): number of qubits in the circuit.
-        entangling_gate (str): gate specification for the entangling layer.
-
+        params: parameters of the circuit.
+        n_qubits: number of qubits in the circuit.
+        entangling_gate: gate specification for the entangling layer.
     """
     assert params.shape[0] == n_qubits - 1
 
@@ -134,7 +127,6 @@ def get_entangling_layer_graph_topology(
     assert adjacency_matrix.shape[0] == adjacency_matrix.shape[1] == n_qubits
 
     circuit = Circuit()
-    circuit.qubits = [Qubit(qubit_index) for qubit_index in range(n_qubits)]
     i = 0
     for qubit1_index in range(n_qubits - 1):
         for qubit2_index in range(qubit1_index + 1, n_qubits):

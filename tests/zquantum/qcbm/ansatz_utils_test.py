@@ -26,8 +26,8 @@ class TestAnsatzUtils:
         )
 
         # Then
-        for gate in ent_layer.gates:
-            self.assertTrue(gate.name, "XX")
+        for operation in ent_layer.operations:
+            assert operation.gate.name == "XX"
 
         # XX on 0, 1
         assert ent_layer.operations[0].qubit_indices == (0, 1)
@@ -45,8 +45,7 @@ class TestAnsatzUtils:
     def test_get_entangling_layer_line_topology(self):
         # Given
         n_qubits = 4
-        single_qubit_gate = "Rx"
-        static_entangler = "XX"
+        static_entangler = XX
         topology = "line"
         params = np.asarray([0, 0, 0])
 
@@ -55,9 +54,8 @@ class TestAnsatzUtils:
             params, n_qubits, static_entangler
         )
 
-        # Then
-        for gate in ent_layer.gates:
-            self.assertTrue(gate.name, "XX")
+        for operation in ent_layer.operations:
+            assert operation.gate.name == "XX"
 
         # XX on 0, 1
         assert ent_layer.operations[0].qubit_indices == (0, 1)
@@ -230,8 +228,7 @@ class TestAnsatzUtils:
     def test_get_entangling_layer_toplogy_supported(self):
         # Given
         n_qubits_list = [2, 3, 4, 5]
-        single_qubit_gate = "Rx"
-        static_entangler = "XX"
+        static_entangler = XX
         topology = "all"
 
         for n_qubits in n_qubits_list:
@@ -245,7 +242,7 @@ class TestAnsatzUtils:
                 params, n_qubits, static_entangler, topology
             )
             # Then
-            self.assertEqual(all_topology_layer, entangling_layer)
+            assert all_topology_layer == entangling_layer
 
         # Given
         topology = "line"
@@ -261,18 +258,15 @@ class TestAnsatzUtils:
                 params, n_qubits, static_entangler, topology
             )
             # Then
-            self.assertEqual(line_topology_layer, entangling_layer)
+            assert line_topology_layer == entangling_layer
 
     def test_get_entangling_layer_toplogy_not_supported(self):
         # Given
         n_qubits = 2
-        single_qubit_gate = "Rx"
-        static_entangler = "XX"
+        static_entangler = XX
         topology = "NOT SUPPORTED"
         params = np.zeros(1)
 
         # When
-        self.assertRaises(
-            RuntimeError,
-            lambda: get_entangling_layer(params, n_qubits, static_entangler, topology),
-        )
+        with pytest.raises(RuntimeError):
+            _ = get_entangling_layer(params, n_qubits, static_entangler, topology)
