@@ -11,6 +11,8 @@ from zquantum.qcbm.ansatz_utils import (
     adjacency_list_to_matrix,
 )
 
+from zquantum.qcbm.ansatz import QCBMAnsatz
+
 
 class TestAnsatzUtils:
     def test_get_entangling_layer_all_topology(self):
@@ -262,3 +264,9 @@ class TestAnsatzUtils:
         # When
         with pytest.raises(RuntimeError):
             _ = get_entangling_layer(params, n_qubits, static_entangler, topology)
+
+    def test_qubit_count_line(self):
+        # Given
+        test_ansatz = QCBMAnsatz(5, 5, "line")
+        # When
+        assert test_ansatz.n_params_per_ent_layer == 4
