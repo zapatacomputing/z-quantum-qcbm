@@ -7,7 +7,7 @@ def get_entangling_layer(
     n_qubits: int,
     entangling_gate: str,
     topology: str,
-    topology_kwargs=None,
+    topology_kwargs: Optional[Dict[str, Any]],
 ) -> Circuit:
     """Builds an entangling layer in the circuit.
 
@@ -25,7 +25,9 @@ def get_entangling_layer(
     elif topology == "line":
         return get_entangling_layer_line_topology(params, n_qubits, entangling_gate)
     elif topology == "star":
-        center_qubit = topology_kwargs["center_qubit"]
+        center_qubit = 0
+        if topology_kwargs is not None and "center_qubit" in topology_kwargs:
+            center_qubit = topology_kwargs["center_qubit"]
         return get_entangling_layer_star_topology(
             params, n_qubits, entangling_gate, center_qubit
         )
@@ -81,14 +83,11 @@ def get_entangling_layer_line_topology(
         params (numpy.array): parameters of the circuit.
         n_qubits (int): number of qubits in the circuit.
         entangling_gate (str): gate specification for the entangling layer.
-
-    Returns:
-        Circuit: a zquantum.core.circuit.Circuit object
     """
     assert params.shape[0] == n_qubits - 1
 
     line_graph = np.zeros((n_qubits, n_qubits))
-    for i in range(0, n_qubits - 1):
+    for i in range(n_qubits - 1):
         line_graph[i][i + 1] = 1
     return get_entangling_layer_graph_topology(
         params, n_qubits, entangling_gate, line_graph
@@ -105,9 +104,6 @@ def get_entangling_layer_star_topology(
         n_qubits (int): number of qubits in the circuit.
         entangling_gate (str): gate specification for the entangling layer.
         center_qubit (int): the center qubit of the star topology.
-
-    Returns:
-        Circuit: a zquantum.core.circuit.Circuit object
     """
     assert center_qubit < n_qubits
     assert params.shape[0] == n_qubits - 1
@@ -133,16 +129,13 @@ def get_entangling_layer_graph_topology(
         n_qubits (int): number of qubits in the circuit.
         entangling_gate (str): gate specification for the entangling layer.
         adjacency_matrix: (numpy.array): adjacency matrix for the entangling layer.
-
-    Returns:
-        Circuit: a zquantum.core.circuit.Circuit object
     """
     assert adjacency_matrix.shape[0] == adjacency_matrix.shape[1] == n_qubits
 
     circuit = Circuit()
     circuit.qubits = [Qubit(qubit_index) for qubit_index in range(n_qubits)]
     i = 0
-    for qubit1_index in range(0, n_qubits - 1):
+    for qubit1_index in range(n_qubits - 1):
         for qubit2_index in range(qubit1_index + 1, n_qubits):
             if (
                 adjacency_matrix[qubit1_index][qubit2_index]
@@ -165,9 +158,6 @@ def adjacency_list_to_matrix(n_qubits: int, adj_list: np.ndarray):
     Args:
         n_qubits (int): number of qubits in the circuit.
         adjacency_list: (numpy.array): adjacency list for the entangling layer.
-
-    Returns:
-        adj_matrix: a numpy.array object
     """
     assert adj_list.shape[1] == 2
     adj_matrix = np.zeros((n_qubits, n_qubits))

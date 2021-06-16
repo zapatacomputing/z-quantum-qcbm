@@ -23,7 +23,7 @@ class QCBMAnsatz(Ansatz):
         number_of_layers: int,
         number_of_qubits: int,
         topology: str = "all",
-        **topology_kwargs
+        **topology_kwargs,
     ):
         """
         An ansatz implementation used for running the Quantum Circuit Born Machine.
@@ -91,10 +91,7 @@ class QCBMAnsatz(Ansatz):
         """
         if params is None:
             params = np.asarray(
-                [
-                    sympy.Symbol("theta_{}".format(i))
-                    for i in range(self.number_of_params)
-                ]
+                [sympy.Symbol(f"theta_{i}") for i in range(self.number_of_params)]
             )
 
         assert len(params) == self.number_of_params
