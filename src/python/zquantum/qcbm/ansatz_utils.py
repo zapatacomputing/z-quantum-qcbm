@@ -1,11 +1,11 @@
-from zquantum.core.circuit import Circuit, Gate, Qubit
+from zquantum.core.circuits import Circuit, GatePrototype
 import numpy as np
 
 
 def get_entangling_layer(
     params: np.ndarray,
     n_qubits: int,
-    entangling_gate: str,
+    entangling_gate: GatePrototype,
     topology: str,
     topology_kwargs: Optional[Dict[str, Any]],
 ) -> Circuit:
@@ -54,7 +54,7 @@ def get_entangling_layer(
 
 
 def get_entangling_layer_all_topology(
-    params: np.ndarray, n_qubits: int, entangling_gate: str
+    params: np.ndarray, n_qubits: int, entangling_gate: GatePrototype
 ) -> Circuit:
     """Builds a circuit representing an entangling layer according to the all-to-all topology.
 
@@ -75,7 +75,7 @@ def get_entangling_layer_all_topology(
 
 
 def get_entangling_layer_line_topology(
-    params: np.ndarray, n_qubits: int, entangling_gate: str
+    params: np.ndarray, n_qubits: int, entangling_gate: GatePrototype
 ) -> Circuit:
     """Builds a circuit representing an entangling layer according to the line topology.
 
@@ -83,6 +83,7 @@ def get_entangling_layer_line_topology(
         params (numpy.array): parameters of the circuit.
         n_qubits (int): number of qubits in the circuit.
         entangling_gate (str): gate specification for the entangling layer.
+
     """
     assert params.shape[0] == n_qubits - 1
 
@@ -95,7 +96,7 @@ def get_entangling_layer_line_topology(
 
 
 def get_entangling_layer_star_topology(
-    params: np.ndarray, n_qubits: int, entangling_gate: str, center_qubit: int
+    params: np.ndarray, n_qubits: int, entangling_gate: GatePrototype, center_qubit: int
 ) -> Circuit:
     """Builds a circuit representing an entangling layer according to the star topology.
 
@@ -119,7 +120,7 @@ def get_entangling_layer_star_topology(
 def get_entangling_layer_graph_topology(
     params: np.ndarray,
     n_qubits: int,
-    entangling_gate: str,
+    entangling_gate: GatePrototype,
     adjacency_matrix: np.ndarray,
 ) -> Circuit:
     """Builds a circuit representing an entangling layer according to a general graph topology.
@@ -141,13 +142,7 @@ def get_entangling_layer_graph_topology(
                 adjacency_matrix[qubit1_index][qubit2_index]
                 or adjacency_matrix[qubit2_index][qubit1_index]
             ):
-                circuit.gates.append(
-                    Gate(
-                        entangling_gate,
-                        [circuit.qubits[qubit1_index], circuit.qubits[qubit2_index]],
-                        [params[i]],
-                    )
-                )
+                circuit += entangling_gate(params[i])(qubit1_index, qubit2_index)
                 i += 1
     return circuit
 
