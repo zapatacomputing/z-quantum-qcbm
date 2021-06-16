@@ -92,7 +92,6 @@ def get_thermal_target_distribution_dict(
         partition_function += boltzmann_factor
 
         binary_bitstring = convert_tuples_to_bitstrings([dec2bin(spin, n_spins)])[-1]
-        #reverse_bitstring = binary_bitstring[len(binary_bitstring) :: -1]
         distribution[binary_bitstring] = boltzmann_factor
 
     normalized_distribution = {
@@ -204,8 +203,7 @@ def get_thermal_sampled_distribution(
 
     for spin in range(int(2 ** n_spins)):
         binary_bitstring = convert_tuples_to_bitstrings([dec2bin(spin, n_spins)])[-1]
-        reverse_bitstring = binary_bitstring[len(binary_bitstring) :: -1]
-        sample_distribution_dict[reverse_bitstring] = histogram_samples[spin]
+        sample_distribution_dict[binary_bitstring] = histogram_samples[spin]
 
     return sample_distribution_dict, pos_spins_list
 
@@ -234,3 +232,4 @@ def get_sampled_bitstring_distribution(
         n_samples, n_spins, temperature, hamiltonian_parameters
     )[1]
     return BitstringDistribution(probabilities), spin_mapping
+
