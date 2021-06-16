@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from zquantum.core.circuits import XX
+from zquantum.core.circuits import XX, RX
 
 from zquantum.qcbm.ansatz_utils import (
     get_entangling_layer,
@@ -67,8 +67,8 @@ class TestAnsatzUtils:
     def test_get_entangling_layer_star_topology(self):
         # Given
         n_qubits = 4
-        single_qubit_gate = "Rx"
-        static_entangler = "XX"
+        single_qubit_gate = RX
+        static_entangler = XX
         topology = "star"
         center_qubit = 1
         params = np.asarray([0, 0, 0])
@@ -79,8 +79,8 @@ class TestAnsatzUtils:
         )
 
         # Then
-        for gate in ent_layer.gates:
-            self.assertTrue(gate.name, "XX")
+        for operation in ent_layer.operations:
+            assert operation.gate.name == "XX"
 
         # XX on 0, 1
         assert ent_layer.operations[0].qubit_indices == (0, 1)
@@ -92,8 +92,8 @@ class TestAnsatzUtils:
     def test_get_entangling_layer_graph_topology_matrix1(self):
         # Given
         n_qubits = 4
-        single_qubit_gate = "Rx"
-        static_entangler = "XX"
+        single_qubit_gate = RX
+        static_entangler = XX
         topology = "graph"
         connectivity = np.asarray(
             [[0, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 0, 0]]
@@ -106,8 +106,8 @@ class TestAnsatzUtils:
         )
 
         # Then
-        for gate in ent_layer.gates:
-            self.assertTrue(gate.name, "XX")
+        for operation in ent_layer.operations:
+            assert operation.gate.name == "XX"
 
         # XX on 0, 1
         assert ent_layer.operations[0].qubit_indices == (0, 1)
@@ -117,8 +117,8 @@ class TestAnsatzUtils:
     def test_get_entangling_layer_graph_topology_graph1(self):
         # Given
         n_qubits = 4
-        single_qubit_gate = "Rx"
-        static_entangler = "XX"
+        single_qubit_gate = RX
+        static_entangler = XX
         topology = "graph"
         connectivity = adjacency_list_to_matrix(n_qubits, np.array([[1, 0], [3, 2]]))
         params = np.asarray([0, 0])
@@ -129,8 +129,8 @@ class TestAnsatzUtils:
         )
 
         # Then
-        for gate in ent_layer.gates:
-            self.assertTrue(gate.name, "XX")
+        for operation in ent_layer.operations:
+            assert operation.gate.name == "XX"
 
         # XX on 0, 1
         assert ent_layer.operations[0].qubit_indices == (0, 1)
@@ -140,8 +140,8 @@ class TestAnsatzUtils:
     def test_get_entangling_layer_graph_topology_matrix2(self):
         # Given
         n_qubits = 4
-        single_qubit_gate = "Rx"
-        static_entangler = "XX"
+        single_qubit_gate = RX
+        static_entangler = XX
         topology = "graph"
         connectivity = np.asarray(
             [[1, 1, 0, 1], [0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 0, 0]]
@@ -154,8 +154,8 @@ class TestAnsatzUtils:
         )
 
         # Then
-        for gate in ent_layer.gates:
-            self.assertTrue(gate.name, "XX")
+        for operation in ent_layer.operations:
+            assert operation.gate.name == "XX"
 
         # XX on 0, 1
         assert ent_layer.operations[0].qubit_indices == (0, 1)
@@ -167,8 +167,8 @@ class TestAnsatzUtils:
     def test_get_entangling_layer_graph_topology_graph2(self):
         # Given
         n_qubits = 4
-        single_qubit_gate = "Rx"
-        static_entangler = "XX"
+        single_qubit_gate = RX
+        static_entangler = XX
         topology = "graph"
         connectivity = adjacency_list_to_matrix(
             n_qubits, np.array([[0, 1], [2, 3], [0, 3]])
@@ -181,8 +181,8 @@ class TestAnsatzUtils:
         )
 
         # Then
-        for gate in ent_layer.gates:
-            self.assertTrue(gate.name, "XX")
+        for operation in ent_layer.operations:
+            assert operation.gate.name == "XX"
 
         # XX on 0, 1
         assert ent_layer.operations[0].qubit_indices == (0, 1)
@@ -194,36 +194,28 @@ class TestAnsatzUtils:
     def test_get_entangling_layer_graph_topology_bad_matrix1(self):
         # Given
         n_qubits = 4
-        single_qubit_gate = "Rx"
-        static_entangler = "XX"
+        single_qubit_gate = RX
+        static_entangler = XX
         topology = "graph"
         connectivity = np.asarray([[1, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1]])
         params = np.asarray([0, 0])
 
         # When
-        self.assertRaises(
-            Exception,
-            lambda: get_entangling_layer_graph_topology(
-                params, n_qubits, static_entangler, adjacency_matrix=connectivity
-            ),
-        )
+        with pytest.raises(Exception):
+            _ = get_entangling_layer(params, n_qubits, static_entangler, topology)
 
     def test_get_entangling_layer_graph_topology_bad_matrix2(self):
         # Given
         n_qubits = 4
-        single_qubit_gate = "Rx"
-        static_entangler = "XX"
+        single_qubit_gate = RX
+        static_entangler = XX
         topology = "graph"
         connectivity = np.asarray([[1, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1]])
         params = np.asarray([0, 0])
 
         # When
-        self.assertRaises(
-            Exception,
-            lambda: get_entangling_layer_graph_topology(
-                params, n_qubits, static_entangler, adjacency_matrix=connectivity
-            ),
-        )
+        with pytest.raises(Exception):
+            _ = get_entangling_layer(params, n_qubits, static_entangler, topology)
 
     def test_get_entangling_layer_toplogy_supported(self):
         # Given

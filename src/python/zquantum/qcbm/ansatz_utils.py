@@ -1,5 +1,6 @@
 from zquantum.core.circuits import Circuit, GatePrototype
 import numpy as np
+from typing import Dict, Optional, Any
 
 
 def get_entangling_layer(
@@ -7,7 +8,7 @@ def get_entangling_layer(
     n_qubits: int,
     entangling_gate: GatePrototype,
     topology: str,
-    topology_kwargs: Optional[Dict[str, Any]],
+    topology_kwargs: Optional[Dict[str, Any]] = None,
 ) -> Circuit:
     """Builds an entangling layer in the circuit.
 
@@ -119,10 +120,10 @@ def get_entangling_layer_graph_topology(
     """Builds a circuit representing an entangling layer according to a general graph topology.
 
     Args:
-        params (numpy.array): parameters of the circuit.
-        n_qubits (int): number of qubits in the circuit.
-        entangling_gate (str): gate specification for the entangling layer.
-        adjacency_matrix: (numpy.array): adjacency matrix for the entangling layer.
+        params: parameters of the circuit.
+        n_qubits: number of qubits in the circuit.
+        entangling_gate: gate specification for the entangling layer.
+        adjacency_matrix: adjacency matrix for the entangling layer.
     """
     assert adjacency_matrix.shape[0] == adjacency_matrix.shape[1] == n_qubits
 
