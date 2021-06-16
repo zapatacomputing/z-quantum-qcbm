@@ -204,7 +204,9 @@ class TestAnsatzUtils:
 
         # When
         with pytest.raises(Exception):
-            _ = get_entangling_layer(params, n_qubits, static_entangler, topology)
+            _ = get_entangling_layer(
+                params, n_qubits, static_entangler, topology, connectivity
+            )
 
     def test_get_entangling_layer_graph_topology_bad_matrix2(self):
         # Given
@@ -217,7 +219,9 @@ class TestAnsatzUtils:
 
         # When
         with pytest.raises(Exception):
-            _ = get_entangling_layer(params, n_qubits, static_entangler, topology)
+            _ = get_entangling_layer(
+                params, n_qubits, static_entangler, topology, connectivity
+            )
 
     def test_get_entangling_layer_toplogy_supported(self):
         # Given
@@ -270,3 +274,22 @@ class TestAnsatzUtils:
         test_ansatz = QCBMAnsatz(5, 5, "line")
         # When
         assert test_ansatz.n_params_per_ent_layer == 4
+
+    def test_qubit_count_star(self):
+        # Given
+        test_ansatz = QCBMAnsatz(5, 5, "star")
+        # When
+        assert test_ansatz.n_params_per_ent_layer == 4
+
+    def test_qubit_count_graph(self):
+        # Given
+        test_ansatz = QCBMAnsatz(
+            4,
+            4,
+            "graph",
+            adjacency_matrix=np.asarray(
+                [[1, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1]]
+            ),
+        )
+        # When
+        assert test_ansatz.n_params_per_ent_layer == 3
