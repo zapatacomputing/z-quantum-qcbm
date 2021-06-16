@@ -94,7 +94,7 @@ class TestQCBMAnsatz(AnsatzTests):
             )
         expected_circuit = Circuit(expected_pycircuit)
         expected_circuit += get_entangling_layer(
-            params[1], number_of_qubits, "XX", topology, topology_kwargs=dict()
+            params[1], number_of_qubits, "XX", topology
         )
 
         params = np.concatenate(params)
