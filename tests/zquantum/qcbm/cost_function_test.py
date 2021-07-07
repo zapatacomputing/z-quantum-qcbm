@@ -45,8 +45,8 @@ class TestQCBMCostFunction(unittest.TestCase):
 
         self.backend = create_object(
             {
-                "module_name": "zquantum.core.interfaces.mock_objects",
-                "function_name": "MockQuantumSimulator",
+                "module_name": "zquantum.core.symbolic_simulator",
+                "function_name": "SymbolicSimulator",
                 "n_samples": 1,
             }
         )
