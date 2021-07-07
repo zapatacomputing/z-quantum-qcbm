@@ -15,12 +15,14 @@ from zquantum.qcbm.ansatz import QCBMAnsatz
 
 
 class TestAnsatzUtils:
-    def test_get_entangling_layer_all_topology(self):
+    @pytest.mark.parametrize(
+        "n_qubits,expected", [(4, [(0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)])]
+    )
+    def test_get_entangling_layer_all_topology(self, n_qubits, expected):
         # Given
-        n_qubits = 4
         static_entangler = XX
         topology = "all"
-        params = np.asarray([0, 0, 0, 0, 0, 0])
+        params = np.asarray([0] * int(n_qubits * (n_qubits - 1) / 2))
 
         # When
         ent_layer = get_entangling_layer_all_topology(
@@ -31,25 +33,15 @@ class TestAnsatzUtils:
         for operation in ent_layer.operations:
             assert operation.gate.name == "XX"
 
-        # XX on 0, 1
-        assert ent_layer.operations[0].qubit_indices == (0, 1)
-        # XX on 0, 2
-        assert ent_layer.operations[1].qubit_indices == (0, 2)
-        # XX on 0, 3
-        assert ent_layer.operations[2].qubit_indices == (0, 3)
-        # XX on 1, 2
-        assert ent_layer.operations[3].qubit_indices == (1, 2)
-        # XX on 1, 3
-        assert ent_layer.operations[4].qubit_indices == (1, 3)
-        # XX on 2, 3
-        assert ent_layer.operations[5].qubit_indices == (2, 3)
+        for i in range(len(params)):
+            assert ent_layer.operations[i].qubit_indices == expected[i]
 
-    def test_get_entangling_layer_line_topology(self):
+    @pytest.mark.parametrize("n_qubits,expected", [(4, [(0, 1), (1, 2), (2, 3)])])
+    def test_get_entangling_layer_line_topology(self, n_qubits, expected):
         # Given
-        n_qubits = 4
         static_entangler = XX
         topology = "line"
-        params = np.asarray([0, 0, 0])
+        params = np.asarray([0] * int(n_qubits - 1))
 
         # When
         ent_layer = get_entangling_layer_line_topology(
@@ -59,21 +51,17 @@ class TestAnsatzUtils:
         for operation in ent_layer.operations:
             assert operation.gate.name == "XX"
 
-        # XX on 0, 1
-        assert ent_layer.operations[0].qubit_indices == (0, 1)
-        # XX on 1, 2
-        assert ent_layer.operations[1].qubit_indices == (1, 2)
-        # XX on 2, 3
-        assert ent_layer.operations[2].qubit_indices == (2, 3)
+        for i in range(len(params)):
+            assert ent_layer.operations[i].qubit_indices == expected[i]
 
-    def test_get_entangling_layer_star_topology(self):
+    @pytest.mark.parametrize("n_qubits,expected", [(4, [(0, 1), (1, 2), (1, 3)])])
+    def test_get_entangling_layer_star_topology(self, n_qubits, expected):
         # Given
-        n_qubits = 4
         single_qubit_gate = RX
         static_entangler = XX
         topology = "star"
         center_qubit = 1
-        params = np.asarray([0, 0, 0])
+        params = np.asarray([0] * int(n_qubits - 1))
 
         # When
         ent_layer = get_entangling_layer_star_topology(
@@ -84,143 +72,108 @@ class TestAnsatzUtils:
         for operation in ent_layer.operations:
             assert operation.gate.name == "XX"
 
-        # XX on 0, 1
-        assert ent_layer.operations[0].qubit_indices == (0, 1)
-        # XX on 1, 2
-        assert ent_layer.operations[1].qubit_indices == (1, 2)
-        # XX on 2, 3
-        assert ent_layer.operations[2].qubit_indices == (1, 3)
+        for i in range(len(params)):
+            assert ent_layer.operations[i].qubit_indices == expected[i]
 
-    def test_get_entangling_layer_graph_topology_matrix1(self):
+    @pytest.mark.parametrize(
+        "n_qubits,matrix,expected,n_connections",
+        [
+            (
+                4,
+                np.asarray([[0, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 0, 0]]),
+                [(0, 1), (2, 3)],
+                2,
+            ),
+            (
+                4,
+                np.asarray([[1, 1, 0, 1], [0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 0, 0]]),
+                [(0, 1), (0, 3), (2, 3)],
+                3,
+            ),
+        ],
+    )
+    def test_get_entangling_layer_graph_topology_matrix(
+        self, n_qubits, matrix, expected, n_connections
+    ):
         # Given
         n_qubits = 4
         single_qubit_gate = RX
         static_entangler = XX
         topology = "graph"
-        connectivity = np.asarray(
-            [[0, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 0, 0]]
-        )
-        params = np.asarray([0, 0])
+        params = np.asarray([0] * n_connections)
 
         # When
         ent_layer = get_entangling_layer_graph_topology(
-            params, n_qubits, static_entangler, adjacency_matrix=connectivity
+            params, n_qubits, static_entangler, adjacency_matrix=matrix
         )
 
         # Then
         for operation in ent_layer.operations:
             assert operation.gate.name == "XX"
 
-        # XX on 0, 1
-        assert ent_layer.operations[0].qubit_indices == (0, 1)
-        # XX on 2, 3
-        assert ent_layer.operations[1].qubit_indices == (2, 3)
+        for i in range(len(params)):
+            assert ent_layer.operations[i].qubit_indices == expected[i]
 
-    def test_get_entangling_layer_graph_topology_graph1(self):
+    @pytest.mark.parametrize(
+        "n_qubits,matrix,expected,n_connections",
+        [
+            (
+                4,
+                np.array([[1, 0], [3, 2]]),
+                [(0, 1), (2, 3)],
+                2,
+            ),
+            (4, np.array([[0, 1], [2, 3], [0, 3]]), [(0, 1), (0, 3), (2, 3)], 3),
+        ],
+    )
+    def test_get_entangling_layer_graph_topology_graph(
+        self, n_qubits, matrix, expected, n_connections
+    ):
         # Given
-        n_qubits = 4
         single_qubit_gate = RX
         static_entangler = XX
         topology = "graph"
-        connectivity = adjacency_list_to_matrix(n_qubits, np.array([[1, 0], [3, 2]]))
-        params = np.asarray([0, 0])
+        params = np.asarray([0] * n_connections)
 
         # When
         ent_layer = get_entangling_layer_graph_topology(
-            params, n_qubits, static_entangler, adjacency_matrix=connectivity
+            params,
+            n_qubits,
+            static_entangler,
+            adjacency_matrix=adjacency_list_to_matrix(n_qubits, matrix),
         )
 
         # Then
         for operation in ent_layer.operations:
             assert operation.gate.name == "XX"
 
-        # XX on 0, 1
-        assert ent_layer.operations[0].qubit_indices == (0, 1)
-        # XX on 2, 3
-        assert ent_layer.operations[1].qubit_indices == (2, 3)
+        for i in range(len(params)):
+            assert ent_layer.operations[i].qubit_indices == expected[i]
 
-    def test_get_entangling_layer_graph_topology_matrix2(self):
+    @pytest.mark.parametrize(
+        "n_qubits,matrix,n_connections",
+        [
+            (
+                4,
+                np.array([[1, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1]]),
+                2,
+            ),
+            (4, np.array([[1, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1]]), 2),
+        ],
+    )
+    def test_get_entangling_layer_graph_topology_wrong_matrix(
+        self, n_qubits, matrix, n_connections
+    ):
         # Given
-        n_qubits = 4
         single_qubit_gate = RX
         static_entangler = XX
         topology = "graph"
-        connectivity = np.asarray(
-            [[1, 1, 0, 1], [0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 0, 0]]
-        )
-        params = np.asarray([0, 0, 0])
 
-        # When
-        ent_layer = get_entangling_layer_graph_topology(
-            params, n_qubits, static_entangler, adjacency_matrix=connectivity
-        )
-
-        # Then
-        for operation in ent_layer.operations:
-            assert operation.gate.name == "XX"
-
-        # XX on 0, 1
-        assert ent_layer.operations[0].qubit_indices == (0, 1)
-        # XX on 1, 2
-        assert ent_layer.operations[1].qubit_indices == (0, 3)
-        # XX on 2, 3
-        assert ent_layer.operations[2].qubit_indices == (2, 3)
-
-    def test_get_entangling_layer_graph_topology_graph2(self):
-        # Given
-        n_qubits = 4
-        single_qubit_gate = RX
-        static_entangler = XX
-        topology = "graph"
-        connectivity = adjacency_list_to_matrix(
-            n_qubits, np.array([[0, 1], [2, 3], [0, 3]])
-        )
-        params = np.asarray([0, 0, 0])
-
-        # When
-        ent_layer = get_entangling_layer_graph_topology(
-            params, n_qubits, static_entangler, adjacency_matrix=connectivity
-        )
-
-        # Then
-        for operation in ent_layer.operations:
-            assert operation.gate.name == "XX"
-
-        # XX on 0, 1
-        assert ent_layer.operations[0].qubit_indices == (0, 1)
-        # XX on 1, 2
-        assert ent_layer.operations[1].qubit_indices == (0, 3)
-        # XX on 2, 3
-        assert ent_layer.operations[2].qubit_indices == (2, 3)
-
-    def test_get_entangling_layer_graph_topology_wrong_matrix1(self):
-        # Given
-        n_qubits = 4
-        single_qubit_gate = RX
-        static_entangler = XX
-        topology = "graph"
-        connectivity = np.asarray([[1, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1]])
-        params = np.asarray([0, 0])
-
+        params = np.asarray([0] * n_connections)
         # When
         with pytest.raises(Exception):
             _ = get_entangling_layer(
-                params, n_qubits, static_entangler, topology, connectivity
-            )
-
-    def test_get_entangling_layer_graph_topology_wrong_matrix2(self):
-        # Given
-        n_qubits = 4
-        single_qubit_gate = RX
-        static_entangler = XX
-        topology = "graph"
-        connectivity = np.asarray([[1, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1]])
-        params = np.asarray([0, 0])
-
-        # When
-        with pytest.raises(AttributeError):
-            _ = get_entangling_layer(
-                params, n_qubits, static_entangler, topology, connectivity
+                params, n_qubits, static_entangler, topology, matrix
             )
 
     def test_get_entangling_layer_topology_supported(self):
@@ -269,51 +222,41 @@ class TestAnsatzUtils:
         with pytest.raises(RuntimeError):
             _ = get_entangling_layer(params, n_qubits, static_entangler, topology)
 
-    def test_qubit_count_line(self):
-        # Given
-        test_ansatz = QCBMAnsatz(5, 5, "line")
-        # When
-        assert test_ansatz.n_params_per_ent_layer == 4
+    @pytest.mark.parametrize("type,n_qubits", [("line", 5), ("star", 5)])
+    def test_qubit_count_topology(self, type, n_qubits):
+        test_ansatz = QCBMAnsatz(1, n_qubits, type)
+        assert test_ansatz.n_params_per_ent_layer == n_qubits - 1
 
-    def test_qubit_count_star(self):
-        # Given
-        test_ansatz = QCBMAnsatz(5, 5, "star")
-        # When
-        assert test_ansatz.n_params_per_ent_layer == 4
+    @pytest.mark.parametrize(
+        "n_qubits,matrix,n_connections",
+        [(4, np.asarray([[1, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1]]), 3)],
+    )
+    def test_qubit_count_matrix_params(self, n_qubits, matrix, n_connections):
+        test_ansatz = QCBMAnsatz(1, n_qubits, "graph", adjacency_matrix=matrix)
+        assert test_ansatz.n_params_per_ent_layer == n_connections
 
-    def test_qubit_count_graph1(self):
+    @pytest.mark.parametrize(
+        "n_qubits,list,n_connections",
+        [(4, np.asarray([[[0, 1], [2, 3], [0, 3]]]), 3)],
+    )
+    def test_qubit_count_list_params(self, n_qubits, list, n_connections):
         # Given
         test_ansatz = QCBMAnsatz(
-            4,
-            4,
+            1,
+            n_qubits,
             "graph",
-            adjacency_matrix=np.asarray(
-                [[1, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1]]
-            ),
+            adjacency_list=list,
         )
         # When
-        assert test_ansatz.n_params_per_ent_layer == 3
+        assert test_ansatz.n_params_per_ent_layer == n_connections
 
-    def test_qubit_count_graph2(self):
-        # Given
-        test_ansatz = QCBMAnsatz(
-            4,
-            4,
-            "graph",
-            adjacency_list=np.asarray([[[0, 1], [2, 3], [0, 3]]]),
+    @pytest.mark.parametrize("n_qubits", [4])
+    def test_default_star_qubit(self, n_qubits):
+        default_layer = get_entangling_layer(
+            np.zeros(n_qubits - 1), n_qubits, XX, "star"
         )
-        # When
-        assert test_ansatz.n_params_per_ent_layer == 3
-
-    def test_default_star_qubit(self):
-        # Given
-        default_layer = get_entangling_layer(np.asarray([0, 0, 0]), 4, XX, "star")
-        # XX on 0, 1
-        assert default_layer.operations[0].qubit_indices == (0, 1)
-        # XX on 0, 2
-        assert default_layer.operations[1].qubit_indices == (0, 2)
-        # XX on 0, 3
-        assert default_layer.operations[2].qubit_indices == (0, 3)
+        for i in range(n_qubits - 1):
+            assert default_layer.operations[i].qubit_indices == (0, i + 1)
 
     def test_get_entangling_layers_fails_with_incorrect_graph_kwargs(self):
         # Given
