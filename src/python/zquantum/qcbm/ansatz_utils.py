@@ -140,7 +140,7 @@ def get_entangling_layer_graph_topology(
     return circuit
 
 
-def adjacency_list_to_matrix(n_qubits: int, adj_list: np.ndarray):
+def adjacency_list_to_matrix(n_qubits: int, adj_list: np.ndarray) -> np.ndarray:
     """Converts an adjacency list to an adjacency matrix.
 
     Args:

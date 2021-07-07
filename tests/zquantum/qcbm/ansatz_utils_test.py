@@ -193,7 +193,7 @@ class TestAnsatzUtils:
         # XX on 2, 3
         assert ent_layer.operations[2].qubit_indices == (2, 3)
 
-    def test_get_entangling_layer_graph_topology_bad_matrix1(self):
+    def test_get_entangling_layer_graph_topology_wrong_matrix1(self):
         # Given
         n_qubits = 4
         single_qubit_gate = RX
@@ -208,7 +208,7 @@ class TestAnsatzUtils:
                 params, n_qubits, static_entangler, topology, connectivity
             )
 
-    def test_get_entangling_layer_graph_topology_bad_matrix2(self):
+    def test_get_entangling_layer_graph_topology_wrong_matrix2(self):
         # Given
         n_qubits = 4
         single_qubit_gate = RX
@@ -218,12 +218,12 @@ class TestAnsatzUtils:
         params = np.asarray([0, 0])
 
         # When
-        with pytest.raises(Exception):
+        with pytest.raises(AttributeError):
             _ = get_entangling_layer(
                 params, n_qubits, static_entangler, topology, connectivity
             )
 
-    def test_get_entangling_layer_toplogy_supported(self):
+    def test_get_entangling_layer_topology_supported(self):
         # Given
         n_qubits_list = [2, 3, 4, 5]
         static_entangler = XX
@@ -315,15 +315,7 @@ class TestAnsatzUtils:
         # XX on 0, 3
         assert default_layer.operations[2].qubit_indices == (0, 3)
 
-    def test_graph_symmetry(self):
-        adjacency_matrix = np.asarray(
-            [[1, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1]]
-        )
-
-        # When
-        assert not np.array_equal(adjacency_matrix, adjacency_matrix.T)
-
-    def test_graph_kwargs(self):
+    def test_get_entangling_layers_fails_with_incorrect_graph_kwargs(self):
         # Given
         n_qubits = 4
         single_qubit_gate = RX
