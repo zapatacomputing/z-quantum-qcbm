@@ -24,15 +24,14 @@ class QCBMAnsatz(Ansatz):
         number_of_layers: int,
         number_of_qubits: int,
         topology: str = "all",
+        **topology_kwargs,
     ):
         """
         An ansatz implementation used for running the Quantum Circuit Born Machine.
-
         Args:
             number_of_layers (int): number of entangling layers in the circuit.
             number_of_qubits (int): number of qubits in the circuit.
             topology (str): the topology representing the connectivity of the qubits.
-
         Attributes:
             number_of_qubits (int): See Args
             number_of_layers (int): See Args
@@ -42,6 +41,7 @@ class QCBMAnsatz(Ansatz):
         super().__init__(number_of_layers)
         self._number_of_qubits = number_of_qubits
         self._topology = topology
+        self._topology_kwargs = topology_kwargs
         if number_of_layers == 0:
             raise ValueError("QCBMAnsatz is only defined for number_of_layers > 0.")
 
@@ -56,18 +56,32 @@ class QCBMAnsatz(Ansatz):
     def n_params_per_ent_layer(self) -> int:
         if self.topology == "all":
             return int((self.number_of_qubits * (self.number_of_qubits - 1)) / 2)
-        elif self.topology == "line":
+        elif self.topology == "line" or self.topology == "star":
             return self.number_of_qubits - 1
+        elif self.topology == "graph":
+            if "adjacency_matrix" in self._topology_kwargs.keys():
+                n_params = 0
+                for qubit1_index in range(0, self._number_of_qubits - 1):
+                    for qubit2_index in range(qubit1_index, self._number_of_qubits):
+                        if self._topology_kwargs["adjacency_matrix"][qubit1_index][
+                            qubit2_index
+                        ]:
+                            n_params += 1
+                        if self._topology_kwargs["adjacency_matrix"][qubit2_index][
+                            qubit1_index
+                        ]:
+                            n_params += 1
+                return n_params
+            elif "adjacency_list" in self._topology_kwargs.keys():
+                return self._topology_kwargs["adjacency_list"].shape[1]
         else:
             raise RuntimeError("Topology {} is not supported".format(self.topology))
 
     @overrides
     def _generate_circuit(self, params: Optional[np.ndarray] = None) -> Circuit:
         """Builds a qcbm ansatz circuit, using the ansatz in https://advances.sciencemag.org/content/5/10/eaaw9918/tab-pdf (Fig.2 - top).
-
         Args:
             params (numpy.array): input parameters of the circuit (1d array).
-
         Returns:
             Circuit
         """
@@ -216,7 +230,6 @@ class QCBMAnsatz(Ansatz):
 
     def get_number_of_parameters_by_layer(self) -> np.ndarray:
         """Determine the number of parameters needed for each layer in the ansatz
-
         Returns:
             A 1D array of integers
         """
