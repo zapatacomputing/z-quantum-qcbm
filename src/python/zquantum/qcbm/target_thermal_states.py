@@ -5,7 +5,7 @@ from zquantum.core.bitstring_distribution import BitstringDistribution
 from zquantum.core.utils import dec2bin, bin2dec, convert_tuples_to_bitstrings
 
 
-def int2ising(number: int, length: int) -> typing.List[int]:
+def convert_integer_to_ising_bitstring(number: int, length: int) -> typing.List[int]:
     """Converts an integer into a +/-1s bitstring (also called Ising bitstring).
     Args:
         number: positive number to be converted into its corresponding Ising bitstring representation
@@ -18,7 +18,7 @@ def int2ising(number: int, length: int) -> typing.List[int]:
     return ising_bitstring
 
 
-def ising2int(ising_bitstring: typing.List[int]) -> int:
+def convert_ising_bitstring_to_integer(ising_bitstring: typing.List[int]) -> int:
     """Converts a +/-1s bitstring (also called Ising bitstring) into an integer.
     Args:
         ising_bitstring: 1D array of +/-1.
@@ -75,7 +75,7 @@ def get_thermal_target_distribution_dict(
     distribution = {}
 
     for spin in range(int(2 ** n_spins)):
-        ising_bitstring = int2ising(spin, n_spins)
+        ising_bitstring = convert_integer_to_ising_bitstring(spin, n_spins)
         energy = 0
         for i in range(n_spins):
             energy -= ising_bitstring[i] * external_fields[i]
@@ -168,7 +168,7 @@ def sample(
         y[i] = np.random.uniform(low=0, high=1)
     for i in range(len(y)):
         idx = bisect.bisect_right(cumulative, y[i])
-        ising_bitstring = int2ising(idx, n_spins)
+        ising_bitstring = convert_integer_to_ising_bitstring(idx, n_spins)
         samples[i, :] = ising_bitstring
     return np.asarray(samples)
 
@@ -193,7 +193,7 @@ def get_thermal_sampled_distribution(
     histogram_samples = np.zeros(2 ** n_spins)
     pos_spins_list = []
     for s in samples:
-        idx = ising2int(s)
+        idx = convert_ising_bitstring_to_integer(s)
         histogram_samples[idx] += 1.0 / n_samples
         pos_spins = 0 
         for elem in s: 

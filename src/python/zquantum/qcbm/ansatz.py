@@ -277,6 +277,18 @@ class QCBMAnsatz(Ansatz):
         return dictionary
 
 
+    def from_dict(self, item: dict)-> Ansatz:
+        """Creates a QCBM ansatz object from an input dictionary of values.
+
+        Returns:
+            QCBMAnsatz (Ansatz): the ansatz with a given number of layers, qubits, and topology 
+        """
+        return QCBMAnsatz(
+                number_of_layers=item["number_of_layers"],
+                number_of_qubits=item["number_of_qubits"],
+                topology=item["topology"])
+
+
 def save_qcbm_ansatz_set(qcbm_ansatz_set: List[QCBMAnsatz], filename: str) -> None:
     """Save a set of qcbm_ansatz to a file.
 
@@ -286,7 +298,7 @@ def save_qcbm_ansatz_set(qcbm_ansatz_set: List[QCBMAnsatz], filename: str) -> No
     """
     dictionary = {
         "schema": ANSATZSET_SCHEMA,
-        "qcbm_ansatz": [ansatz.to_dict() for ansatz in qcbm_ansatz_set]
+        "qcbm_ansatz_set": [ansatz.to_dict() for ansatz in qcbm_ansatz_set]
     }
 
     with open(filename, "w") as f:
@@ -309,13 +321,8 @@ def load_qcbm_ansatz_set(file: str) -> List[QCBMAnsatz]:
         data = json.load(file)
 
     qcbm_ansatz_set = []
-    for item in data["qcbm_ansatz"]:
+    for item in data["qcbm_ansatz_set"]:
         qcbm_ansatz_set.append(
-            QCBMAnsatz(
-                number_of_layers=item["number_of_layers"],
-                number_of_qubits=item["number_of_qubits"],
-                topology=item["topology"],
-            )
+            QCBMAnsatz.from_dict(item)
         )
-
     return qcbm_ansatz_set
