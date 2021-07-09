@@ -3,9 +3,15 @@ import numpy as np
 from zquantum.core.utils import dec2bin, convert_tuples_to_bitstrings
 from zquantum.core.bitstring_distribution import BitstringDistribution
 from zquantum.core.bitstring_distribution.distance_measures.mmd import compute_mmd
+<<<<<<< HEAD
 from .target_thermal_states import (
     convert_integer_to_ising_bitstring,
     convert_ising_bitstring_to_integer,
+=======
+from zquantum.qcbm.target_thermal_states import (
+    int2ising,
+    ising2int,
+>>>>>>> bc4081fb587d257192da82c643372d9bf53ff04b
     get_random_hamiltonian_parameters,
     get_thermal_target_distribution_dict,
     get_target_bitstring_distribution,
