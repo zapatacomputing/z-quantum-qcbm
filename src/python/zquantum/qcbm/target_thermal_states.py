@@ -25,12 +25,16 @@ def convert_ising_bitstring_to_integer(ising_bitstring: typing.List[int]) -> int
     Returns:
         Integer number representation of the Ising bitstring."""
 
+    if 0 in ising_bitstring:
+        raise ValueError("Ising Bitstrings contain only +1 and -1.")
     binary_bitstring = [int((bit + 1) / 2) for bit in ising_bitstring]
     number = bin2dec(binary_bitstring)
     return number
 
 
-def get_random_hamiltonian_parameters(n_spins: int) -> typing.Tuple:
+def get_random_hamiltonian_parameters(
+    n_spins: int,
+) -> typing.Tuple[np.ndarray, np.ndarray]:
     """Generates random h, J, and where h and J are arrays of random coefficients sampled from a normal distribution with zero mean and sqrt(n_spins) sd.
     For reproducibilty, fix random generator seed in the higher level from which this function is called.
     Args:
@@ -55,7 +59,7 @@ def get_random_hamiltonian_parameters(n_spins: int) -> typing.Tuple:
 def get_thermal_target_distribution_dict(
     n_spins: int,
     temperature: float,
-    hamiltonian_parameters: typing.List[np.array],  # TODO: add docstring
+    hamiltonian_parameters: typing.Tuple[np.ndarray, np.ndarray],
 ) -> typing.Dict:
     """Generates thermal states target distribution, saved in a dict where keys are bitstrings and
     values are corresponding probabilities according to the Boltzmann Distribution formula.
@@ -67,7 +71,7 @@ def get_thermal_target_distribution_dict(
 
     Returns:
        Thermal target distribution.
-       Number of positive spins in the spin state. 
+       Number of positive spins in the spin state.
     """
     partition_function = 0
     external_fields, two_body_couplings = hamiltonian_parameters
@@ -104,9 +108,9 @@ def get_thermal_target_distribution_dict(
 def get_target_bitstring_distribution(
     n_spins: int,
     temperature: float,
-    hamiltonian_parameters: typing.List[np.array],  # TODO: add docstring
+    hamiltonian_parameters: typing.Tuple[np.ndarray, np.ndarray],
 ) -> BitstringDistribution:
-    """Generates thermal states target data as BitStringDistribution object
+    """Generates thermal states target data as BitStringDistribution object.
 
     Args:
         n_spins: positive number of spins in the Ising system
@@ -125,7 +129,7 @@ def get_target_bitstring_distribution(
 def cumulate(
     n_spins: int,
     temperature: float,
-    hamiltonian_parameters: typing.List[np.array],  # TODO: add docstring
+    hamiltonian_parameters: typing.Tuple[np.ndarray, np.ndarray],
 ) -> typing.List[float]:
     """Generates array of cumulative probabilities from target_distribution.
     Args:
@@ -151,8 +155,8 @@ def sample(
     n_samples: int,
     n_spins: int,
     temperature: float,
-    hamiltonian_parameters: typing.List[np.array],  # TODO: add docstring
-) -> np.array:
+    hamiltonian_parameters: typing.Tuple[np.ndarray, np.ndarray],
+) -> np.ndarray:
     """Generates samples from the original target distribution in the form of a list of ising vectors
     Args:
         n_samples: the number of samples from the original distribution
@@ -173,13 +177,12 @@ def sample(
     return np.asarray(samples)
 
 
-
 def get_thermal_sampled_distribution(
     n_samples: int,
     n_spins: int,
     temperature: float,
-    hamiltonian_parameters: typing.List[np.array],  # TODO: add docstring
-) -> typing.Dict:
+    hamiltonian_parameters: typing.Tuple[np.ndarray, np.ndarray],
+) -> typing.Tuple[typing.Dict, typing.List[int]]:
     """Generates thermal states sample distribution
     Args:
         n_samples: the number of samples from the original distribution
@@ -191,15 +194,15 @@ def get_thermal_sampled_distribution(
     sample_distribution_dict = {}
     samples = sample(n_samples, n_spins, temperature, hamiltonian_parameters)
     histogram_samples = np.zeros(2 ** n_spins)
-    pos_spins_list = []
+    pos_spins_list: typing.List[int] = []
     for s in samples:
         idx = convert_ising_bitstring_to_integer(s)
         histogram_samples[idx] += 1.0 / n_samples
-        pos_spins = 0 
-        for elem in s: 
-            if elem == 1.0: 
-                pos_spins += 1 
-        pos_spins_list.insert(idx,pos_spins)
+        pos_spins = 0
+        for elem in s:
+            if elem == 1.0:
+                pos_spins += 1
+        pos_spins_list.insert(idx, pos_spins)
 
     for spin in range(int(2 ** n_spins)):
         binary_bitstring = convert_tuples_to_bitstrings([dec2bin(spin, n_spins)])[-1]
@@ -208,14 +211,11 @@ def get_thermal_sampled_distribution(
     return sample_distribution_dict, pos_spins_list
 
 
-
-
-
 def get_sampled_bitstring_distribution(
     n_samples: int,
     n_spins: int,
     temperature: float,
-    hamiltonian_parameters: typing.List[np.array],  # TODO: add docstring
+    hamiltonian_parameters: typing.Tuple[np.ndarray, np.ndarray],
 ) -> BitstringDistribution:
     """Generates thermal states sample distribution as BitstringDistribution object
     Args:
@@ -232,4 +232,3 @@ def get_sampled_bitstring_distribution(
         n_samples, n_spins, temperature, hamiltonian_parameters
     )[1]
     return BitstringDistribution(probabilities), spin_mapping
-

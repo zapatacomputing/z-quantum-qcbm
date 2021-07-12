@@ -3,15 +3,9 @@ import numpy as np
 from zquantum.core.utils import dec2bin, convert_tuples_to_bitstrings
 from zquantum.core.bitstring_distribution import BitstringDistribution
 from zquantum.core.bitstring_distribution.distance_measures.mmd import compute_mmd
-<<<<<<< HEAD
 from .target_thermal_states import (
     convert_integer_to_ising_bitstring,
     convert_ising_bitstring_to_integer,
-=======
-from zquantum.qcbm.target_thermal_states import (
-    int2ising,
-    ising2int,
->>>>>>> bc4081fb587d257192da82c643372d9bf53ff04b
     get_random_hamiltonian_parameters,
     get_thermal_target_distribution_dict,
     get_target_bitstring_distribution,
@@ -38,18 +32,17 @@ class TestThermalTarget(unittest.TestCase):
         # Then
         self.assertListEqual(ising_bitstring, expected_ising_bitstring)
 
-        # When 
+        # When
         ising_bitstring_zero = convert_integer_to_ising_bitstring(0, length)
 
         # Then
-        self.assertListEqual(ising_bitstring_zero, [0,0,0,0,0])
-
+        self.assertListEqual(ising_bitstring_zero, [-1, -1, -1, -1, -1])
 
     def test_convert_ising_bitstring_to_integer(self):
         # Given
         ising_bitstring = [-1, -1, 1, -1, -1]
         expected_number = 4
-        zero_bitstring = [0, 0, 0, 0, 0]
+        zero_bitstring = [-1, -1, -1, -1, -1]
 
         # When
         number = convert_ising_bitstring_to_integer(ising_bitstring)
@@ -63,33 +56,35 @@ class TestThermalTarget(unittest.TestCase):
         # Then
         self.assertEqual(number, 0)
 
-
-
     def test_ising2int2ising(self):
         # Given
         expected_number = 14
         length = 5
-        zero_number = 0 
+        zero_number = 0
         zero_length = 0
         # When
-        number = convert_ising_bitstring_to_integer(convert_integer_to_ising_bitstring(expected_number, length))
+        number = convert_ising_bitstring_to_integer(
+            convert_integer_to_ising_bitstring(expected_number, length)
+        )
 
         # Then
         self.assertEqual(number, expected_number)
 
         # When
-        number = convert_ising_bitstring_to_integer(convert_integer_to_ising_bitstring(zero_number, length))
+        number = convert_ising_bitstring_to_integer(
+            convert_integer_to_ising_bitstring(zero_number, length)
+        )
 
         # Then
         self.assertEqual(number, zero_number)
 
         # When
-        number = convert_ising_bitstring_to_integer(convert_integer_to_ising_bitstring(zero_number, zero_length))
+        number = convert_ising_bitstring_to_integer(
+            convert_integer_to_ising_bitstring(zero_number, zero_length)
+        )
 
         # Then
         self.assertEqual(number, zero_number)
-
-
 
     def test_get_random_hamiltonian_parameters(self):
         # Given
@@ -111,7 +106,7 @@ class TestThermalTarget(unittest.TestCase):
 
     def test_get_thermal_target_distribution_dict(self):
         # Given
-        n_spins = 5 
+        n_spins = 5
         temperature = 1.0
         expected_bitstrings = convert_tuples_to_bitstrings(
             [dec2bin(number, n_spins) for number in range(int(2 ** n_spins))]
