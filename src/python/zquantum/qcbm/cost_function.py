@@ -14,6 +14,7 @@ import numpy as np
 def QCBMCostFunction(
     ansatz: Ansatz,
     backend: QuantumBackend,
+    n_samples: int,
     distance_measure: Callable,
     distance_measure_parameters: dict,
     target_bitstring_distribution: BitstringDistribution,
@@ -54,7 +55,7 @@ def QCBMCostFunction(
         """
         # circuit = ansatz.get_executable_circuit(parameters)
         circuit = ansatz._generate_circuit(parameters)
-        distribution = backend.get_bitstring_distribution(circuit)
+        distribution = backend.get_bitstring_distribution(circuit, n_samples)
         value = evaluate_distribution_distance(
             target_bitstring_distribution,
             distribution,
