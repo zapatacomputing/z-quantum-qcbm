@@ -1,7 +1,7 @@
 import numpy as np
 from zquantum.core.bitstring_distribution import (
     save_bitstring_distribution,
-    save_bitstring_distribution_set,
+    save_bitstring_distributions,
 )
 from zquantum.qcbm.target import (
     get_bars_and_stripes_target_distribution as _get_bars_and_stripes_target_distribution,
@@ -39,6 +39,6 @@ def get_thermal_target_training_set(
         for _ in range(number_of_instances)
     ]
 
-    save_bitstring_distribution_set(
+    save_bitstring_distributions(
         training_data_set_distributions, "distribution_set.json"
     )
