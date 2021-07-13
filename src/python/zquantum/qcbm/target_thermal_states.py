@@ -114,12 +114,12 @@ def get_thermal_sampled_distribution(
     n_spins: int,
     temperature: float,
     hamiltonian_parameters: typing.Tuple[np.ndarray, np.ndarray],
-) -> typing.Tuple[BitstringDistribution, typing.List[int]]:
+) -> BitstringDistribution:
     """Generates thermal states sample distribution
     Args:
         n_samples: the number of samples from the original distribution
-        n_spins: positive number of spins in the Ising system
-        temperature: temperature factor in the boltzman distribution
+        n_spins: number of spins in the Ising system
+        temperature: temperature factor in the Boltzmann distribution
     Returns:
        histogram_samples: keys are binary string representations and values are corresponding probabilities.
     """
@@ -130,23 +130,47 @@ def get_thermal_sampled_distribution(
         distribution, n_samples
     )
     histogram_samples = np.zeros(2 ** n_spins)
-    pos_spins_list: typing.List[int] = []
     for samples, counts in sample_distribution_dict.items():
         integer_list: typing.List[int] = []
         for elem in samples:
             integer_list.append(int(elem))
         idx = convert_ising_bitstring_to_integer(integer_list)
         histogram_samples[idx] += counts / n_samples
-        pos_spins = 0
-        for elem in integer_list:
-            if elem == 1.0:
-                pos_spins += 1
-        for num in range(counts):
-            pos_spins_list.append(pos_spins)
 
     for spin in range(int(2 ** n_spins)):
         binary_bitstring = convert_tuples_to_bitstrings([dec2bin(spin, n_spins)])[0]
-
         sample_distribution_dict[binary_bitstring] = histogram_samples[spin]
 
-    return BitstringDistribution(sample_distribution_dict), pos_spins_list
+    return BitstringDistribution(sample_distribution_dict)
+
+
+def get_cardinality_distribution(
+    n_samples: int, n_spins: int, sampled_distribution: BitstringDistribution
+) -> typing.List[int]:
+    """Generates a list with all the occurrences associated to different cardinalities in a sampled distribution.
+
+    Args:
+        n_samples: the number of samples used to build the sampled distribution (used for normalization purposes)
+        n_spins: positive number of spins in the Ising system
+        sampled_distribution: bitstring distribution built of samples drawn for a target distribution
+
+    Returns:
+        cardinality_list: a list with the cardinalities of all the sampled bitstrings.
+
+    """
+    histogram_samples = np.zeros(2 ** n_spins)
+    cardinality_list: typing.List[int] = []
+    for samples, counts in sampled_distribution.distribution_dict.items():
+        integer_list: typing.List[int] = []
+        for elem in samples:
+            integer_list.append(int(elem))
+        idx = convert_ising_bitstring_to_integer(integer_list)
+        histogram_samples[idx] += counts / n_samples
+        cardinality = 0
+        for elem in integer_list:
+            if elem == 1:
+                cardinality += 1
+        for _ in range(int(counts)):
+            cardinality_list.append(cardinality)
+
+    return cardinality_list

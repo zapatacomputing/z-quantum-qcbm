@@ -9,6 +9,7 @@ from zquantum.qcbm.target_thermal_states import (
     _get_random_ising_hamiltonian_parameters,
     get_thermal_target_bitstring_distribution,
     get_thermal_sampled_distribution,
+    get_cardinality_distribution,
 )
 
 
@@ -146,7 +147,7 @@ class TestThermalTarget(unittest.TestCase):
         # When
         sample_distribution = get_thermal_sampled_distribution(
             n_samples, n_spins, temperature, hamiltonian_parameters
-        )[0]
+        )
 
         # Then
         self.assertListEqual(
@@ -158,13 +159,12 @@ class TestThermalTarget(unittest.TestCase):
             sum(list(sample_distribution.distribution_dict.values())), 1
         )
 
-
     def test_samples_from_distribution(self):
         # Given
         n_samples = 10000
         n_spins = 4
         temperature = 1.0
-        distance_measure = {"epsilon": 1e-6}
+        distance_measure_parameters = {"sigma": 1.0}
         np.random.seed(SEED)
         external_fields = np.random.rand(n_spins)
         two_body_couplings = np.random.rand(n_spins, n_spins)
@@ -178,13 +178,34 @@ class TestThermalTarget(unittest.TestCase):
         np.random.seed(SEED)
         model = get_thermal_sampled_distribution(
             n_samples, n_spins, temperature, hamiltonian_parameters
-        )[0]
+        )
 
         # When
-        mmd = compute_mmd(actual, model, distance_measure)
+        mmd = compute_mmd(actual, model, distance_measure_parameters)
 
         # Then
         self.assertLess(mmd, 1e-4)
+
+    def test_cardinality_distribution(self):
+        # Given
+        n_samples = 10000
+        n_spins = 4
+        temperature = 1.0
+        np.random.seed(SEED)
+        external_fields = np.random.rand(n_spins)
+        two_body_couplings = np.random.rand(n_spins, n_spins)
+        hamiltonian_parameters = [external_fields, two_body_couplings]
+        sampled_distribution = get_thermal_sampled_distribution(
+            n_samples, n_spins, temperature, hamiltonian_parameters
+        )
+
+        # When
+        cardinality_distr = get_cardinality_distribution(
+            n_samples, n_spins, sampled_distribution
+        )
+
+        # Then
+        assert all([spin_cardinality >= 0 for spin_cardinality in cardinality_distr])
 
 
 if __name__ == "__main__":
