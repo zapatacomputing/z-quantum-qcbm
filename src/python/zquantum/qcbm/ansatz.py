@@ -289,7 +289,8 @@ class QCBMAnsatz(Ansatz):
 
         return dictionary
 
-    def from_dict(self, item: dict) -> Ansatz:
+    @classmethod
+    def from_dict(cls, item: dict) -> Ansatz:
         """Creates a QCBM ansatz object from an input dictionary of values.
 
         Returns:

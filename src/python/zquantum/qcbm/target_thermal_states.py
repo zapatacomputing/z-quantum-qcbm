@@ -2,7 +2,12 @@ import bisect
 import typing
 import numpy as np
 from zquantum.core.bitstring_distribution import BitstringDistribution
-from zquantum.core.utils import dec2bin, bin2dec, convert_tuples_to_bitstrings, sample_from_probability_distribution
+from zquantum.core.utils import (
+    dec2bin,
+    bin2dec,
+    convert_tuples_to_bitstrings,
+    sample_from_probability_distribution,
+)
 
 
 def convert_integer_to_ising_bitstring(number: int, length: int) -> typing.List[int]:
@@ -36,8 +41,9 @@ def _get_random_ising_hamiltonian_parameters(
     n_spins: int,
 ) -> typing.Tuple[np.ndarray, np.ndarray]:
     """Generates random h, J, and where h and J are arrays of random coefficients sampled from a normal distribution with zero mean and sqrt(n_spins) sd.
-    For reproducibilty, fix random generator seed in the higher level from which this function is called. 
-    Useful in the following Ising Hamiltonian: 1D Nearest Neighbor Transverse Field Ising Model (TFIM) with open boundary conditions. 
+    For reproducibilty, fix random generator seed in the higher level from which this function is called.
+    Useful in the following Ising Hamiltonian: 1D Nearest Neighbor Ising Model with open boundary conditions,
+    where h's are the external field values and J's the two-body couplings coefficients.
     Args:
         n_spins (int): positive number of spins in the Ising system.
     Returns:
@@ -93,7 +99,7 @@ def get_thermal_target_bitstring_distribution(
         boltzmann_factor = np.exp(energy * beta)
         partition_function += boltzmann_factor
 
-        binary_bitstring = convert_tuples_to_bitstrings([dec2bin(spin, n_spins)])[-1]
+        binary_bitstring = convert_tuples_to_bitstrings([dec2bin(spin, n_spins)])[0]
         distribution[binary_bitstring] = boltzmann_factor
 
     normalized_distribution = {
@@ -117,13 +123,17 @@ def get_thermal_sampled_distribution(
     Returns:
        histogram_samples: keys are binary string representations and values are corresponding probabilities.
     """
-    distribution = get_thermal_target_bitstring_distribution(n_spins, temperature, hamiltonian_parameters).distribution_dict
-    sample_distribution_dict = sample_from_probability_distribution(distribution, n_samples) 
+    distribution = get_thermal_target_bitstring_distribution(
+        n_spins, temperature, hamiltonian_parameters
+    ).distribution_dict
+    sample_distribution_dict = sample_from_probability_distribution(
+        distribution, n_samples
+    )
     histogram_samples = np.zeros(2 ** n_spins)
     pos_spins_list: typing.List[int] = []
-    for samples,counts in sample_distribution_dict.items():
+    for samples, counts in sample_distribution_dict.items():
         integer_list: typing.List[int] = []
-        for elem in samples: 
+        for elem in samples:
             integer_list.append(int(elem))
         idx = convert_ising_bitstring_to_integer(integer_list)
         histogram_samples[idx] += counts / n_samples
@@ -131,11 +141,12 @@ def get_thermal_sampled_distribution(
         for elem in integer_list:
             if elem == 1.0:
                 pos_spins += 1
-        for num in range(counts): 
+        for num in range(counts):
             pos_spins_list.append(pos_spins)
 
     for spin in range(int(2 ** n_spins)):
-        binary_bitstring = convert_tuples_to_bitstrings([dec2bin(spin, n_spins)])[-1]
+        binary_bitstring = convert_tuples_to_bitstrings([dec2bin(spin, n_spins)])[0]
+
         sample_distribution_dict[binary_bitstring] = histogram_samples[spin]
 
     return BitstringDistribution(sample_distribution_dict), pos_spins_list
