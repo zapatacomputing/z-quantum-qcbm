@@ -6,10 +6,8 @@ from zquantum.core.bitstring_distribution.distance_measures.mmd import compute_m
 from zquantum.qcbm.target_thermal_states import (
     convert_integer_to_ising_bitstring,
     convert_ising_bitstring_to_integer,
-    _get_random_hamiltonian_parameters,
+    _get_random_ising_hamiltonian_parameters,
     get_thermal_target_bitstring_distribution,
-    _get_cumulative_probability_distribution,
-    _get_samples_from_distribution,
     get_thermal_sampled_distribution,
 )
 
@@ -84,13 +82,13 @@ class TestThermalTarget(unittest.TestCase):
         # Then
         self.assertEqual(number, zero_number)
 
-    def test_get_random_hamiltonian_parameters(self):
+    def test_get_random_ising_hamiltonian_parameters(self):
         # Given
         np.random.seed(seed=SEED)
         n_spins = 15
 
         # When
-        hamiltonian_parameters = _get_random_hamiltonian_parameters(n_spins)
+        hamiltonian_parameters = _get_random_ising_hamiltonian_parameters(n_spins)
 
         # Then
         self.assertEqual(
@@ -131,70 +129,6 @@ class TestThermalTarget(unittest.TestCase):
             1.0,
         )
 
-    def test_get_target_bitstring_distribution(self):
-        # Given
-        np.random.seed(SEED)
-        n_spins = 6
-        temperature = 1.0
-        external_fields = np.random.rand(n_spins)
-        two_body_couplings = np.random.rand(n_spins, n_spins)
-        hamiltonian_parameters = [external_fields, two_body_couplings]
-
-        target_distribution = get_thermal_target_bitstring_distribution(
-            n_spins, temperature, hamiltonian_parameters
-        )
-
-        # When
-        np.random.seed(SEED)
-        target_bitstring_distribution = get_thermal_target_bitstring_distribution(
-            n_spins, temperature, hamiltonian_parameters
-        )
-
-        # Then
-        self.assertTrue(
-            isinstance(target_bitstring_distribution, BitstringDistribution)
-        )
-
-        self.assertDictEqual(
-            target_bitstring_distribution.distribution_dict,
-            target_distribution.distribution_dict,
-        )
-
-    def test_cumulate(self):
-        # Given
-        n_spins = 3
-        temperature = 2.0
-        np.random.seed(SEED)
-        external_fields = np.random.rand(n_spins)
-        two_body_couplings = np.random.rand(n_spins, n_spins)
-        hamiltonian_parameters = [external_fields, two_body_couplings]
-
-        # When
-        cumulative_probabilities = _get_cumulative_probability_distribution(
-            n_spins, temperature, hamiltonian_parameters
-        )
-
-        # Then
-        self.assertAlmostEqual(cumulative_probabilities[-1], 1.0)
-
-    def test_sample(self):
-        # Given
-        n_samples = 1000
-        n_spins = 2
-        temperature = 0.7
-        np.random.seed(SEED)
-        external_fields = np.random.rand(n_spins)
-        two_body_couplings = np.random.rand(n_spins, n_spins)
-        hamiltonian_parameters = [external_fields, two_body_couplings]
-
-        # When
-        samples = _get_samples_from_distribution(
-            n_samples, n_spins, temperature, hamiltonian_parameters
-        )
-
-        # Then
-        self.assertEqual(samples.shape, (n_samples, n_spins))
-
     def test_thermal_sampled_distribution(self):
         # Given
         n_samples = 5000
@@ -224,34 +158,6 @@ class TestThermalTarget(unittest.TestCase):
             sum(list(sample_distribution.distribution_dict.values())), 1
         )
 
-    def test_get_sampled_bitstring_distribution(self):
-        # Given
-        np.random.seed(SEED)
-        n_samples = 1000
-        n_spins = 8
-        temperature = 1.2
-        external_fields = np.random.rand(n_spins)
-        two_body_couplings = np.random.rand(n_spins, n_spins)
-        hamiltonian_parameters = [external_fields, two_body_couplings]
-        np.random.seed(SEED)
-        target_distribution = get_thermal_sampled_distribution(
-            n_samples, n_spins, temperature, hamiltonian_parameters
-        )[0]
-
-        # When
-        np.random.seed(SEED)
-        target_bitstring_distribution = get_thermal_sampled_distribution(
-            n_samples, n_spins, temperature, hamiltonian_parameters
-        )[0]
-
-        # Then
-        self.assertTrue(
-            isinstance(target_bitstring_distribution, BitstringDistribution)
-        )
-        self.assertDictEqual(
-            target_bitstring_distribution.distribution_dict,
-            target_distribution.distribution_dict,
-        )
 
     def test_samples_from_distribution(self):
         # Given
