@@ -48,11 +48,11 @@ def QCBMCostFunction(
 
         Args:
             parameters: parameters for which the evaluation should occur.
-
-        Returns:
-            (float): cost function value for given parameters
-            zquantum.core.bitstring_distribution.BitstringDistribution: distribution obtained
+            store_artifact: callable defining how the bitstring distributions should be stored.
         """
+        # TODO: we use private method here due to performance reasons.
+        # This should be fixed once better mechanism for handling it will be implemented.
+        # In case of questions ask mstechly.
         # circuit = ansatz.get_executable_circuit(parameters)
         circuit = ansatz._generate_circuit(parameters)
         distribution = backend.get_bitstring_distribution(circuit, n_samples)
