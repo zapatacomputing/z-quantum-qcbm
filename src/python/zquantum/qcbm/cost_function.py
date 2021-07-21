@@ -19,6 +19,7 @@ def QCBMCostFunction(
     distance_measure_parameters: dict,
     target_bitstring_distribution: BitstringDistribution,
     gradient_type: str = "finite_difference",
+    gradient_kwargs: dict = None,
 ):
     """Cost function used for evaluating QCBM.
 
@@ -68,9 +69,12 @@ def QCBMCostFunction(
 
         return ValueEstimate(value)
 
+    if gradient_kwargs is None:
+        gradient_kwargs = {}
+        
     if gradient_type == "finite_difference":
         cost_function = function_with_gradient(
-            cost_function, finite_differences_gradient(cost_function)
+            cost_function, finite_differences_gradient(cost_function, **gradient_kwargs)
         )
     else:
         raise RuntimeError("Unsupported gradient type: ", gradient_type)
