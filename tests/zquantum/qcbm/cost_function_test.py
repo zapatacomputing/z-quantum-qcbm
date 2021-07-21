@@ -47,11 +47,11 @@ class TestQCBMCostFunction(unittest.TestCase):
             {
                 "module_name": "zquantum.core.symbolic_simulator",
                 "function_name": "SymbolicSimulator",
-                "n_samples": 1,
             }
         )
 
         self.gradient_types = ["finite_difference"]
+        self.n_samples = 1
 
     def test_evaluate(self):
         for distance_meas, distance_measure_params in param_list:
@@ -63,6 +63,7 @@ class TestQCBMCostFunction(unittest.TestCase):
                 cost_function = QCBMCostFunction(
                     self.ansatz,
                     self.backend,
+                    self.n_samples,
                     self.distance_measure,
                     distance_measure_parameters,
                     self.target_bitstring_distribution,
@@ -87,6 +88,7 @@ class TestQCBMCostFunction(unittest.TestCase):
                 cost_function = QCBMCostFunction(
                     self.ansatz,
                     self.backend,
+                    self.n_samples,
                     self.distance_measure,
                     distance_measure_parameters,
                     self.target_bitstring_distribution,
@@ -120,6 +122,7 @@ class TestQCBMCostFunction(unittest.TestCase):
                     cost_function = QCBMCostFunction(
                         self.ansatz,
                         self.backend,
+                        self.n_samples,
                         self.distance_measure,
                         distance_measure_parameters,
                         self.target_bitstring_distribution,
@@ -149,6 +152,7 @@ class TestQCBMCostFunction(unittest.TestCase):
                         lambda: QCBMCostFunction(
                             self.ansatz,
                             self.backend,
+                            self.n_samples,
                             self.distance_measure,
                             distance_measure_parameters,
                             self.target_bitstring_distribution,
@@ -173,6 +177,7 @@ class TestQCBMCostFunction(unittest.TestCase):
                     lambda: QCBMCostFunction(
                         self.ansatz,
                         self.backend,
+                        self.n_samples,
                         self.distance_measure,
                         distance_measure_parameters,
                         self.target_bitstring_distribution,

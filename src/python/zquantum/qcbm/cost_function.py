@@ -14,6 +14,7 @@ import numpy as np
 def QCBMCostFunction(
     ansatz: Ansatz,
     backend: QuantumBackend,
+    n_samples: int,
     distance_measure: Callable,
     distance_measure_parameters: dict,
     target_bitstring_distribution: BitstringDistribution,
@@ -47,13 +48,14 @@ def QCBMCostFunction(
 
         Args:
             parameters: parameters for which the evaluation should occur.
-
-        Returns:
-            (float): cost function value for given parameters
-            zquantum.core.bitstring_distribution.BitstringDistribution: distribution obtained
+            store_artifact: callable defining how the bitstring distributions should be stored.
         """
-        circuit = ansatz.get_executable_circuit(parameters)
-        distribution = backend.get_bitstring_distribution(circuit)
+        # TODO: we use private method here due to performance reasons.
+        # This should be fixed once better mechanism for handling it will be implemented.
+        # In case of questions ask mstechly.
+        # circuit = ansatz.get_executable_circuit(parameters)
+        circuit = ansatz._generate_circuit(parameters)
+        distribution = backend.get_bitstring_distribution(circuit, n_samples)
         value = evaluate_distribution_distance(
             target_bitstring_distribution,
             distribution,
