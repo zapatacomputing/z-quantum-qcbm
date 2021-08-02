@@ -1,9 +1,8 @@
 import setuptools
-import os
 
 setuptools.setup(
     name="z-quantum-qcbm",
-    version="0.2.0",
+    use_scm_version=True,
     author="Zapata Computing, Inc.",
     author_email="info@zapatacomputing.com",
     description="QCBM package for Orquestra.",
@@ -12,11 +11,10 @@ setuptools.setup(
         include=["zquantum.*"], where="src/python"
     ),
     package_dir={"": "src/python"},
-    classifiers=(
+    classifiers=[
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
-    ),
-    install_requires=[
-        "z-quantum-core",
     ],
+    setup_requires=["setuptools_scm~=6.0"],
+    install_requires=["z-quantum-core"],
 )

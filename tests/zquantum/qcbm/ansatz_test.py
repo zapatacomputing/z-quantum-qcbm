@@ -4,7 +4,12 @@ import numpy as np
 from zquantum.core.circuits import Circuit, RX, RZ, XX
 from zquantum.core.interfaces.ansatz_test import AnsatzTests
 
-from zquantum.qcbm.ansatz import QCBMAnsatz
+from zquantum.qcbm.ansatz import (
+    QCBMAnsatz,
+    ANSATZ_SCHEMA,
+    save_qcbm_ansatz_set,
+    load_qcbm_ansatz_set,
+)
 from zquantum.qcbm.ansatz_utils import get_entangling_layer
 
 
@@ -417,3 +422,68 @@ class TestQCBMAnsatz(AnsatzTests):
 
         # Then
         assert circuit == expected_circuit
+
+    def test_ansatz_to_dict(self, ansatz, n_qubits, topology):
+        # Given
+        expected_dict = {
+            "schema": ANSATZ_SCHEMA,
+            "number_of_layers": 2,
+            "number_of_qubits": n_qubits,
+            "topology": topology,
+        }
+        # When
+        ansatz_dict = ansatz.to_dict()
+
+        # Then
+        assert isinstance(ansatz_dict, dict)
+        assert ansatz_dict == expected_dict
+
+    def test_ansatz_from_dict(self, ansatz, n_qubits, topology):
+        # Given
+        expected_ansatz = QCBMAnsatz(2, n_qubits, topology)
+
+        # When
+        ansatz = ansatz.from_dict(
+            {
+                "schema": ANSATZ_SCHEMA,
+                "number_of_layers": 2,
+                "number_of_qubits": n_qubits,
+                "topology": topology,
+            }
+        )
+
+        # Then
+        assert isinstance(ansatz, QCBMAnsatz)
+        assert ansatz._number_of_qubits == expected_ansatz._number_of_qubits
+        assert ansatz._number_of_layers == expected_ansatz._number_of_layers
+        assert ansatz.topology == expected_ansatz.topology
+
+    def test_qcbm_ansatz_set_io(self, ansatz):
+        # Given
+        expected_ansatz_list = [ansatz] * 5
+        filename = "ansatz_set.json"
+
+        # When
+        save_qcbm_ansatz_set(expected_ansatz_list, filename)
+        ansatz_list = load_qcbm_ansatz_set(filename)
+
+        # Then
+        assert len(ansatz_list) == len(expected_ansatz_list)
+        assert all(
+            [
+                ansatz._number_of_qubits == expected_ansatz._number_of_qubits
+                for ansatz, expected_ansatz in zip(ansatz_list, expected_ansatz_list)
+            ]
+        )
+        assert all(
+            [
+                ansatz._number_of_layers == expected_ansatz._number_of_layers
+                for ansatz, expected_ansatz in zip(ansatz_list, expected_ansatz_list)
+            ]
+        )
+        assert all(
+            [
+                ansatz.topology == expected_ansatz.topology
+                for ansatz, expected_ansatz in zip(ansatz_list, expected_ansatz_list)
+            ]
+        )

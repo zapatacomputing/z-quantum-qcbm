@@ -126,6 +126,9 @@ steps:
         type: bitstring-distribution
       - keep_history: True
         type: bool
+      - gradient_kwargs:
+          finite_diff_step_size: 0.00001
+        type: dict
 
     outputs:
       - name: qcbm-optimization-results
