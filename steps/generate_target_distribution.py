@@ -7,7 +7,7 @@ from zquantum.qcbm.target import (
     get_bars_and_stripes_target_distribution as _get_bars_and_stripes_target_distribution,
 )
 from zquantum.qcbm.target_thermal_states import (
-    get_target_bitstring_distribution as _get_thermal_states_target_distribution,
+    get_thermal_target_bitstring_distribution as _get_thermal_states_target_distribution,
 )
 
 
