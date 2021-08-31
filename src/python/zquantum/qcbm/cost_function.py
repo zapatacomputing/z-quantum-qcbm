@@ -1,14 +1,16 @@
-from zquantum.core.interfaces.functions import function_with_gradient, StoreArtifact
-from zquantum.core.interfaces.backend import QuantumBackend
-from zquantum.core.interfaces.ansatz import Ansatz
+from typing import Callable
+
+import numpy as np
 from zquantum.core.bitstring_distribution import (
     BitstringDistribution,
     evaluate_distribution_distance,
 )
-from zquantum.core.utils import ValueEstimate
 from zquantum.core.gradients import finite_differences_gradient
-from typing import Union, Callable
-import numpy as np
+from zquantum.core.interfaces.ansatz import Ansatz
+from zquantum.core.interfaces.backend import QuantumBackend
+from zquantum.core.interfaces.cost_function import CostFunction
+from zquantum.core.interfaces.functions import StoreArtifact, function_with_gradient
+from zquantum.core.utils import ValueEstimate
 
 
 def QCBMCostFunction(
@@ -20,7 +22,7 @@ def QCBMCostFunction(
     target_bitstring_distribution: BitstringDistribution,
     gradient_type: str = "finite_difference",
     gradient_kwargs: dict = None,
-):
+) -> CostFunction:
     """Cost function used for evaluating QCBM.
 
     Args:
@@ -71,7 +73,7 @@ def QCBMCostFunction(
 
     if gradient_kwargs is None:
         gradient_kwargs = {}
-        
+
     if gradient_type == "finite_difference":
         cost_function = function_with_gradient(
             cost_function, finite_differences_gradient(cost_function, **gradient_kwargs)
