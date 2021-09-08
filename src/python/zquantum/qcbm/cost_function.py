@@ -1,4 +1,5 @@
 import warnings
+from numbers import Number
 from typing import Callable
 
 import numpy as np
@@ -14,14 +15,18 @@ from zquantum.core.interfaces.functions import StoreArtifact, function_with_grad
 from zquantum.core.utils import ValueEstimate
 
 
+GradientFactory = Callable[[Callable], Callable[[np.ndarray], np.ndarray]]
+DistanceMeasure = Callable[..., Number]
+
+
 def create_QCBM_cost_function(
     ansatz: Ansatz,
     backend: QuantumBackend,
     n_samples: int,
-    distance_measure: Callable,
+    distance_measure: DistanceMeasure,
     distance_measure_parameters: dict,
     target_bitstring_distribution: BitstringDistribution,
-    gradient_function: Callable = finite_differences_gradient,
+    gradient_function: GradientFactory = finite_differences_gradient,
 ) -> CostFunction:
     """Cost function used for evaluating QCBM.
 
@@ -55,7 +60,7 @@ def QCBMCostFunction(
     ansatz: Ansatz,
     backend: QuantumBackend,
     n_samples: int,
-    distance_measure: Callable,
+    distance_measure: DistanceMeasure,
     distance_measure_parameters: dict,
     target_bitstring_distribution: BitstringDistribution,
     gradient_type: str = "finite_difference",
@@ -107,7 +112,7 @@ def _create_QCBM_cost_function(
     ansatz: Ansatz,
     backend: QuantumBackend,
     n_samples: int,
-    distance_measure: Callable,
+    distance_measure: DistanceMeasure,
     distance_measure_parameters: dict,
     target_bitstring_distribution: BitstringDistribution,
 ):
