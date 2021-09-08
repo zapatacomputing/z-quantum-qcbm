@@ -78,25 +78,6 @@ class TestQCBMCostFunction:
     def distance_measure_kwargs(self, request):
         return request.param
 
-    def test_evaluate(self, cost_function_factory, distance_measure_kwargs):
-        # Given
-        cost_function = cost_function_factory(
-            ansatz,
-            backend,
-            n_samples,
-            **distance_measure_kwargs,
-            target_bitstring_distribution=target_bitstring_distribution,
-        )
-
-        params = np.array([0, 0, 0, 0])
-
-        # When
-        value_estimate = cost_function(params)
-
-        # Then
-        assert type(value_estimate) == ValueEstimate
-        assert isinstance(value_estimate.value, (np.floating, float))
-
     def test_evaluate_history(self, cost_function_factory, distance_measure_kwargs):
         # Given
         cost_function = cost_function_factory(
@@ -116,13 +97,9 @@ class TestQCBMCostFunction:
         history = cost_function.history
 
         # Then
-        assert pytest.approx(len(history), 1)
-        assert pytest.approx(
-            BitstringDistribution,
-            type(history[0].artifacts["bitstring_distribution"]),
-        )
+        assert len(history) == 1
         np.testing.assert_array_equal(params, history[0].params)
-        assert pytest.approx(value_estimate, history[0].value)
+        assert value_estimate == history[0].value
 
     @pytest.mark.parametrize(
         "gradient_types, cf_factory",
@@ -159,9 +136,7 @@ class TestQCBMCostFunction:
             gradient = cost_function.gradient(params)
 
             # Then
-            assert pytest.approx(len(params), len(gradient))
-            for gradient_val in gradient:
-                assert pytest.approx(np.float64, type(gradient_val))
+            assert len(params) == len(gradient)
 
     def test_error_raised_if_gradient_is_not_supported(self, distance_measure_kwargs):
         # Given
