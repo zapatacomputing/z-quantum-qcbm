@@ -143,3 +143,4 @@ types:
   - bitstring-distribution
   - optimization-results
   - specs
+  - dict
