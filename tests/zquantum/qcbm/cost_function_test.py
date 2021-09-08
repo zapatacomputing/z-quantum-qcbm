@@ -54,7 +54,7 @@ def test_QCBMCostFunction_raises_deprecation_warning():
             n_samples,
             distance_measure=compute_clipped_negative_log_likelihood,
             distance_measure_parameters={"epsilon": 1e-6},
-            target_bitstring_distribution=target_bitstring_distribution
+            target_bitstring_distribution=target_bitstring_distribution,
         )
 
 
@@ -104,13 +104,10 @@ class TestQCBMCostFunction:
     @pytest.mark.parametrize(
         "gradient_kwargs, cf_factory",
         [
-            (
-                {"gradient_type": "finite_difference"},
-                QCBMCostFunction
-            ),
+            ({"gradient_type": "finite_difference"}, QCBMCostFunction),
             (
                 {"gradient_function": finite_differences_gradient},
-                create_QCBM_cost_function
+                create_QCBM_cost_function,
             ),
         ],
     )
@@ -122,7 +119,7 @@ class TestQCBMCostFunction:
             n_samples,
             **distance_measure_kwargs,
             target_bitstring_distribution=target_bitstring_distribution,
-            **gradient_kwargs
+            **gradient_kwargs,
         )
 
         params = np.array([0, 0, 0, 0])

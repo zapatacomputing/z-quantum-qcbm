@@ -83,7 +83,7 @@ def QCBMCostFunction(
 
     warnings.warn(
         "QCBMCostFunction is deprecated in favour of create_QCBM_cost_function.",
-        DeprecationWarning
+        DeprecationWarning,
     )
 
     cost_function = _create_QCBM_cost_function(
