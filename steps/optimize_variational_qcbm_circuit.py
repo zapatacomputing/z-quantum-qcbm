@@ -15,6 +15,7 @@ def optimize_variational_qcbm_circuit(
     distance_measure_parameters,
     n_layers,
     n_qubits,
+    n_samples,
     topology,
     backend_specs,
     optimizer_specs,
@@ -47,6 +48,7 @@ def optimize_variational_qcbm_circuit(
     cost_function = QCBMCostFunction(
         ansatz,
         backend,
+        n_samples,
         distance_measure,
         distance_measure_parameters,
         target_distribution,
