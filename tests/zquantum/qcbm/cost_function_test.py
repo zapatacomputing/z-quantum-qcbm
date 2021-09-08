@@ -46,6 +46,18 @@ backend = create_object(
 n_samples = 1
 
 
+def test_QCBMCostFunction_raises_deprecation_warning():
+    with pytest.deprecated_call():
+        QCBMCostFunction(
+            ansatz,
+            backend,
+            n_samples,
+            distance_measure=compute_clipped_negative_log_likelihood,
+            distance_measure_parameters={"epsilon": 1e-6},
+            target_bitstring_distribution=target_bitstring_distribution
+        )
+
+
 class TestQCBMCostFunction:
     @pytest.fixture(params=[QCBMCostFunction, create_QCBM_cost_function])
     def cost_function_factory(self, request):

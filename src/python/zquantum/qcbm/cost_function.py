@@ -1,3 +1,4 @@
+import warnings
 from typing import Callable
 
 import numpy as np
@@ -75,8 +76,9 @@ def QCBMCostFunction(
         parameters and returns the distance between the produced bitstring distribution and the target distribution
     """
 
-    DeprecationWarning(
-        "QCBMCostFunction is deprecated in favour of create_QCBM_cost_function."
+    warnings.warn(
+        "QCBMCostFunction is deprecated in favour of create_QCBM_cost_function.",
+        DeprecationWarning
     )
 
     cost_function = _create_QCBM_cost_function(
