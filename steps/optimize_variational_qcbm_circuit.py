@@ -22,6 +22,7 @@ def optimize_variational_qcbm_circuit(
     initial_parameters,
     target_distribution,
     keep_history,
+    gradient_type = "finite_difference",
     gradient_kwargs = None,
 ):
 
@@ -52,6 +53,7 @@ def optimize_variational_qcbm_circuit(
         distance_measure,
         distance_measure_parameters,
         target_distribution,
+        gradient_type,
         gradient_kwargs
     )
     opt_results = optimizer.minimize(cost_function, initial_parameters, keep_history)
