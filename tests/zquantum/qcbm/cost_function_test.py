@@ -102,41 +102,36 @@ class TestQCBMCostFunction:
         assert value_estimate == history[0].value
 
     @pytest.mark.parametrize(
-        "gradient_types, cf_factory",
+        "gradient_kwargs, cf_factory",
         [
-            (["finite_difference"], QCBMCostFunction),
-            ([finite_differences_gradient], create_QCBM_cost_function),
+            (
+                {"gradient_type": "finite_difference"},
+                QCBMCostFunction
+            ),
+            (
+                {"gradient_function": finite_differences_gradient},
+                create_QCBM_cost_function
+            ),
         ],
     )
-    def test_gradient(self, gradient_types, cf_factory, distance_measure_kwargs):
-        for gradient_type in gradient_types:
-            # Given
-            try:
-                cost_function = cf_factory(
-                    ansatz,
-                    backend,
-                    n_samples,
-                    **distance_measure_kwargs,
-                    target_bitstring_distribution=target_bitstring_distribution,
-                    gradient_type=gradient_type,
-                )
-            except TypeError:
-                cost_function = cf_factory(
-                    ansatz,
-                    backend,
-                    n_samples,
-                    **distance_measure_kwargs,
-                    target_bitstring_distribution=target_bitstring_distribution,
-                    gradient_function=gradient_type,
-                )
+    def test_gradient(self, gradient_kwargs, cf_factory, distance_measure_kwargs):
+        # Given
+        cost_function = cf_factory(
+            ansatz,
+            backend,
+            n_samples,
+            **distance_measure_kwargs,
+            target_bitstring_distribution=target_bitstring_distribution,
+            **gradient_kwargs
+        )
 
-            params = np.array([0, 0, 0, 0])
+        params = np.array([0, 0, 0, 0])
 
-            # When
-            gradient = cost_function.gradient(params)
+        # When
+        gradient = cost_function.gradient(params)
 
-            # Then
-            assert len(params) == len(gradient)
+        # Then
+        assert len(params) == len(gradient)
 
     def test_error_raised_if_gradient_is_not_supported(self, distance_measure_kwargs):
         # Given
