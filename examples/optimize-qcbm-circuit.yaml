@@ -101,6 +101,8 @@ steps:
         type: int
       - topology: all
         type: string
+      - n_samples: 1000
+        type: int
       - distance_measure_specs:
           module_name: zquantum.core.bitstring_distribution
           function_name: compute_clipped_negative_log_likelihood
@@ -126,6 +128,9 @@ steps:
         type: bitstring-distribution
       - keep_history: True
         type: bool
+      - gradient_kwargs:
+          finite_diff_step_size: 0.00001
+        type: dict
 
     outputs:
       - name: qcbm-optimization-results
@@ -138,3 +143,4 @@ types:
   - bitstring-distribution
   - optimization-results
   - specs
+  - dict

@@ -15,12 +15,15 @@ def optimize_variational_qcbm_circuit(
     distance_measure_parameters,
     n_layers,
     n_qubits,
+    n_samples,
     topology,
     backend_specs,
     optimizer_specs,
     initial_parameters,
     target_distribution,
     keep_history,
+    gradient_type = "finite_difference",
+    gradient_kwargs = None,
 ):
 
     if isinstance(distance_measure_specs, str):
@@ -46,9 +49,12 @@ def optimize_variational_qcbm_circuit(
     cost_function = QCBMCostFunction(
         ansatz,
         backend,
+        n_samples,
         distance_measure,
         distance_measure_parameters,
         target_distribution,
+        gradient_type,
+        gradient_kwargs
     )
     opt_results = optimizer.minimize(cost_function, initial_parameters, keep_history)
 

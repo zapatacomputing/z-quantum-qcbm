@@ -1,5 +1,6 @@
 import numpy as np
 import sympy
+import json
 
 from zquantum.core.circuits import Circuit, create_layer_of_gates, RX, RZ, XX
 from zquantum.core.interfaces.ansatz import Ansatz
@@ -13,6 +14,10 @@ from .ansatz_utils import get_entangling_layer
 from overrides import overrides
 
 
+ANSATZ_SCHEMA = "zquantum.qcbm.ansatz.v1"
+ANSATZSET_SCHEMA = "zquantum.qcbm.ansatzset.v1"
+
+
 class QCBMAnsatz(Ansatz):
 
     supports_parametrized_circuits = True
@@ -24,15 +29,14 @@ class QCBMAnsatz(Ansatz):
         number_of_layers: int,
         number_of_qubits: int,
         topology: str = "all",
+        **topology_kwargs,
     ):
         """
         An ansatz implementation used for running the Quantum Circuit Born Machine.
-
         Args:
             number_of_layers (int): number of entangling layers in the circuit.
             number_of_qubits (int): number of qubits in the circuit.
             topology (str): the topology representing the connectivity of the qubits.
-
         Attributes:
             number_of_qubits (int): See Args
             number_of_layers (int): See Args
@@ -42,6 +46,7 @@ class QCBMAnsatz(Ansatz):
         super().__init__(number_of_layers)
         self._number_of_qubits = number_of_qubits
         self._topology = topology
+        self._topology_kwargs = topology_kwargs
         if number_of_layers == 0:
             raise ValueError("QCBMAnsatz is only defined for number_of_layers > 0.")
 
@@ -56,18 +61,32 @@ class QCBMAnsatz(Ansatz):
     def n_params_per_ent_layer(self) -> int:
         if self.topology == "all":
             return int((self.number_of_qubits * (self.number_of_qubits - 1)) / 2)
-        elif self.topology == "line":
+        elif self.topology == "line" or self.topology == "star":
             return self.number_of_qubits - 1
+        elif self.topology == "graph":
+            if "adjacency_matrix" in self._topology_kwargs.keys():
+                n_params = 0
+                for qubit1_index in range(0, self._number_of_qubits - 1):
+                    for qubit2_index in range(qubit1_index, self._number_of_qubits):
+                        if self._topology_kwargs["adjacency_matrix"][qubit1_index][
+                            qubit2_index
+                        ]:
+                            n_params += 1
+                        if self._topology_kwargs["adjacency_matrix"][qubit2_index][
+                            qubit1_index
+                        ]:
+                            n_params += 1
+                return n_params
+            elif "adjacency_list" in self._topology_kwargs.keys():
+                return self._topology_kwargs["adjacency_list"].shape[1]
         else:
             raise RuntimeError("Topology {} is not supported".format(self.topology))
 
     @overrides
     def _generate_circuit(self, params: Optional[np.ndarray] = None) -> Circuit:
         """Builds a qcbm ansatz circuit, using the ansatz in https://advances.sciencemag.org/content/5/10/eaaw9918/tab-pdf (Fig.2 - top).
-
         Args:
             params (numpy.array): input parameters of the circuit (1d array).
-
         Returns:
             Circuit
         """
@@ -216,7 +235,6 @@ class QCBMAnsatz(Ansatz):
 
     def get_number_of_parameters_by_layer(self) -> np.ndarray:
         """Determine the number of parameters needed for each layer in the ansatz
-
         Returns:
             A 1D array of integers
         """
@@ -255,3 +273,68 @@ class QCBMAnsatz(Ansatz):
                 num_params_by_layer.append(self.number_of_qubits * 2)
 
         return np.asarray(num_params_by_layer)
+
+    def to_dict(self):
+        """Creates a dictionary representing a QCBM ansatz.
+
+        Returns:
+            dictionary (dict): the dictionary
+        """
+        dictionary = {
+            "schema": ANSATZ_SCHEMA,
+            "number_of_layers": self.number_of_layers,
+            "number_of_qubits": self.number_of_qubits,
+            "topology": self.topology,
+        }
+
+        return dictionary
+
+    @classmethod
+    def from_dict(cls, item: dict) -> Ansatz:
+        """Creates a QCBM ansatz object from an input dictionary of values.
+
+        Returns:
+            QCBMAnsatz (Ansatz): the ansatz with a given number of layers, qubits, and topology
+        """
+        return QCBMAnsatz(
+            number_of_layers=item["number_of_layers"],
+            number_of_qubits=item["number_of_qubits"],
+            topology=item["topology"],
+        )
+
+
+def save_qcbm_ansatz_set(qcbm_ansatz_set: List[QCBMAnsatz], filename: str) -> None:
+    """Save a set of qcbm_ansatz to a file.
+
+    Args:
+        qcbm_ansatz_set (list): a list ansatz to be saved
+        file (str): the name of the file
+    """
+    dictionary = {
+        "schema": ANSATZSET_SCHEMA,
+        "qcbm_ansatz_set": [ansatz.to_dict() for ansatz in qcbm_ansatz_set],
+    }
+
+    with open(filename, "w") as f:
+        f.write(json.dumps(dictionary, indent=2))
+
+
+def load_qcbm_ansatz_set(file: str) -> List[QCBMAnsatz]:
+    """Load a list of qcbm_ansatz from a json file using a schema.
+
+    Arguments:
+        file (str): the name of the file
+
+    Returns:
+        object: a list of qcbm_ansatz loaded from the file
+    """
+    if isinstance(file, str):
+        with open(file, "r") as f:
+            data = json.load(f)
+    else:
+        data = json.load(file)
+
+    qcbm_ansatz_set = []
+    for item in data["qcbm_ansatz_set"]:
+        qcbm_ansatz_set.append(QCBMAnsatz.from_dict(item))
+    return qcbm_ansatz_set
