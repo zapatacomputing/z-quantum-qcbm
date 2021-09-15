@@ -50,21 +50,24 @@ def optimize_circuit(
     cost_function = QCBMCostFunction(
         ansatz=ansatz,
         backend=backend_map[backend_name](),
+        n_samples=None,
         distance_measure=compute_clipped_negative_log_likelihood,
         distance_measure_parameters={"epsilon": 1e-6},
         target_bitstring_distribution=target_distribution,
     )
-    opt_results = optimizer.minimize(cost_function, initial_parameters)
+    opt_results = optimizer.minimize(
+        cost_function, initial_parameters, keep_history=True
+    )
     return opt_results
 
 
 @qe.workflow(
     name="qcbm-opt",
     import_defs=[
-        qe.Z.Quantum.Core(),
-        qe.Z.Quantum.Optimizers(),
-        qe.QE.Qulacs(),
-        qe.QE.Qiskit(),
+        qe.Z.Quantum.Core("dev"),
+        qe.Z.Quantum.Optimizers("dev"),
+        qe.QE.Qulacs("dev"),
+        qe.QE.Qiskit("dev"),
         qe.GitImportDefinition.get_current_repo_and_branch(),
     ],
 )
