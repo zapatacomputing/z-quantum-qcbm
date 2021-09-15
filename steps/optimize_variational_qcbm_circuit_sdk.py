@@ -94,12 +94,12 @@ if __name__ == "__main__":
         ansatz=QCBMAnsatz(number_of_layers=4, number_of_qubits=4, topology="all"),
         backend_name="qulacs",
         optimizer=CMAESOptimizer(
+            sigma_0=0.1,
             options={
                 "popsize": 5,
-                "sigma_0": 0.1,
                 "tolx": 0.000001,
                 "seed": optimizer_seed,
-            }
+            },
         ),
         seed=rng_seed,
     )

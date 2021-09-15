@@ -12,8 +12,14 @@ from zquantum.core.utils import get_ordered_list_of_bitstrings
 import qe.sdk.v1 as qe
 
 # Insert the workflow ID here
-workflow_id = "qcbm-opt-8d8f0935-9a51-4912-a2e0-37992ea6004f"
-data = qe.load_workflowresult(workflow_id).steps
+workflow_id = "qcbm-opt-ba9e5b01-aa7b-46cf-8ff1-be870b4cb15f"
+result_type = "local"  # "orquestra"
+
+data = (
+    qe.load_workflowresult(workflow_id)
+    if result_type == "orquestra"
+    else qe.get_local_workflow_result(workflow_id)
+).steps
 
 distances = []
 minimum_distances = []
@@ -32,7 +38,7 @@ for step_name in data:
         exact_distance_value = entropy(target_distribution)
         print(exact_distance_value)
     elif step_name == "optimize-circuit":
-        number_of_qubits = step_input["ansatz"].number_of_qubits
+        number_of_qubits = step_input["ansatz"]["value"].number_of_qubits
         ordered_bitstrings = get_ordered_list_of_bitstrings(number_of_qubits)
         for evaluation in step_result["history"]:
             distances.append(evaluation.value)
