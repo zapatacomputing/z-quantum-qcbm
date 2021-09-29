@@ -1,41 +1,121 @@
-from zquantum.core.interfaces.functions import function_with_gradient, StoreArtifact
-from zquantum.core.interfaces.backend import QuantumBackend
-from zquantum.core.interfaces.ansatz import Ansatz
+import warnings
+from numbers import Number
+from typing import Callable
+
+import numpy as np
 from zquantum.core.bitstring_distribution import (
     BitstringDistribution,
     evaluate_distribution_distance,
 )
-from zquantum.core.utils import ValueEstimate
 from zquantum.core.gradients import finite_differences_gradient
-from typing import Union, Callable
-import numpy as np
+from zquantum.core.interfaces.ansatz import Ansatz
+from zquantum.core.interfaces.backend import QuantumBackend
+from zquantum.core.interfaces.cost_function import CostFunction
+from zquantum.core.interfaces.functions import StoreArtifact, function_with_gradient
+from zquantum.core.utils import ValueEstimate
+
+
+GradientFactory = Callable[[Callable], Callable[[np.ndarray], np.ndarray]]
+DistanceMeasure = Callable[..., Number]
+
+
+def create_QCBM_cost_function(
+    ansatz: Ansatz,
+    backend: QuantumBackend,
+    n_samples: int,
+    distance_measure: DistanceMeasure,
+    distance_measure_parameters: dict,
+    target_bitstring_distribution: BitstringDistribution,
+    gradient_function: GradientFactory = finite_differences_gradient,
+) -> CostFunction:
+    """Cost function used for evaluating QCBM.
+
+    Args:
+        ansatz: the ansatz used to construct the variational circuits
+        backend: backend used for QCBM evaluation
+        distance_measure: function used to calculate the distance measure
+        distance_measure_parameters: dictionary containing the relevant parameters for the chosen distance measure
+        target_bitstring_distribution: bistring distribution which QCBM aims to learn
+        gradient_function: a function which returns a function used to compute the gradient of the cost function
+            (see zquantum.core.gradients.finite_differences_gradient for reference)
+
+    Returns:
+        Callable CostFunction object that evaluates the parametrized circuit produced by the ansatz with the given
+        parameters and returns the distance between the produced bitstring distribution and the target distribution
+    """
+
+    cost_function = _create_QCBM_cost_function(
+        ansatz,
+        backend,
+        n_samples,
+        distance_measure,
+        distance_measure_parameters,
+        target_bitstring_distribution,
+    )
+
+    return function_with_gradient(cost_function, gradient_function(cost_function))
 
 
 def QCBMCostFunction(
     ansatz: Ansatz,
     backend: QuantumBackend,
     n_samples: int,
-    distance_measure: Callable,
+    distance_measure: DistanceMeasure,
     distance_measure_parameters: dict,
     target_bitstring_distribution: BitstringDistribution,
     gradient_type: str = "finite_difference",
     gradient_kwargs: dict = None,
-):
+) -> CostFunction:
     """Cost function used for evaluating QCBM.
 
     Args:
-        ansatz (zquantum.core.interfaces.ansatz.Ansatz): the ansatz used to construct the variational circuits
-        backend (zquantum.core.interfaces.backend.QuantumBackend): backend used for QCBM evaluation
-        distance_measure (callable): function used to calculate the distance measure
-        distance_measure_parameters (dict): dictionary containing the relevant parameters for the chosen distance measure
-        target_bitstring_distribution (zquantum.core.bitstring_distribution.BitstringDistribution): bistring distribution which QCBM aims to learn
-        gradient_type (str): parameter indicating which type of gradient should be used.
+        ansatz: the ansatz used to construct the variational circuits
+        backend: backend used for QCBM evaluation
+        distance_measure: function used to calculate the distance measure
+        distance_measure_parameters: dictionary containing the relevant parameters for the chosen distance measure
+        target_bitstring_distribution: bistring distribution which QCBM aims to learn
+        gradient_type: parameter indicating which type of gradient should be used.
 
     Returns:
-        Callable that evaluates the parametrized circuit produced by the ansatz with the given parameters and returns
-            the distance between the produced bitstring distribution and the target distribution
+        Callable CostFunction object that evaluates the parametrized circuit produced by the ansatz with the given
+        parameters and returns the distance between the produced bitstring distribution and the target distribution
     """
 
+    warnings.warn(
+        "QCBMCostFunction is deprecated in favour of create_QCBM_cost_function.",
+        DeprecationWarning,
+    )
+
+    cost_function = _create_QCBM_cost_function(
+        ansatz,
+        backend,
+        n_samples,
+        distance_measure,
+        distance_measure_parameters,
+        target_bitstring_distribution,
+    )
+
+    if gradient_kwargs is None:
+        gradient_kwargs = {}
+
+    if gradient_type == "finite_difference":
+        cost_function = function_with_gradient(
+            cost_function, finite_differences_gradient(cost_function, **gradient_kwargs)
+        )
+    else:
+        raise RuntimeError("Unsupported gradient type: ", gradient_type)
+
+    return cost_function
+
+
+def _create_QCBM_cost_function(
+    ansatz: Ansatz,
+    backend: QuantumBackend,
+    n_samples: int,
+    distance_measure: DistanceMeasure,
+    distance_measure_parameters: dict,
+    target_bitstring_distribution: BitstringDistribution,
+):
     assert (
         int(target_bitstring_distribution.get_qubits_number())
         == ansatz.number_of_qubits
@@ -68,15 +148,5 @@ def QCBMCostFunction(
             store_artifact("bitstring_distribution", distribution)
 
         return ValueEstimate(value)
-
-    if gradient_kwargs is None:
-        gradient_kwargs = {}
-        
-    if gradient_type == "finite_difference":
-        cost_function = function_with_gradient(
-            cost_function, finite_differences_gradient(cost_function, **gradient_kwargs)
-        )
-    else:
-        raise RuntimeError("Unsupported gradient type: ", gradient_type)
 
     return cost_function

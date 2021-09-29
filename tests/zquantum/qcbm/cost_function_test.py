@@ -1,185 +1,170 @@
-import unittest
-from zquantum.qcbm.cost_function import QCBMCostFunction
-from zquantum.qcbm.ansatz import QCBMAnsatz
+import numpy as np
+import pytest
 from zquantum.core.bitstring_distribution import (
     BitstringDistribution,
     compute_clipped_negative_log_likelihood,
     compute_mmd,
 )
-from zquantum.core.utils import create_object, ValueEstimate
+from zquantum.core.gradients import finite_differences_gradient
 from zquantum.core.history.recorder import recorder
-import numpy as np
+from zquantum.core.utils import ValueEstimate, create_object
+from zquantum.qcbm.ansatz import QCBMAnsatz
+from zquantum.qcbm.cost_function import QCBMCostFunction, create_QCBM_cost_function
 
-param_list = [
-    (compute_clipped_negative_log_likelihood, {"epsilon": 1e-6}),
-    (compute_mmd, {"sigma": 1}),
-]
+number_of_layers = 1
+number_of_qubits = 4
+topology = "all"
+ansatz = QCBMAnsatz(number_of_layers, number_of_qubits, topology)
+target_bitstring_distribution = BitstringDistribution(
+    {
+        "0000": 1.0,
+        "0001": 0.0,
+        "0010": 0.0,
+        "0011": 1.0,
+        "0100": 0.0,
+        "0101": 1.0,
+        "0110": 0.0,
+        "0111": 0.0,
+        "1000": 0.0,
+        "1001": 0.0,
+        "1010": 1.0,
+        "1011": 0.0,
+        "1100": 1.0,
+        "1101": 0.0,
+        "1110": 0.0,
+        "1111": 1.0,
+    }
+)
+
+backend = create_object(
+    {
+        "module_name": "zquantum.core.symbolic_simulator",
+        "function_name": "SymbolicSimulator",
+    }
+)
+
+n_samples = 1
 
 
-class TestQCBMCostFunction(unittest.TestCase):
-    def setUp(self):
-        number_of_layers = 1
-        number_of_qubits = 4
-        topology = "all"
-        self.ansatz = QCBMAnsatz(number_of_layers, number_of_qubits, topology)
-        self.target_bitstring_distribution = BitstringDistribution(
-            {
-                "0000": 1.0,
-                "0001": 0.0,
-                "0010": 0.0,
-                "0011": 1.0,
-                "0100": 0.0,
-                "0101": 1.0,
-                "0110": 0.0,
-                "0111": 0.0,
-                "1000": 0.0,
-                "1001": 0.0,
-                "1010": 1.0,
-                "1011": 0.0,
-                "1100": 1.0,
-                "1101": 0.0,
-                "1110": 0.0,
-                "1111": 1.0,
-            }
+def test_QCBMCostFunction_raises_deprecation_warning():
+    with pytest.deprecated_call():
+        QCBMCostFunction(
+            ansatz,
+            backend,
+            n_samples,
+            distance_measure=compute_clipped_negative_log_likelihood,
+            distance_measure_parameters={"epsilon": 1e-6},
+            target_bitstring_distribution=target_bitstring_distribution,
         )
 
-        self.backend = create_object(
+
+class TestQCBMCostFunction:
+    @pytest.fixture(params=[QCBMCostFunction, create_QCBM_cost_function])
+    def cost_function_factory(self, request):
+        return request.param
+
+    @pytest.fixture(
+        params=[
             {
-                "module_name": "zquantum.core.symbolic_simulator",
-                "function_name": "SymbolicSimulator",
-            }
+                "distance_measure": compute_clipped_negative_log_likelihood,
+                "distance_measure_parameters": {"epsilon": 1e-6},
+            },
+            {
+                "distance_measure": compute_mmd,
+                "distance_measure_parameters": {"sigma": 1},
+            },
+        ]
+    )
+    def distance_measure_kwargs(self, request):
+        return request.param
+
+    def test_evaluate_history(self, cost_function_factory, distance_measure_kwargs):
+        # Given
+        cost_function = cost_function_factory(
+            ansatz,
+            backend,
+            n_samples,
+            **distance_measure_kwargs,
+            target_bitstring_distribution=target_bitstring_distribution,
         )
 
-        self.gradient_types = ["finite_difference"]
-        self.n_samples = 1
+        cost_function = recorder(cost_function)
 
-    def test_evaluate(self):
-        for distance_meas, distance_measure_params in param_list:
-            with self.subTest():
-                # Given
-                self.distance_measure = distance_meas
-                distance_measure_parameters = distance_measure_params
+        params = np.array([0, 0, 0, 0])
 
-                cost_function = QCBMCostFunction(
-                    self.ansatz,
-                    self.backend,
-                    self.n_samples,
-                    self.distance_measure,
-                    distance_measure_parameters,
-                    self.target_bitstring_distribution,
-                )
+        # When
+        value_estimate = cost_function(params)
+        history = cost_function.history
 
-                params = np.array([0, 0, 0, 0])
+        # Then
+        assert len(history) == 1
+        np.testing.assert_array_equal(params, history[0].params)
+        assert value_estimate == history[0].value
 
-                # When
-                value_estimate = cost_function(params)
+    @pytest.mark.parametrize(
+        "gradient_kwargs, cf_factory",
+        [
+            ({"gradient_type": "finite_difference"}, QCBMCostFunction),
+            (
+                {"gradient_function": finite_differences_gradient},
+                create_QCBM_cost_function,
+            ),
+        ],
+    )
+    def test_gradient(self, gradient_kwargs, cf_factory, distance_measure_kwargs):
+        # Given
+        cost_function = cf_factory(
+            ansatz,
+            backend,
+            n_samples,
+            **distance_measure_kwargs,
+            target_bitstring_distribution=target_bitstring_distribution,
+            **gradient_kwargs,
+        )
 
-                # Then
-                self.assertEqual(type(value_estimate), ValueEstimate)
-                assert isinstance(value_estimate.value, (np.floating, float))
+        params = np.array([0, 0, 0, 0])
 
-    def test_evaluate_history(self):
-        for distance_meas, distance_measure_params in param_list:
-            with self.subTest():
-                # Given
-                self.distance_measure = distance_meas
-                distance_measure_parameters = distance_measure_params
+        # When
+        gradient = cost_function.gradient(params)
 
-                cost_function = QCBMCostFunction(
-                    self.ansatz,
-                    self.backend,
-                    self.n_samples,
-                    self.distance_measure,
-                    distance_measure_parameters,
-                    self.target_bitstring_distribution,
-                )
+        # Then
+        assert len(params) == len(gradient)
 
-                cost_function = recorder(cost_function)
+    def test_error_raised_if_gradient_is_not_supported(self, distance_measure_kwargs):
+        # Given
+        gradient_type = "UNSUPPORTED GRADIENT TYPE"
 
-                params = np.array([0, 0, 0, 0])
-
-                # When
-                value_estimate = cost_function(params)
-                history = cost_function.history
-
-                # Then
-                self.assertEqual(len(history), 1)
-                self.assertEqual(
-                    BitstringDistribution,
-                    type(history[0].artifacts["bitstring_distribution"]),
-                )
-                np.testing.assert_array_equal(params, history[0].params)
-                self.assertEqual(value_estimate, history[0].value)
-
-    def test_gradient(self):
-        for distance_meas, distance_measure_params in param_list:
-            for gradient_type in self.gradient_types:
-                with self.subTest():
-                    # Given
-                    self.distance_measure = distance_meas
-                    distance_measure_parameters = distance_measure_params
-
-                    cost_function = QCBMCostFunction(
-                        self.ansatz,
-                        self.backend,
-                        self.n_samples,
-                        self.distance_measure,
-                        distance_measure_parameters,
-                        self.target_bitstring_distribution,
-                        gradient_type=gradient_type,
-                    )
-
-                    params = np.array([0, 0, 0, 0])
-
-                    # When
-                    gradient = cost_function.gradient(params)
-
-                    # Then
-                    self.assertEqual(len(params), len(gradient))
-                    for gradient_val in gradient:
-                        self.assertEqual(np.float64, type(gradient_val))
-
-    def test_error_raised_if_gradient_is_not_supported(self):
-        for distance_meas, distance_measure_params in param_list:
-            for gradient_type in self.gradient_types:
-                with self.subTest():
-                    # Given
-                    self.distance_measure = distance_meas
-                    distance_measure_parameters = distance_measure_params
-
-                    self.assertRaises(
-                        RuntimeError,
-                        lambda: QCBMCostFunction(
-                            self.ansatz,
-                            self.backend,
-                            self.n_samples,
-                            self.distance_measure,
-                            distance_measure_parameters,
-                            self.target_bitstring_distribution,
-                            gradient_type="UNSUPPORTED GRADIENT TYPE",
-                        ),
-                    )
+        # When/then
+        with pytest.raises(RuntimeError):
+            cost_function = (
+                QCBMCostFunction(
+                    ansatz,
+                    backend,
+                    n_samples,
+                    **distance_measure_kwargs,
+                    target_bitstring_distribution=target_bitstring_distribution,
+                    gradient_type=gradient_type,
+                ),
+            )
+            params = np.array([0, 0, 0, 0])
+            cost_function(params)
 
     def test_error_raised_if_target_distribution_and_ansatz_are_for_differing_number_of_qubits(
-        self,
+        self, cost_function_factory, distance_measure_kwargs
     ):
-        for distance_meas, distance_measure_params in param_list:
-            with self.subTest():
-                # Given
-                self.ansatz.number_of_qubits = 5
+        # Given
+        ansatz.number_of_qubits = 5
 
-                self.distance_measure = distance_meas
-                distance_measure_parameters = distance_measure_params
-
-                # When/Then
-                self.assertRaises(
-                    AssertionError,
-                    lambda: QCBMCostFunction(
-                        self.ansatz,
-                        self.backend,
-                        self.n_samples,
-                        self.distance_measure,
-                        distance_measure_parameters,
-                        self.target_bitstring_distribution,
-                    ),
-                )
+        # When/Then
+        with pytest.raises(AssertionError):
+            cost_function = (
+                cost_function_factory(
+                    ansatz,
+                    backend,
+                    n_samples,
+                    **distance_measure_kwargs,
+                    target_bitstring_distribution=target_bitstring_distribution,
+                ),
+            )
+            params = np.array([0, 0, 0, 0])
+            cost_function(params)
