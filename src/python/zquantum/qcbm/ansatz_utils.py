@@ -31,6 +31,8 @@ def get_entangling_layer(
         )
     elif topology == "graph":
         # support adjacency matrix or adjacency list
+        if topology_kwargs is None:
+            raise ValueError("topology_kwargs can't be None for graph topology")
         if (
             "adjacency_matrix" in topology_kwargs.keys()
             and "adjacency_list" in topology_kwargs.keys()

@@ -80,6 +80,8 @@ class QCBMAnsatz(Ansatz):
                 return n_params
             elif "adjacency_list" in self._topology_kwargs.keys():
                 return self._topology_kwargs["adjacency_list"].shape[1]
+            else:
+                raise ValueError("self._topology_kwargs has wrong value.")
         else:
             raise RuntimeError("Topology {} is not supported".format(self.topology))
 
