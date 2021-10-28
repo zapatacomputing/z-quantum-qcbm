@@ -1,13 +1,14 @@
-from zquantum.qcbm.cost_function import QCBMCostFunction
-from zquantum.qcbm.ansatz import QCBMAnsatz
+import json
+
+from zquantum.core.bitstring_distribution import load_bitstring_distribution
 from zquantum.core.serialization import (
     load_array,
     save_array,
+    save_optimization_results,
 )
 from zquantum.core.utils import create_object, get_func_from_specs
-from zquantum.core.serialization import save_optimization_results
-from zquantum.core.bitstring_distribution import load_bitstring_distribution
-import json
+from zquantum.qcbm.ansatz import QCBMAnsatz
+from zquantum.qcbm.cost_function import QCBMCostFunction
 
 
 def optimize_variational_qcbm_circuit(

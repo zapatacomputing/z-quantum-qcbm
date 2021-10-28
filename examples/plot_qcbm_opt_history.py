@@ -1,15 +1,16 @@
 import json
+
 import matplotlib
+import matplotlib.animation as animation
+import matplotlib.gridspec as gridspec
+import numpy as np
+from matplotlib import pyplot as plt
+from matplotlib.animation import FuncAnimation
+from matplotlib.cbook import get_sample_data
+from scipy.stats import entropy
 
 # matplotlib.use("Agg")
 
-from matplotlib import pyplot as plt
-from matplotlib.animation import FuncAnimation
-import matplotlib.animation as animation
-from matplotlib.cbook import get_sample_data
-import matplotlib.gridspec as gridspec
-import numpy as np
-from scipy.stats import entropy
 
 
 def get_ordered_list_of_bitstrings(num_qubits):

@@ -1,17 +1,15 @@
-import pytest
 import numpy as np
-from zquantum.core.circuits import XX, RX
-
+import pytest
+from zquantum.core.circuits import RX, XX
+from zquantum.qcbm.ansatz import QCBMAnsatz
 from zquantum.qcbm.ansatz_utils import (
+    adjacency_list_to_matrix,
     get_entangling_layer,
     get_entangling_layer_all_topology,
+    get_entangling_layer_graph_topology,
     get_entangling_layer_line_topology,
     get_entangling_layer_star_topology,
-    get_entangling_layer_graph_topology,
-    adjacency_list_to_matrix,
 )
-
-from zquantum.qcbm.ansatz import QCBMAnsatz
 
 
 class TestAnsatzUtils:

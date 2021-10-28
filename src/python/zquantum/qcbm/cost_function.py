@@ -14,7 +14,6 @@ from zquantum.core.interfaces.cost_function import CostFunction
 from zquantum.core.interfaces.functions import StoreArtifact, function_with_gradient
 from zquantum.core.utils import ValueEstimate
 
-
 GradientFactory = Callable[[Callable], Callable[[np.ndarray], np.ndarray]]
 DistanceMeasure = Callable[..., Number]
 

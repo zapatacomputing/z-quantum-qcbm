@@ -1,14 +1,12 @@
-import pytest
 import numpy as np
-
-from zquantum.core.circuits import Circuit, RX, RZ, XX
+import pytest
+from zquantum.core.circuits import RX, RZ, XX, Circuit
 from zquantum.core.interfaces.ansatz_test import AnsatzTests
-
 from zquantum.qcbm.ansatz import (
-    QCBMAnsatz,
     ANSATZ_SCHEMA,
-    save_qcbm_ansatz_set,
+    QCBMAnsatz,
     load_qcbm_ansatz_set,
+    save_qcbm_ansatz_set,
 )
 from zquantum.qcbm.ansatz_utils import get_entangling_layer
 

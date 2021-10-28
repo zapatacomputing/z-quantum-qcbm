@@ -1,18 +1,17 @@
+import json
+from typing import List, Optional
+
 import numpy as np
 import sympy
-import json
-
-from zquantum.core.circuits import Circuit, create_layer_of_gates, RX, RZ, XX
+from overrides import overrides
+from zquantum.core.circuits import RX, RZ, XX, Circuit, create_layer_of_gates
 from zquantum.core.interfaces.ansatz import Ansatz
 from zquantum.core.interfaces.ansatz_utils import (
     ansatz_property,
     invalidates_parametrized_circuit,
 )
-from typing import Optional, List
+
 from .ansatz_utils import get_entangling_layer
-
-from overrides import overrides
-
 
 ANSATZ_SCHEMA = "zquantum.qcbm.ansatz.v1"
 ANSATZSET_SCHEMA = "zquantum.qcbm.ansatzset.v1"

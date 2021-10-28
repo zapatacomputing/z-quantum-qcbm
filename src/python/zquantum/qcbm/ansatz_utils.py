@@ -1,6 +1,7 @@
-from zquantum.core.circuits import Circuit, GatePrototype
+from typing import Any, Dict, Optional
+
 import numpy as np
-from typing import Dict, Optional, Any
+from zquantum.core.circuits import Circuit, GatePrototype
 
 
 def get_entangling_layer(
