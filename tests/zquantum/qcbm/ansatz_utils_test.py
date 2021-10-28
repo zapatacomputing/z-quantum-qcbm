@@ -21,7 +21,6 @@ class TestAnsatzUtils:
     def test_get_entangling_layer_all_topology(self, n_qubits, expected):
         # Given
         static_entangler = XX
-        topology = "all"
         params = np.asarray([0] * int(n_qubits * (n_qubits - 1) / 2))
 
         # When
@@ -40,7 +39,6 @@ class TestAnsatzUtils:
     def test_get_entangling_layer_line_topology(self, n_qubits, expected):
         # Given
         static_entangler = XX
-        topology = "line"
         params = np.asarray([0] * int(n_qubits - 1))
 
         # When
@@ -57,9 +55,7 @@ class TestAnsatzUtils:
     @pytest.mark.parametrize("n_qubits,expected", [(4, [(0, 1), (1, 2), (1, 3)])])
     def test_get_entangling_layer_star_topology(self, n_qubits, expected):
         # Given
-        single_qubit_gate = RX
         static_entangler = XX
-        topology = "star"
         center_qubit = 1
         params = np.asarray([0] * int(n_qubits - 1))
 
@@ -97,9 +93,7 @@ class TestAnsatzUtils:
     ):
         # Given
         n_qubits = 4
-        single_qubit_gate = RX
         static_entangler = XX
-        topology = "graph"
         params = np.asarray([0] * n_connections)
 
         # When
@@ -130,9 +124,7 @@ class TestAnsatzUtils:
         self, n_qubits, matrix, expected, n_connections
     ):
         # Given
-        single_qubit_gate = RX
         static_entangler = XX
-        topology = "graph"
         params = np.asarray([0] * n_connections)
 
         # When
@@ -165,7 +157,6 @@ class TestAnsatzUtils:
         self, n_qubits, matrix, n_connections
     ):
         # Given
-        single_qubit_gate = RX
         static_entangler = XX
         topology = "graph"
 
@@ -261,7 +252,6 @@ class TestAnsatzUtils:
     def test_get_entangling_layers_fails_with_incorrect_graph_kwargs(self):
         # Given
         n_qubits = 4
-        single_qubit_gate = RX
         static_entangler = XX
         topology = "graph"
         connectivity = np.asarray(

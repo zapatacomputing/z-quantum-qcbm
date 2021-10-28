@@ -149,7 +149,7 @@ class TestQCBMCostFunction:
             params = np.array([0, 0, 0, 0])
             cost_function(params)
 
-    def test_error_raised_if_target_distribution_and_ansatz_are_for_differing_number_of_qubits(
+    def test_error_raised_if_target_distribution_and_ansatz_are_for_differing_number_of_qubits(  # noqa E501
         self, cost_function_factory, distance_measure_kwargs
     ):
         # Given

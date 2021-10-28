@@ -47,7 +47,7 @@ for step_id in data:
                 target_distribution.append(
                     step["distribution"]["bitstring_distribution"][key]
                 )
-            except:
+            except Exception:
                 target_distribution.append(0)
         exact_distance_value = entropy(target_distribution)
         print(exact_distance_value)
@@ -63,7 +63,7 @@ for step_id in data:
                     bitstring_dist.append(
                         evaluation["artifacts"]["bitstring_distribution"][key]
                     )
-                except:
+                except Exception:
                     bitstring_dist.append(0)
             bitstring_distributions.append(bitstring_dist)
 
@@ -129,10 +129,11 @@ def animate(i):
     ax2.clear()
     ax2.set(xlabel="Bitstring", ylabel="Measured Probability")
     ax2.set_ylim([0, np.max(target_distribution) + 0.05])
-    
+
     x_locations = np.arange(16)
 
-    # Create the bars at the x locations with the height of the proportions for each bitstring
+    # Create the bars at the x locations with the height of the proportions
+    # for each bitstring
 
     ax2.bar(x_locations, bitstring_distributions[i], facecolor="green")
     ax2.bar(
@@ -143,11 +144,12 @@ def animate(i):
         label="target",
     )
 
-    # set the tick locations as the center of the bar, then set the label to be the bitstring
-    ax2.set_xticks([x+0.4 for x in x_locations])
+    # set the tick locations as the center of the bar, then set the label to
+    # be the bitstring
+    ax2.set_xticks([x + 0.4 for x in x_locations])
     ax2.set_xticklabels(ordered_bitstrings)
     ax2.legend(loc="upper right")
-    
+
     if distances[i] == minimum_distances[i]:
         normalized_distribution = np.array(bitstring_distributions[i]) / max(
             bitstring_distributions[i]
