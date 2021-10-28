@@ -1,18 +1,17 @@
+import json
+from typing import List, Optional
+
 import numpy as np
 import sympy
-import json
-
-from zquantum.core.circuits import Circuit, create_layer_of_gates, RX, RZ, XX
+from overrides import overrides
+from zquantum.core.circuits import RX, RZ, XX, Circuit, create_layer_of_gates
 from zquantum.core.interfaces.ansatz import Ansatz
 from zquantum.core.interfaces.ansatz_utils import (
     ansatz_property,
     invalidates_parametrized_circuit,
 )
-from typing import Optional, List
+
 from .ansatz_utils import get_entangling_layer
-
-from overrides import overrides
-
 
 ANSATZ_SCHEMA = "zquantum.qcbm.ansatz.v1"
 ANSATZSET_SCHEMA = "zquantum.qcbm.ansatzset.v1"
@@ -34,14 +33,15 @@ class QCBMAnsatz(Ansatz):
         """
         An ansatz implementation used for running the Quantum Circuit Born Machine.
         Args:
-            number_of_layers (int): number of entangling layers in the circuit.
-            number_of_qubits (int): number of qubits in the circuit.
-            topology (str): the topology representing the connectivity of the qubits.
+            number_of_layers: number of entangling layers in the circuit.
+            number_of_qubits: number of qubits in the circuit.
+            topology: the topology representing the connectivity of the qubits.
         Attributes:
-            number_of_qubits (int): See Args
-            number_of_layers (int): See Args
-            topology (str): See Args
-            number_of_params: number of the parameters that need to be set for the ansatz circuit.
+            number_of_qubits: See Args
+            number_of_layers: See Args
+            topology: See Args
+            number_of_params: number of the parameters that need to be set for
+                the ansatz circuit.
         """
         super().__init__(number_of_layers)
         self._number_of_qubits = number_of_qubits
@@ -79,12 +79,15 @@ class QCBMAnsatz(Ansatz):
                 return n_params
             elif "adjacency_list" in self._topology_kwargs.keys():
                 return self._topology_kwargs["adjacency_list"].shape[1]
+            else:
+                raise ValueError("self._topology_kwargs has wrong value.")
         else:
             raise RuntimeError("Topology {} is not supported".format(self.topology))
 
     @overrides
     def _generate_circuit(self, params: Optional[np.ndarray] = None) -> Circuit:
-        """Builds a qcbm ansatz circuit, using the ansatz in https://advances.sciencemag.org/content/5/10/eaaw9918/tab-pdf (Fig.2 - top).
+        """Builds a qcbm ansatz circuit, using the ansatz in
+        https://advances.sciencemag.org/content/5/10/eaaw9918/tab-pdf (Fig.2 - top).
         Args:
             params (numpy.array): input parameters of the circuit (1d array).
         Returns:
@@ -148,7 +151,8 @@ class QCBMAnsatz(Ansatz):
                 self.number_of_layers % 2 == 0
                 and layer_index == self.number_of_layers - 2
             ):
-                # Even number of layers, second to last layer is 3 rotation layer with RX RZ RX
+                # Even number of layers, second to last layer is 3 rotation layer
+                # with RX RZ RX
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
                     RX,
@@ -177,7 +181,8 @@ class QCBMAnsatz(Ansatz):
                 self.number_of_layers % 2 == 1
                 and layer_index == self.number_of_layers - 3
             ):
-                # Odd number of layers, third to last layer is 3 rotation layer with RX RZ RX
+                # Odd number of layers, third to last layer is 3 rotation layer
+                # with RX RZ RX
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
                     RX,
@@ -239,13 +244,15 @@ class QCBMAnsatz(Ansatz):
             A 1D array of integers
         """
         if self.number_of_layers == 1:
-            # If only one layer, then only need parameters for a single layer of RX gates
+            # If only one layer, then only need parameters for a single layer
+            # of RX gates
             return np.asarray([self.number_of_qubits])
 
         num_params_by_layer = []
         for layer_index in range(self.number_of_layers):
             if layer_index == 0:
-                # First layer is always 2 parameters per qubit for 2 single qubit rotations
+                # First layer is always 2 parameters per qubit for 2 single qubit
+                # rotations
                 num_params_by_layer.append(self.number_of_qubits * 2)
             elif (
                 self.number_of_layers % 2 == 1
@@ -294,7 +301,7 @@ class QCBMAnsatz(Ansatz):
         """Creates a QCBM ansatz object from an input dictionary of values.
 
         Returns:
-            QCBMAnsatz (Ansatz): the ansatz with a given number of layers, qubits, and topology
+            QCBMAnsatz: the ansatz with a given number of layers, qubits, and topology
         """
         return QCBMAnsatz(
             number_of_layers=item["number_of_layers"],

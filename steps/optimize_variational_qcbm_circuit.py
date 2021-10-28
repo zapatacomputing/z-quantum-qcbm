@@ -1,13 +1,14 @@
-from zquantum.qcbm.cost_function import QCBMCostFunction
-from zquantum.qcbm.ansatz import QCBMAnsatz
+import json
+
+from zquantum.core.bitstring_distribution import load_bitstring_distribution
 from zquantum.core.serialization import (
     load_array,
     save_array,
+    save_optimization_results,
 )
 from zquantum.core.utils import create_object, get_func_from_specs
-from zquantum.core.serialization import save_optimization_results
-from zquantum.core.bitstring_distribution import load_bitstring_distribution
-import json
+from zquantum.qcbm.ansatz import QCBMAnsatz
+from zquantum.qcbm.cost_function import QCBMCostFunction
 
 
 def optimize_variational_qcbm_circuit(
@@ -22,8 +23,8 @@ def optimize_variational_qcbm_circuit(
     initial_parameters,
     target_distribution,
     keep_history,
-    gradient_type = "finite_difference",
-    gradient_kwargs = None,
+    gradient_type="finite_difference",
+    gradient_kwargs=None,
 ):
 
     if isinstance(distance_measure_specs, str):
@@ -54,7 +55,7 @@ def optimize_variational_qcbm_circuit(
         distance_measure_parameters,
         target_distribution,
         gradient_type,
-        gradient_kwargs
+        gradient_kwargs,
     )
     opt_results = optimizer.minimize(cost_function, initial_parameters, keep_history)
 

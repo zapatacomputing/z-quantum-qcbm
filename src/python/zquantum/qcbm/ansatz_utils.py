@@ -1,6 +1,7 @@
-from zquantum.core.circuits import Circuit, GatePrototype
+from typing import Any, Dict, Optional
+
 import numpy as np
-from typing import Dict, Optional, Any
+from zquantum.core.circuits import Circuit, GatePrototype
 
 
 def get_entangling_layer(
@@ -31,6 +32,8 @@ def get_entangling_layer(
         )
     elif topology == "graph":
         # support adjacency matrix or adjacency list
+        if topology_kwargs is None:
+            raise ValueError("topology_kwargs can't be None for graph topology")
         if (
             "adjacency_matrix" in topology_kwargs.keys()
             and "adjacency_list" in topology_kwargs.keys()
@@ -54,7 +57,8 @@ def get_entangling_layer(
 def get_entangling_layer_all_topology(
     params: np.ndarray, n_qubits: int, entangling_gate: GatePrototype
 ) -> Circuit:
-    """Builds a circuit representing an entangling layer according to the all-to-all topology.
+    """Builds a circuit representing an entangling layer according to
+        the all-to-all topology.
 
     Args:
         params: parameters of the circuit.
@@ -72,7 +76,8 @@ def get_entangling_layer_all_topology(
 def get_entangling_layer_line_topology(
     params: np.ndarray, n_qubits: int, entangling_gate: GatePrototype
 ) -> Circuit:
-    """Builds a circuit representing an entangling layer according to the line topology.
+    """Builds a circuit representing an entangling layer according to
+        the line topology.
 
     Args:
         params: parameters of the circuit.
@@ -90,9 +95,13 @@ def get_entangling_layer_line_topology(
 
 
 def get_entangling_layer_star_topology(
-    params: np.ndarray, n_qubits: int, entangling_gate: GatePrototype, center_qubit: int
+    params: np.ndarray,
+    n_qubits: int,
+    entangling_gate: GatePrototype,
+    center_qubit: int,
 ) -> Circuit:
-    """Builds a circuit representing an entangling layer according to the star topology.
+    """Builds a circuit representing an entangling layer according
+        to the star topology.
 
     Args:
         params (numpy.array): parameters of the circuit.
@@ -117,7 +126,8 @@ def get_entangling_layer_graph_topology(
     entangling_gate: GatePrototype,
     adjacency_matrix: np.ndarray,
 ) -> Circuit:
-    """Builds a circuit representing an entangling layer according to a general graph topology.
+    """Builds a circuit representing an entangling layer according
+        to a general graph topology.
 
     Args:
         params: parameters of the circuit.
