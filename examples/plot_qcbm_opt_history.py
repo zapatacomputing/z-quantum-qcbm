@@ -12,7 +12,6 @@ from scipy.stats import entropy
 # matplotlib.use("Agg")
 
 
-
 def get_ordered_list_of_bitstrings(num_qubits):
     bitstrings = []
     for i in range(2 ** num_qubits):
