@@ -9,22 +9,22 @@ imports:
     type: git
     parameters:
       repository: "git@github.com:zapatacomputing/z-quantum-core.git"
-      branch: "master"
+      branch: "main"
   - name: z-quantum-qcbm
     type: git
     parameters:
       repository: "git@github.com:zapatacomputing/z-quantum-qcbm.git"
-      branch: "master"
+      branch: "main"
   - name: z-quantum-optimizers
     type: git
     parameters:
       repository: "git@github.com:zapatacomputing/z-quantum-optimizers.git"
-      branch: "master"
+      branch: "main"
   - name: qe-qulacs
     type: git
     parameters:
       repository: "git@github.com:zapatacomputing/qe-qulacs.git"
-      branch: "master"
+      branch: "main"
 
 steps:
   - name: get-initial-parameters

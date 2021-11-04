@@ -1,6 +1,6 @@
 # Orquestra Quantum Circuit Born Machine
 
-[![codecov](https://codecov.io/gh/zapatacomputing/z-quantum-qcbm/branch/master/graph/badge.svg?token=nLDcbGF5DU)](https://codecov.io/gh/zapatacomputing/z-quantum-qcbm)
+[![codecov](https://codecov.io/gh/zapatacomputing/z-quantum-qcbm/branch/main/graph/badge.svg?token=nLDcbGF5DU)](https://codecov.io/gh/zapatacomputing/z-quantum-qcbm)
 
 ## Overview
 
