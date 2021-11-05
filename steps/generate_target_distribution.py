@@ -1,7 +1,7 @@
 import numpy as np
-from zquantum.core.bitstring_distribution import (
-    save_bitstring_distribution,
-    save_bitstring_distributions,
+from zquantum.core.distribution import (
+    save_measurement_outcome_distribution,
+    save_measurement_outcome_distributions,
 )
 from zquantum.qcbm.target import (
     get_bars_and_stripes_target_distribution as _get_bars_and_stripes_target_distribution,  # noqa: E501
@@ -16,7 +16,7 @@ def get_bars_and_stripes_target_distribution(nrows, ncols, fraction, method):
         nrows, ncols, fraction, method
     )
 
-    save_bitstring_distribution(distribution, "distribution.json")
+    save_measurement_outcome_distribution(distribution, "distribution.json")
 
 
 def get_thermal_states_target_distribution(
@@ -25,7 +25,7 @@ def get_thermal_states_target_distribution(
     distribution = _get_thermal_states_target_distribution(
         n_spins, temperature, hamiltonian_parameters
     )
-    save_bitstring_distribution(distribution, "distribution.json")
+    save_measurement_outcome_distribution(distribution, "distribution.json")
 
 
 def get_thermal_target_training_set(
@@ -39,6 +39,6 @@ def get_thermal_target_training_set(
         for _ in range(number_of_instances)
     ]
 
-    save_bitstring_distributions(
+    save_measurement_outcome_distributions(
         training_data_set_distributions, "distribution_set.json"
     )
