@@ -123,7 +123,7 @@ def _create_QCBM_cost_function(
     target_bitstring_distribution: BitstringDistribution,
 ):
     assert (
-        int(target_bitstring_distribution.get_qubits_number())
+        int(target_bitstring_distribution.get_number_of_subsystems())
         == ansatz.number_of_qubits
     )
 

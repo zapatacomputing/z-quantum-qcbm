@@ -1,6 +1,6 @@
 import json
 
-from zquantum.core.bitstring_distribution import load_bitstring_distribution
+from zquantum.core.distribution import load_measurement_outcome_distribution
 from zquantum.core.serialization import (
     load_array,
     save_array,
@@ -42,7 +42,7 @@ def optimize_variational_qcbm_circuit(
     optimizer = create_object(optimizer_specs)
 
     initial_parameters = load_array(initial_parameters)
-    target_distribution = load_bitstring_distribution(target_distribution)
+    target_distribution = load_measurement_outcome_distribution(target_distribution)
 
     if isinstance(distance_measure_parameters, str):
         distance_measure_parameters = json.loads(distance_measure_parameters)
