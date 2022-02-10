@@ -1,3 +1,5 @@
+import site
+import sys
 import warnings
 
 import setuptools
@@ -7,6 +9,9 @@ try:
 except ImportError:
     warnings.warn("Unable to import extras")
     extras = {}
+
+# Workaound for https://github.com/pypa/pip/issues/7953
+site.ENABLE_USER_SITE = "--user" in sys.argv[1:]
 
 with open("README.md", "r") as f:
     long_description = f.read()
@@ -29,4 +34,6 @@ setuptools.setup(
     setup_requires=["setuptools_scm~=6.0"],
     install_requires=["z-quantum-core"],
     extras_require=extras,
+    zip_safe=False,
+    package_data={"ops": ["py.typed"]},
 )
