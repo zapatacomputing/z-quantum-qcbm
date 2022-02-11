@@ -5,7 +5,8 @@ requires = ["setuptools", "wheel",  "setuptools_scm>=6.0", "pygit2"]
 module = [
     'sympy.*',
     'openfermion.*',
-    'overrides.*',`
+    'overrides.*',
+    'cirq.*',
 ]
 ignore_missing_imports = true
 
