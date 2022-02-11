@@ -6,7 +6,6 @@ module = [
     'sympy.*',
     'openfermion.*',
     'overrides.*',
-    'cirq.*',
 ]
 ignore_missing_imports = true
 
