@@ -6,9 +6,7 @@ import sympy
 from overrides import overrides
 from zquantum.core.circuits import RX, RZ, XX, Circuit, create_layer_of_gates
 from zquantum.core.interfaces.ansatz import Ansatz
-from zquantum.core.interfaces.ansatz_utils import (
-    ansatz_property,
-)
+from zquantum.core.interfaces.ansatz_utils import ansatz_property
 
 from .ansatz_utils import get_entangling_layer
 
