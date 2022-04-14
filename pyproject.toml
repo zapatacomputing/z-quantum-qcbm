@@ -4,7 +4,6 @@ requires = ["setuptools", "wheel",  "setuptools_scm>=6.0", "pygit2"]
 [[tool.mypy.overrides]]
 module = [
     'sympy.*',
-    'openfermion.*',
     'overrides.*',
 ]
 ignore_missing_imports = true
