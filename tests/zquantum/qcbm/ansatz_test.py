@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pytest
 from zquantum.core.circuits import RX, RZ, XX, Circuit
@@ -485,3 +486,5 @@ class TestQCBMAnsatz(AnsatzTests):
                 for ansatz, expected_ansatz in zip(ansatz_list, expected_ansatz_list)
             ]
         )
+
+        os.remove(filename)
