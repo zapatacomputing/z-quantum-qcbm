@@ -112,7 +112,9 @@ class QCBMAnsatz(Ansatz):
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
                     RX,
-                    params[parameter_index : parameter_index + self.number_of_qubits],
+                    params[
+                        parameter_index : parameter_index + self.number_of_qubits
+                    ].reshape(-1, 1),
                 )
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
@@ -121,7 +123,7 @@ class QCBMAnsatz(Ansatz):
                         parameter_index
                         + self.number_of_qubits : parameter_index
                         + 2 * self.number_of_qubits
-                    ],
+                    ].reshape(-1, 1),
                 )
                 parameter_index += 2 * self.number_of_qubits
             elif (
@@ -132,7 +134,9 @@ class QCBMAnsatz(Ansatz):
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
                     RZ,
-                    params[parameter_index : parameter_index + self.number_of_qubits],
+                    params[
+                        parameter_index : parameter_index + self.number_of_qubits
+                    ].reshape(-1, 1),
                 )
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
@@ -141,7 +145,7 @@ class QCBMAnsatz(Ansatz):
                         parameter_index
                         + self.number_of_qubits : parameter_index
                         + 2 * self.number_of_qubits
-                    ],
+                    ].reshape(-1, 1),
                 )
                 parameter_index += 2 * self.number_of_qubits
             elif (
@@ -153,7 +157,9 @@ class QCBMAnsatz(Ansatz):
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
                     RX,
-                    params[parameter_index : parameter_index + self.number_of_qubits],
+                    params[
+                        parameter_index : parameter_index + self.number_of_qubits
+                    ].reshape(-1, 1),
                 )
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
@@ -162,7 +168,7 @@ class QCBMAnsatz(Ansatz):
                         parameter_index
                         + self.number_of_qubits : parameter_index
                         + 2 * self.number_of_qubits
-                    ],
+                    ].reshape(-1, 1),
                 )
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
@@ -171,7 +177,7 @@ class QCBMAnsatz(Ansatz):
                         parameter_index
                         + 2 * self.number_of_qubits : parameter_index
                         + 3 * self.number_of_qubits
-                    ],
+                    ].reshape(-1, 1),
                 )
                 parameter_index += 3 * self.number_of_qubits
             elif (
@@ -183,7 +189,9 @@ class QCBMAnsatz(Ansatz):
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
                     RX,
-                    params[parameter_index : parameter_index + self.number_of_qubits],
+                    params[
+                        parameter_index : parameter_index + self.number_of_qubits
+                    ].reshape(-1, 1),
                 )
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
@@ -192,7 +200,7 @@ class QCBMAnsatz(Ansatz):
                         parameter_index
                         + self.number_of_qubits : parameter_index
                         + 2 * self.number_of_qubits
-                    ],
+                    ].reshape(-1, 1),
                 )
                 circuit += create_layer_of_gates(
                     self.number_of_qubits,
@@ -201,7 +209,7 @@ class QCBMAnsatz(Ansatz):
                         parameter_index
                         + 2 * self.number_of_qubits : parameter_index
                         + 3 * self.number_of_qubits
-                    ],
+                    ].reshape(-1, 1),
                 )
                 parameter_index += 3 * self.number_of_qubits
             elif layer_index % 2 == 1:
