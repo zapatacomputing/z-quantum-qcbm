@@ -1,3 +1,6 @@
+################################################################################
+# © Copyright 2020-2021 Zapata Computing Inc.
+################################################################################
 import warnings
 from numbers import Number
 from typing import Callable
