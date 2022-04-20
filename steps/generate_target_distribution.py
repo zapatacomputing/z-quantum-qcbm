@@ -1,3 +1,6 @@
+################################################################################
+# © Copyright 2020-2022 Zapata Computing Inc.
+################################################################################
 import numpy as np
 from zquantum.core.distribution import (
     save_measurement_outcome_distribution,

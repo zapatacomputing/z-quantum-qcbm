@@ -1,3 +1,6 @@
+################################################################################
+# © Copyright 2020-2021 Zapata Computing Inc.
+################################################################################
 import json
 
 from zquantum.core.distribution import load_measurement_outcome_distribution
