@@ -12,7 +12,3 @@ github_actions:
 
 build-system-deps:
 	$(PYTHON) -m pip install setuptools wheel "setuptools_scm>=6.0"
-
-
-build-system-deps:
-	$(PYTHON) -m pip install setuptools wheel "setuptools_scm>=6.0"
