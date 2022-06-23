@@ -34,7 +34,6 @@ setuptools.setup(
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    setup_requires=["setuptools_scm~=6.0"],
     install_requires=["z-quantum-core"],
     extras_require=extras,
     zip_safe=False,
