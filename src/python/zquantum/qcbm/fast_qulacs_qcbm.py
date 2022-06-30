@@ -8,10 +8,14 @@ class QCBM:
     _allowed_single_qubit_gates = ["RX", "RZ"]
     _allowed_two_qubit_gates = ["XX"]
 
-    def __init__(self, n_qubits: int, n_layers: int, topology: str = "all"):
-        assert topology == "all", "For the moment I only support all topology"
+    def __init__(self, n_layers: int, n_qubits: int, topology: str = "all"):
+        assert topology in [
+            "all",
+            "line",
+        ], "For the moment I only support 'all' and 'line' topology"
         self._n_qubits = n_qubits
         self._n_layers = n_layers
+        self._topology = topology
         self.circuit = self._init_circuit()
         self.n_params = self.circuit.get_parameter_count()
         self.state = QuantumState(n_qubits)
@@ -34,8 +38,16 @@ class QCBM:
             )
         }[gate]
         angle = random.random()
-        for pair in combinations(list(range(0, self._n_qubits)), 2):
+        for pair in self._iterator_given_topology():
             add_gate(pair, angle)
+
+    def _iterator_given_topology(self):
+        if self._topology == "all":
+            return combinations(list(range(0, self._n_qubits)), 2)
+        elif self._topology == "line":
+            return [(i, i + 1) for i in range(self._n_qubits - 1)]
+        else:
+            raise ValueError(f"Topology '{self._topology}' not supported.")
 
     def _init_circuit(self):
         circuit = ParametricQuantumCircuit(self._n_qubits)
